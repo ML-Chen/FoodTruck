@@ -52,6 +52,18 @@ pip install -r dev-requirements.txt
 npm install
 ```
 
+### Create a superuser
+
+In the backend folder, run
+
+```sh
+python manage.py createsuperuser
+```
+
+Enter the email and password you want to use for your superuser. In the development environment, your database is just a local `backend/db.sqlite3` file which is in `.gitignore`, so your changes to the database data won't sync over anywhere.
+
+Then you can access the admin page at `127.0.0.1:8000/admin`, and log in with those credentials.
+
 ### Run the project
 
 In one terminal, run:
