@@ -4,21 +4,67 @@
 
 ## Getting started
 
-Python 3.7 or 3.8 is recommended.
+Install [Python 3.7 or 3.8](https://www.python.org/downloads/), and [Node.js](https://nodejs.org/en/).
 
-On Linux, install [virtualenvwrapper](https://virtualenvwrapper.readthedocs.io/en/latest/) and then run `mkvirtualenv {{project_name}}`.
+### Set up virtual environment
 
-On Windows, install virtualenv with `pip install virtualenv`, and then `virtualenv env`, and then in PowerShell, `.\env\Scripts\activate` in this folder.
+This should be a one-time task.
 
-On Linux or Mac, run `make compile_install_requirements`. On Windows, run
+```bash
+pip install virtualenv
+virtualenv env
+```
+
+### Activate virtual environment
+
+Unix (Linux, Mac, or Windows Subsystem on Linux):
+
+```bash
+source env/bin/activate
+export PIP_REQUIRE_VIRTUALENV=true
+```
+
+Git Bash on Windows:
+
+```bash
+source env/Scripts/activate
+export PIP_REQUIRE_VIRTUALENV=true
+```
+
+Powershell:
 
 ```powershell
+.\env\Scripts\activate
 SET PIP_REQUIRE_VIRTUALENV=true
-pip install pip-tools
-pip-compile requirements.in > requirements.txt
-pip-compile dev-requirements.in > dev-requirements.txt
+```
+
+### Install dependencies
+
+```sh
 pip install -r requirements.txt
 pip install -r dev-requirements.txt
+npm install
+```
+
+### Run the project
+
+In one terminal, run:
+```
+npm run start
+```
+
+In another, activate the virtual environment and run:
+
+```
+python manage.py runserver
+```
+
+## Helpful commands
+
+```bash
+# In /backend
+python manage.py makemigrations
+python manage.py migrate
 ```
 
 # Django React Boilerplate
@@ -62,6 +108,19 @@ In the next steps, always remember to replace theprojectname with your project's
 - [ ] Add an email address to the `ADMINS` settings variable in `FoodTruck/backend/FoodTruck/settings/base.py`
 - [ ] Change the `SERVER_EMAIL` to the email address used to send e-mails in `FoodTruck/backend/FoodTruck/settings/production.py`
 - [ ] Rename the folder `circleci` to `.circleci` with the command `mv circleci .circleci`
+
+On Windows, install virtualenv with `pip install virtualenv`, and then `virtualenv env`, and then in PowerShell, `.\env\Scripts\activate` in this folder.
+
+On Windows, instead of `make compile_install_requirements`, run
+
+```powershell
+SET PIP_REQUIRE_VIRTUALENV=true
+pip install pip-tools
+pip-compile requirements.in
+pip-compile dev-requirements.in
+pip install -r requirements.txt
+pip install -r dev-requirements.txt
+```
 
 After completing ALL of the above, remove this `Project bootstrap` section from the project README. Then follow `Running` below.
 
