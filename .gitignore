@@ -1,4 +1,5 @@
 *.pyc
+/backend
 /backend/db.sqlite3
 .DS_Store
 .env
