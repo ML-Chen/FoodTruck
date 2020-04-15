@@ -71,7 +71,7 @@ In one terminal, run:
 npm run start
 ```
 
-In another, activate the virtual environment and run:
+In another, activate the virtual environment, and in the /backend folder, run:
 
 ```
 python manage.py runserver
