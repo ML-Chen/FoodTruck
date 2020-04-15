@@ -11,6 +11,7 @@ from math import ceil
 import asyncio
 import mysql.connector
 from mysql.connector import Error
+import re
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
@@ -26,16 +27,18 @@ try:
 except mysql.connector.Error as error:
     print('Failed to connect to database: ' + error)
 
-def db_wrapper(proc_name: str, methods: List[str], args: List[Tuple[str, Dict[str, Any]]]) -> function:
+def db_wrapper(proc_name: str, methods: List[str], args: List[Tuple[str, Dict[str, Any]]], results_table: str = None) -> function:
     """
     Parameters:
         proc_name
         methods: HTTP methods, such as ['GET'] (if the operation is just fetching data and doesn't modify the database), or ['POST']
         args: e.g., [('username', {'type': str, 'required': True})]. These arguments should be in the same order as the SQL stored procedure, but can be called anything you like.
+        results_table: name of the temporary table that results are stored in. If defined, we'll run another query to retrieve these results.
     """
     @app.route('/' + proc_name, methods=methods)
     def new_api() -> Response:
         nonlocal args
+        nonlocal results_table
 
         parser = reqparse.RequestParser()
         for r in args:
@@ -43,7 +46,9 @@ def db_wrapper(proc_name: str, methods: List[str], args: List[Tuple[str, Dict[st
         args = parser.parse_args()
 
         try:
-            cursor.callproc(proc_name, [args.values()])
+            cursor.callproc(proc_name, args.values())
+            if results_table:
+                cursor.execute("SELECT * FROM %s", (results_table,))
             result = [r.fetchall() for r in cursor.stored_results()]
             return jsonify(*result)
         except ValueError as e:
