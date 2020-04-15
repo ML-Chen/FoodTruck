@@ -33,8 +33,6 @@ def db_wrapper(proc_name: str, methods: List[str], args: List[Tuple[str, Dict[st
         methods: HTTP methods, such as ['GET'] (if the operation is just fetching data and doesn't modify the database), or ['POST']
         args: e.g., [('username', {'type': str, 'required': True})]. These arguments should be in the same order as the SQL stored procedure, but can be called anything you like.
     """
-
-
     @app.route('/' + proc_name, methods=methods)
     def new_api() -> Response:
         nonlocal args
@@ -62,112 +60,29 @@ def db_wrapper(proc_name: str, methods: List[str], args: List[Tuple[str, Dict[st
 
     return new_api
 
-@app.route('/login', methods=['POST'])
-def login() -> Response:
-    parser = reqparse.RequestParser()
-    parser.add_argument('username', type=str, required=True)
-    parser.add_argument('password', type=str, required=True)
-    args = parser.parse_args()
-
-    try:
-        cursor.callproc('login', [args['username'], args['password']])
-        result = [r.fetchall() for r in cursor.stored_results()]
-        return jsonify(*result)
-    except ValueError as e:
-        message = 'Incorrect parameter types'
-        print(message + ' ' + e)
-        return {'error': message}, 405
-    except mysql.connector.Error as error:
-        print('Failed to register: ' + error)
-        return {'error': error}, 405
-    except Exception as e:
-        message = 'Unknown error: ' + e
-        print(message)
-        return {'error': e}, 400
-
-@app.route('/register', methods=['POST'])
-def register() -> Response:
-    parser = reqparse.RequestParser()
-    parser.add_argument('username', type=str, required=True)
-    parser.add_argument('email', type=str, required=True)
-    parser.add_argument('first_name', type=str, required=True)
-    parser.add_argument('last_name', type=str, required=True)
-    parser.add_argument('password', type=str, required=True)
-    parser.add_argument('balance', type=float, required=True)
-    parser.add_argument('i_type', type=str, required=True, choices=('Admin', 'Manager', 'Staff'))
-    args = parser.parse_args()
-
-    try:
-        username: str = args['username']
-        email: str = args['email']
-        first_name: str = args['first_name']
-        last_name: str = args['last_name']
-        password: str = args['password']
-        balance: float = args['balance']
-        i_type: float = args['i_type']
-        cursor.callproc('register', [username, email, first_name, last_name, password, balance, i_type])
-        result = [r.fetchall() for r in cursor.stored_results()]
-        return jsonify(*result)
-    except ValueError as e:
-        message = 'Incorrect parameter types'
-        print(message + ' ' + e)
-        return {'error': message}, 405
-    except mysql.connector.Error as error:
-        print('Failed to register: ' + error)
-        return {'error': error}, 405
-    except Exception as e:
-        message = 'Unknown error: ' + e
-        print(message)
-        return {'error': e}, 400
-
-@app.route('/ad_filter_building_station', methods=['GET'])
-def ad_filter_building_station() -> Response:
-    parser = reqparse.RequestParser()
-    parser.add_argument('building_name', type=str, required=True)
-    parser.add_argument('building_tag', type=str, required=True)
-    parser.add_argument('station_name', type=str, required=True)
-    parser.add_argument('min_capacity', type=int, required=True)
-    parser.add_argument('max_capacity', type=int, required=True)
-    args = parser.parse_args()
-
-    try:
-        cursor.callproc('ad_filter_building_station', [args['building_name'], args['building_tag'], args['station_name'], args['min_capacity'], args['max_capacity']])
-        result = [r.fetchall() for r in cursor.stored_results()]
-        return jsonify(*result)
-    except ValueError as e:
-        message = 'Incorrect parameter types'
-        print(message + ' ' + e)
-        return {'error': message}, 405
-    except mysql.connector.Error as error:
-        print('Failed to register: ' + error)
-        return {'error': error}, 405
-    except Exception as e:
-        message = 'Unknown error: ' + e
-        print(message)
-        return {'error': e}, 400
-
-@app.route('/ad_delete_building', methods=['POST'])
-def ad_delete_building() -> Response:
-    parser = reqparse.RequestParser()
-    parser.add_argument('building_name', type=str, required=True)
-    args = parser.parse_args()
-
-    try:
-        cursor.callproc('ad_delete_building', [args['building_name']])
-        result = [r.fetchall() for r in cursor.stored_results()]
-        return jsonify(*result)
-    except ValueError as e:
-        message = 'Incorrect parameter types'
-        print(message + ' ' + e)
-        return {'error': message}, 405
-    except mysql.connector.Error as error:
-        print('Failed to register: ' + error)
-        return {'error': error}, 405
-    except Exception as e:
-        message = 'Unknown error: ' + e
-        print(message)
-        return {'error': e}, 400
-
+login = db_wrapper('login', ['POST'], [
+    ('username', {'type': str, 'required': True}),
+    ('password', {'type': str, 'required': True}),
+])
+register = db_wrapper('register', ['POST'], [
+    ('username', {'type': str, 'required': True}),
+    ('email', {'type': str, 'required': True}),
+    ('first_name', {'type': str, 'required': True}),
+    ('last_name', {'type': str, 'required': True}),
+    ('password', {'type': str, 'required': True}),
+    ('balance', {'type': float}),
+    ('i_type', {'type': float, 'required': True, 'choices': ('Admin', 'Manager', 'Staff')}),
+])
+ad_delete_building = db_wrapper('ad_filter_building_station', ['GET'], [
+    ('building_name', {'type': str, 'required': True}),
+    ('building_tag', {'type': str, 'required': True}),
+    ('station_name', {'type': str, 'required': True}),
+    ('min_capacity', {'type': str, 'required': True}),
+    ('max_capacity', {'type': str, 'required': True}),
+])
+ad_delete_building = db_wrapper('ad_delete_building', ['POST'], [
+    ('building_name', {'type': str, 'required': True})
+])
 ad_add_building_tag = db_wrapper('ad_add_building_tag', ['POST'], [
     ('building_name', {'type': str, 'required': True}),
     ('tag', {'type': str, 'required': True})
@@ -180,6 +95,7 @@ ad_remove_building_tag = db_wrapper('ad_remove_building_tag', ['POST'], [
     ('building_name', {'type': str, 'required': True}),
     ('tag', {'type': str, 'required': True})
 ])
+# etc.
 
 def close_connection() -> None:
     connection.close()
