@@ -36,6 +36,7 @@ npm-debug.log
 # General
 /FoodTruck-venv/
 /venv/
+/server/venv
 /env/
 /output/
 /cache/

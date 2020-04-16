@@ -56,3 +56,7 @@ Start the server:
 ```
 flask run
 ```
+
+## Tips
+
+To test the backend, you can use the application Postman.
