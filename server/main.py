@@ -6,7 +6,6 @@ import os
 import random
 import requests
 from typing import Dict, Tuple, Optional, Any, List, Callable, NamedTuple
-from typing_extensions import Literal
 import asyncio
 import mysql.connector
 from mysql.connector import Error
