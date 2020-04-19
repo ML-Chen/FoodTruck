@@ -133,20 +133,20 @@
         </tr>
     </thead>
     <tbody>
-            {#if buildings}
-                {#each buildings as building}
-                    <td>
-                        <label>
-                            <input type="radio" bind:group={selectedBuilding} value={{ buildingName: building.buildingName, stationName: building.stationName }}/>
-                        </label>
-                        {building.buildingName}
-                    </td>
-                    <td>{building.tags}</td>
-                    <td>{building.stationName}</td>
-                    <td>{building.capacity}</td>
-                    <td>{building.foodTruckNames}</td>
-                {/each}
-            {/if}
+        {#if buildings}
+            {#each buildings as building}
+                <td>
+                    <label>
+                        <input type="radio" bind:group={selectedBuilding} value={{ buildingName: building.buildingName, stationName: building.stationName }}/>
+                    </label>
+                    {building.buildingName}
+                </td>
+                <td>{building.tags}</td>
+                <td>{building.stationName}</td>
+                <td>{building.capacity}</td>
+                <td>{building.foodTruckNames}</td>
+            {/each}
+        {/if}
     </tbody>
 </table>
 {#if errorMsg2}
