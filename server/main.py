@@ -135,14 +135,14 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
     return new_api
 
 # Query #1: login [Screen #1: Login]
-# Response: {username: str, userType: str}
+# Response: {username: str, userType: str} or [] if no user found
 login = db_api('login', ['POST'], [
     ('username', {'type': str, 'required': True}),
     ('password', {'type': str, 'required': True}),
 ], get_result=True)
 
 # Query #2: register [Screen #2 Register]
-# Response: {}
+# Response: []
 register = db_api('register', ['POST'], [
     ('username', {'type': str, 'required': True}),
     ('email', {'type': str, 'required': True}),
@@ -163,36 +163,36 @@ ad_filter_building_station = db_api('ad_filter_building_station', ['GET'], [
     ('stationName', {'type': str, 'required': True}),
     ('minCapacity', {'type': str, 'required': True}),
     ('maxCapacity', {'type': str, 'required': True}),
-], True)
+], get_result=True)
 
 # Query #4: ad_delete_building [Screen #4 Admin Manage Building & Station]
-# Response: {}
+# Response: []
 ad_delete_building = db_api('ad_delete_building', ['POST'], [
     ('buildingName', {'type': str, 'required': True})
 ])
 
 # Query #5: ad_delete_station [Screen #4 Admin Manage Building & Station]
-# Response: {}
+# Response: []
 ad_delete_station = db_api('ad_delete_station', ['POST'], [
     ('stationName', {'type': str, 'required': True})
 ])
 
 # Query #6a: ad_add_building_tag [Screen #5 Admin Add Building Tag]
-# Response: {}
+# Response: []
 ad_add_building_tag = db_api('ad_add_building_tag', ['POST'], [
     ('buildingName', {'type': str, 'required': True}),
     ('tag', {'type': str, 'required': True})
 ])
 
 # Query #6b: ad_remove_building_tag [Screen #5 Admin Remove Building Tag]
-# Response: {}
+# Response: []
 ad_remove_building_tag = db_api('ad_remove_building_tag', ['POST'], [
     ('buildingName', {'type': str, 'required': True}),
     ('tag', {'type': str, 'required': True})
 ])
 
 # Query #7: ad_create_building [Screen #5 Admin Create Building]
-# Response: 
+# Response: []
 ad_create_building = db_api('ad_create_building', ['POST'], [
     ('buildingName', {'type': str, 'required': True}),
     ('description', {'type':str, 'required': True})
@@ -202,16 +202,16 @@ ad_create_building = db_api('ad_create_building', ['POST'], [
 # Response: 
 ad_view_building_general = db_api('ad_view_building_general', ['GET'], [
     ('buildingName', {'type': str, 'required': True})
-])
+], get_result=True)
 
 # Query #8b: ad_view_building_tags [Screen #6 Admin Update Building]
 # Response: 
 ad_view_building_tags  = db_api('ad_view_building_tags', ['GET'], [
     ('buildingName', {'type': str, 'required': True})
-])
+], get_result=True)
 
 # Query #9: ad_update_building [Screen #6 Admin Update Building]
-# Response:
+# Response: []
 ad_update_building = db_api('ad_update_building', ['POST'], [
     ('oldBuildingName', {'type': str, 'required': True}),
     ('newBuildingname', {'type': str, 'required': True}),
