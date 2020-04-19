@@ -17,7 +17,7 @@
     <a href={$url('../customer/explore')}>Explore</a>
     <a href={$url('../customer/order-history')}>View order history</a>
     <a href={$url('../customer/order')}>Place and order</a>
-    <a href={$url('../customer/info')}>View current location and balance</a>
+    <a href={$url('../customer/current-info')}>View current location and balance</a>
 {/if}
 {#if $userType.includes('Manager')}
     <a href={$url('../manager/manage-food-truck')}>Manage food truck</a>
