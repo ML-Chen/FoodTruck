@@ -1,12 +1,15 @@
 # routify-starter
 
-Starter template for [Routify](https://github.com/sveltech/routify)
+Relevant documentation for the frameworks: [Routify](https://routify.dev/), [Svelte](https://www.freecodecamp.org/news/the-svelte-handbook/)
 
-### Get started
+Run
 
-To use this starter run `npx @sveltech/routify init` in an empty folder.
+```
+npm install
+npm run dev
+```
 
-Alternatively, you can clone this repo.
+If it says "Your app should probably have loaded by now", try temporarily making sure that no other servers are running.
 
 ### Npm scripts
 

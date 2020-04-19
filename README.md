@@ -55,12 +55,12 @@ See `main.py` for the database name and password that the Flask server expects.
 
 ### Start the server
 
-Start the server:
+Start the server on port 4000:
 
 ```
-flask run
+flask run -p 4000
 ```
 
 ## Tips
 
-To test the backend, you can use the application Postman.
+To test the backend, you can use the application [Postman](https://www.postman.com/).
