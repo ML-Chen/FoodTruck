@@ -190,7 +190,35 @@ ad_remove_building_tag = db_api('ad_remove_building_tag', ['POST'], [
     ('buildingName', {'type': str, 'required': True}),
     ('tag', {'type': str, 'required': True})
 ])
-# query #7 etc.
+
+# Query #7: ad_create_building [Screen #5 Admin Create Building]
+# Response: 
+ad_create_building = db_api('ad_create_building', ['POST'], [
+    ('buildingName', {'type': str, 'required': True}),
+    ('description', {'type':str, 'required': True})
+])
+
+# Query #8a: ad_view_building_general [Screen #6 Admin Update Building]
+# Response: 
+ad_view_building_general = db_api('ad_view_building_general', ['GET'], [
+    ('buildingName', {'type': str, 'required': True})
+])
+
+# Query #8b: ad_view_building_tags [Screen #6 Admin Update Building]
+# Response: 
+ad_view_building_tags  = db_api('ad_view_building_tags', ['GET'], [
+    ('buildingName', {'type': str, 'required': True})
+])
+
+# Query #9: ad_update_building [Screen #6 Admin Update Building]
+# Response:
+ad_update_building = db_api('ad_update_building', ['POST'], [
+    ('oldBuildingName', {'type': str, 'required': True}),
+    ('newBuildingname', {'type': str, 'required': True}),
+    ('description', {'type':str, 'required': True})
+])
+
+# Query #10: ad_get_available_building [Screen #7 Admin Create Station]
 
 # Query #22b: mn_update_foodTruck_staff [Screen #13 Manager Update Food Truck]
 # Response: {}
