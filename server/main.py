@@ -37,7 +37,7 @@ class Auth(NamedTuple):
 tokens: Dict[str, Auth] = {}
 
 def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict[str, Any]]], get_result: bool = False,
-           restrict_by_username: bool = False, restrict_by_food_truck: bool = False) -> Callable[[None], Response]:
+           get_one_result: bool = False, restrict_by_username: bool = False, restrict_by_food_truck: bool = False) -> Callable[[None], Response]:
     """
     Parameters:
     - procedure: name of the MySQL stored procedure which we will call.
@@ -50,6 +50,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         - See reqparse (https://flask-restful.readthedocs.io/en/latest/reqparse.html) for documentation on other keys we can have in the dictionary, besides 'type', 'required', 'default', etc.
         - When contacting the API, the client can pass these parameters in as query parameters or form body parameters.
     - get_result: whether the procedure creates a table named `procedure + '_result'` (e.g., 'login_result'). If so, we'll make another SELECT query to get that table, after we call the procedure. Then, the response of the API endpoint is the result. Otherwise, the response an empty JSON object {}.
+    - get_one_result: is the database query expected to return one result or a list of results?
     - restrict_by_username: restrict access to this API endpoint to people whose token corresponds to a user with a 'username', 'customer_username', or 'manager_username' field in inputs.
     - restrict_by_food_truck: restrict access to this API endpoint to people whose token corresponds to a user with a username 'manager_username' in inputs that manages the food truck with the 'food_truck_name' in inputs.
 
@@ -107,7 +108,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 # The next two lines are from https://stackoverflow.com/a/17534004/5139284 by juandesant, CC-BY-SA 4.0
                 fields = map(lambda x: x[0], cursor.description)
                 result = [dict(zip(fields, row)) for row in cursor.fetchall()]
-                if len(result) == 1:
+                if len(result) == 1 and get_one_result:
                     result = result[0]
                 if procedure == 'login' and result:
                     # TODO: don't generate a new token if the user already exists (honestly not very important though)
@@ -138,7 +139,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
 login = db_api('login', ['POST'], [
     ('username', {'type': str, 'required': True}),
     ('password', {'type': str, 'required': True}),
-], get_result=True)
+], get_result=True, get_one_result=True)
 
 # Query #2: register [Screen #2 Register]
 # Response: []
@@ -155,13 +156,13 @@ register = db_api('register', ['POST'], [
 # Query #3: ad_filter_building_station [Screen #4 Admin Manage Building & Station]
 # As mentioned above in the definition of `db_api`, endpoints beginning with 'ad_' will be restricted to admins.
 # The request will need an additional 'token' field which belongs to an admin that has logged in.
-# Response: {buildingName: str, tags: str, stationName: str, capacity: int, foodTruckNames: str}
+# Response: [{buildingName: str, tags: str, stationName: str, capacity: int, foodTruckNames: str}]
 ad_filter_building_station = db_api('ad_filter_building_station', ['GET'], [
-    ('buildingName', {'type': str, 'required': True}),
-    ('buildingTag', {'type': str, 'required': True}),
-    ('stationName', {'type': str, 'required': True}),
-    ('minCapacity', {'type': str, 'required': True}),
-    ('maxCapacity', {'type': str, 'required': True}),
+    ('buildingName', {'type': str}),
+    ('buildingTag', {'type': str}),
+    ('stationName', {'type': str}),
+    ('minCapacity', {'type': str}),
+    ('maxCapacity', {'type': str}),
 ], get_result=True)
 
 # Query #4: ad_delete_building [Screen #4 Admin Manage Building & Station]
