@@ -219,6 +219,119 @@ ad_update_building = db_api('ad_update_building', ['POST'], [
 ])
 
 # Query #10: ad_get_available_building [Screen #7 Admin Create Station]
+# Response: 
+ad_get_available_building = db_api('ad_get_available_building', ['GET'], [
+    ('buildingName', {'type': str, 'required': True})
+], get_one_result=True)
+
+# Query #11: ad_create_station [Screen #7 Admin Create Station]
+# Response: 
+ad_create_station = db_api('ad_create_station', ['POST'], [
+    ('stationName', {'type': str, 'required': True}),
+    ('buildingname', {'type': str, 'required': True}),
+    ('capacity', {'type':int, 'required': True})
+])
+
+# Query #12: ad_view_station [Screen #8 Admin Update Station]
+# Rresponse:
+ad_view_station = db_api('ad_view_station', ['GET'], [
+    ('stationName', {'type': str, 'required': True})
+], get_result=True)
+
+# Query #13: ad_update_station [Screen #8 Admin Update Station]
+# Response:
+ad_update_station = db_api('ad_update_station', ['POST'], [
+    ('stationName', {'type': str, 'required': True}),
+    ('capacity', {'type':int, 'required': True}),
+    ('buildingname', {'type': str, 'required': True})
+])
+
+# Query #14: ad_filter_food [Screen #9 Admin Manage Food]
+# Response: 
+ad_filter_food = db_api('ad_filter_food', ['GET'], [
+    ('foodName', {'type': str, 'required': True}),
+    ('sortedBy', {'type': float, 'required': True, 'choices': ('name', 'menuCount', 'purchaseCount')}),
+    ('sortDirection', {'type': float, 'required':True, 'choices': ('ASC', 'DESC')})
+], get_result=True)
+
+# Query #15: ad_delete_food [Screen #9 Admin Manage Food]
+# Response:
+ad_delete_food = db_api('ad_delete_food', ['POST'], [
+    ('foodName', {'type': str, 'required': True})
+])
+
+# Query #16: ad_create_food [Screen #10 Admin Create Food]
+# Response:
+ad_create_food = db_api(' ad_create_food', ['POST'], [
+    ('foodName', {'type': str, 'required': True})
+])
+
+# Query #17: mn_filter_foodTruck [Screen #11 Manager Manage Food Truck]
+# Response: 
+mn_filter_foodTruck = db_api('mn_filter_foodTruck', ['GET'], [
+    ('managerUsername', {'type': str, 'required': True}),
+    ('foodTruckName', {'type': str, 'required': True}),
+    ('stationName', {'type': str, 'required': True}),
+    ('minStaffCount', {'type': int, 'required': True}),
+    ('maxStaffCount', {'type': int, 'required': True}),
+    ('hasRemainingCapacity', {'type': bool, 'required': True})
+], get_result=True, restrict_by_username=True)
+# no need to do restrict_by_food_truck=True because the query already does a join with the manager's username
+
+# Query #18: mn_delete_foodTruck [Screen #11 Manager Manage Food Truck]
+# Response :
+ mn_delete_foodTruck = db_api('mn_delete_foodTruck', ['POST'], [
+    ('foodTruckName', {'type': str, 'required': True})
+ ], restrict_by_food_truck=True)
+
+# Query #19a: mn_create_foodTruck_add_station [Screen #12 Manager Create Food Truck]
+# Response:
+mn_create_foodTruck_add_station = db_api('mn_create_foodTruck_add_station', ['POST'], [
+    ('foodTruckName', {'type': str, 'required': True}),
+    ('stationName', {'type': str, 'required': True}),
+    ('managerUsername', {'type': str, 'required': True})
+], restrict_by_food_truck=True, restrict_by_username=True)
+
+# Query #19b: mn_create_foodTruck_add_staff [Screen #12 Manager Create Food Truck]
+# Response:
+mn_create_foodTruck_add_staff = db_api('mn_create_foodTruck_add_staff', ['POST'], [
+    ('foodTruckName', {'type': str, 'required': True}),
+    ('staffName', {'type': str, 'required': True})
+], restrict_by_food_truck=True)
+
+# Query #19c: mn_create_foodTruck_add_MenuItem [Screen #12 Manager Create Food Truck]
+# Response:
+mn_create_foodTruck_add_MenuItem = db_api('mn_create_foodTruck_add_MenuItem', ['POST'], [
+    ('foodTruckName', {'type': str, 'required': True}),
+    ('price', {'type': float, 'required': True}),
+    ('foodName', {'type': str, 'required': True})
+], restrict_by_food_truck=True)
+
+# Query #20a: mn_view_foodTruck_available_staff [Screen #13 Manager Update Food Truck]
+# Response:
+mn_view_foodTruck_available_staff = db_api('mn_view_foodTruck_available_staff', ['GET'], [
+    ('managerUsername', {'type': str, 'required': True}),
+    ('foodTruckName', {'type': str, 'required': True})
+], get_result=True, restrict_by_food_truck=True, restrict_by_username=True)
+
+# Query #20b: mn_view_foodTruck_staff [Screen #13 Manager Update Food Truck]
+# Response: 
+mn_view_foodTruck_staff = db_api('mn_view_foodTruck_staff', ['GET'], [
+    ('foodTruckName', {'type': str, 'required': True})
+ ], get_result=True, restrict_by_food_truck=True)
+
+# Query #21: mn_view_foodTruck_menu [Screen #13 Manager Update Food Truck]
+# Response:
+mn_view_foodTruck_menu = db_api('mn_view_foodTruck_menu', ['GET'], [
+    ('foodTruckName', {'type': str, 'required': True})
+ ], get_result=True, restrict_by_food_truck=True)
+
+# Query #22a: mn_update_foodTruck_station [Screen #13 Manager Update Food Truck]
+# Response:
+mn_update_foodTruck_station = (' mn_update_foodTruck_station', ['POST'], [
+    ('foodTruckName', {'type': str, 'required': True}),
+    ('stationName', {'type': str, 'required': True})
+], restrict_by_food_truck=True)
 
 # Query #22b: mn_update_foodTruck_staff [Screen #13 Manager Update Food Truck]
 # Response: {}
