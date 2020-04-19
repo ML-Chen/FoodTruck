@@ -125,7 +125,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
             print(message + ' ' + repr(e))
             return {'error': message}, 405
         except mysql.connector.Error as e:
-            print('Failed to register: ' + repr(e))
+            print(repr(e))
             return {'error': repr(e)}, 405
         except Exception as e:
             message = 'Unknown error: ' + repr(e)

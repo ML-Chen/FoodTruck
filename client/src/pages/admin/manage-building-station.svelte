@@ -19,33 +19,65 @@
     let minCapacity;
     let maxCapacity;
     let errorMsg;
+    let errorMsg2;
+    /** @type {{ buildingName: string, stationName: string }} */
     let selectedBuilding; // name of the selected building in the table
 
-    onMount(async () => {
-        try {
-            const response = await fetch(`http://localhost:4000/ad_filter_building_station?token=${$token}`, { method: 'GET' });
-            /** @type {[{buildingName: string, tags: string, stationName: string, capacity: int, foodTruckNames: string}]} */
-            buildings = await response.json();
-            buildings = buildings.filter(building => Object.keys(building).length !== 0)
-        } catch (error) {
-            console.log(error);
-            errorMsg = 'Network error. Maybe the server is down?';
-        }
-    });
+    onMount(fetchBuildings);
 
-    export async function handleFilter() {
+    async function fetchBuildings() {
         try {
-            const json = (await axios.get(`http://localhost:4000/ad_filter_building_station`, {
+            const json = (await axios.get('http://localhost:4000/ad_filter_building_station', {
                 params: { buildingName, stationName, buildingTag, minCapacity, maxCapacity, errorMsg, selectedBuilding, token: $token }
             })).data;
             if (json.error) {
                 errorMsg = json.error
             } else {
+                /** @type {[{buildingName: string, tags: string, stationName: string, capacity: int, foodTruckNames: string}]} */
                 buildings = json.filter(building => Object.keys(building).length !== 0);
             }
+            errorMsg = null;
+            errorMsg2 = null;
         } catch (error) {
             console.log(error);
             errorMsg = 'Network error. Maybe the server is down?';
+        }
+    }
+
+    async function deleteBuilding() {
+        console.log(selectedBuilding)
+        try {
+            const response = await axios.post('http://localhost:4000/ad_delete_building', {
+                buildingName: selectedBuilding.buildingName, token: $token
+            });
+            await fetchBuildings();
+            errorMsg = null;
+            errorMsg2 = null;
+        } catch (error) {
+            console.log(error);
+            if (error.response.data.error.includes('IntegrityError')) {
+                errorMsg2 = "Can't delete building because something depends on it"
+            } else {
+                errorMsg2 = 'Network error. Maybe the server is down?';
+            }
+        }
+    }
+
+    async function deleteStation() {
+        try {
+            const response = await axios.post('http://localhost:4000/ad_delete_station', {
+                stationName: selectedBuilding.stationName, token: $token
+            });
+            await fetchBuildings();
+            errorMsg = null;
+            errorMsg2 = null;
+        } catch (error) {
+            console.log(error);
+            if (error.response.data.error.includes('IntegrityError')) {
+                errorMsg2 = "Can't delete station because something depends on it"
+            } else {
+                errorMsg2 = 'Network error. Maybe the server is down?';
+            }
         }
     }
 </script>
@@ -57,7 +89,7 @@
 
 <h1>Manage Building & Station</h1>
 
-<form on:submit|preventDefault={handleFilter}>
+<form on:submit|preventDefault={fetchBuildings}>
     <label for="username">Building name:</label>
     <select id="building-name" name="station-name" bind:value={buildingName}>
         {#if buildings}
@@ -104,7 +136,9 @@
             {#if buildings}
                 {#each buildings as building}
                     <td>
-                        <label><input type="radio" bind:group={buildingName} value={building.buildingName}/></label>
+                        <label>
+                            <input type="radio" bind:group={selectedBuilding} value={{ buildingName: building.buildingName, stationName: building.stationName }}/>
+                        </label>
                         {building.buildingName}
                     </td>
                     <td>{building.tags}</td>
@@ -115,17 +149,19 @@
             {/if}
     </tbody>
 </table>
+{#if errorMsg2}
+    <p class="error">{errorMsg2}</p>
+{/if}
 
 <a href={$url('../../home')}>Back</a>
 
-<!-- TODO -->
-<button>Create building</button>
-<button>Update building</button>
-<button>Delete building</button>
+<a href={$url('../create-building')}>Create building</a>
+<a href={$url('../update-building')} scoped={{selectedBuilding}}>Update building</a>
+<button on:click={deleteBuilding}>Delete building</button>
 
-<button>Create station</button>
-<button>Update station</button>
-<button>Delete station</button>
+<a href={$url('../create-station')}>Create station</a>
+<a href={$url('../update-station')} scoped={{selectedBuilding}}>Update station</a>
+<button on:click={deleteStation}>Delete station</button>
 
 <style>
     .error {
