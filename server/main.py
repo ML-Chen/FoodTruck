@@ -250,9 +250,9 @@ ad_update_station = db_api('ad_update_station', ['POST'], [
 # Query #14: ad_filter_food [Screen #9 Admin Manage Food]
 # Response: 
 ad_filter_food = db_api('ad_filter_food', ['GET'], [
-    ('foodName', {'type': str, 'required': True}),
+    ('foodName', {'type': str}),
     ('sortedBy', {'type': float, 'required': True, 'choices': ('name', 'menuCount', 'purchaseCount')}),
-    ('sortDirection', {'type': float, 'required':True, 'choices': ('ASC', 'DESC')})
+    ('sortDirection', {'type': float, 'default': 'ASC', 'choices': ('ASC', 'DESC')})
 ], get_result=2)
 
 # Query #15: ad_delete_food [Screen #9 Admin Manage Food]
@@ -270,11 +270,11 @@ ad_create_food = db_api(' ad_create_food', ['POST'], [
 # Query #17: mn_filter_foodTruck [Screen #11 Manager Manage Food Truck]
 # Response: 
 mn_filter_foodTruck = db_api('mn_filter_foodTruck', ['GET'], [
-    ('managerUsername', {'type': str}),
+    ('managerUsername', {'type': str, 'required': True}),
     ('foodTruckName', {'type': str}),
-    ('stationName', {'type': str, 'required': True}),
-    ('minStaffCount', {'type': int, 'required': True}),
-    ('maxStaffCount', {'type': int, 'required': True}),
+    ('stationName', {'type': str}),
+    ('minStaffCount', {'type': int}),
+    ('maxStaffCount', {'type': int}),
     ('hasRemainingCapacity', {'type': bool, 'required': True})
 ], get_result=2, restrict_by_username=True, restrict_by_food_truck=True)
 
@@ -357,13 +357,13 @@ mn_get_station = db_api('mn_get_station', ['GET'], [
 # Query #24: mn_filter_summary [Screen #14 Manager Food Truck Summary]
 # Response:
 mn_filter_summary = db_api('mn_filter_summary', ['GET'], [
-    ('managerUsername', {'type': str}),
+    ('managerUsername', {'type': str, 'required': True}),
     ('foodTruckName', {'type': str}),
     ('stationName', {'type': str}),
     ('minDate', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date()}),
     ('maxDate', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date()}),
     ('sortedBy', {'type': float, 'choices': ('foodTruckName', 'totalOrder', 'totalRevenue', 'totalCustomer')}),
-    ('sortDirection', {'type': float, 'choices': ('ASC', 'DESC')})
+    ('sortDirection', {'type': float, 'default': 'ASC', 'choices': ('ASC', 'DESC')})
 ], get_result=2, restrict_by_username=True)
 # no need to do restrict_by_food_truck=True because the query already does a join with the manager's username
 
