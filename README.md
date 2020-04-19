@@ -49,6 +49,10 @@ Next, we need to install the project dependencies, which are listed in `requirem
 (venv) $ pip install -r requirements.txt
 ```
 
+### Set your database password
+
+See `main.py` for the database name and password that the Flask server expects.
+
 ### Start the server
 
 Start the server:

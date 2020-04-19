@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, Response
 from flask_restful import reqparse, Api, Resource
+from flask_cors import CORS
 import sys
 import os
 import random
@@ -13,6 +14,7 @@ import re
 from secrets import token_hex
 
 app = Flask(__name__)
+cors = CORS(app)  # allow CORS on all routes
 app.config['JSON_SORT_KEYS'] = False
 api = Api(app)
 try:
