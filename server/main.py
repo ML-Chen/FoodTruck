@@ -134,10 +134,10 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         except ValueError as e:
             message = 'Incorrect parameter types'
             print(message + ' ' + repr(e))
-            return {'error': message}, 405
+            return {'error': message}, 400
         except mysql.connector.Error as e:
             print(repr(e))
-            return {'error': repr(e)}, 405
+            return {'error': repr(e)}, 400
         except Exception as e:
             message = 'Unknown error: ' + repr(e)
             print(locals())

@@ -8,7 +8,7 @@ function persistentWritable(key, startValue) {
         set,
         useLocalStorage: () => {
             const json = localStorage.getItem(key);
-            if (json) {
+            if (json && json !== "undefined" && json != null) {
                 set(JSON.parse(json));
             }
     
@@ -19,7 +19,7 @@ function persistentWritable(key, startValue) {
     };
 }
 
-export const token = persistentWritable('FoodTruck token', '');
-export const userType = persistentWritable('FoodTruck userType', '');
+export const token = persistentWritable('token', '');
+export const userType = persistentWritable('userType', '');
 
 // TODO: use cookies instead of storing token in localStorage
