@@ -57,21 +57,22 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         cursor.execute(f"SELECT * FROM {procedure + '_result'};")
     Don't let users have access to this function and pass in arbitrary `procedure`.
     """
-    @app.route('/' + procedure, methods=methods, endpoint=procedure)
+    @app.route('/' + procedure, methods=http_methods, endpoint=procedure)
     def new_api() -> Response:
         nonlocal inputs
         nonlocal get_result
 
         parser = reqparse.RequestParser()
         for arg_name, arg_params in inputs:
-            print(arg_name, arg_params)
             parser.add_argument(arg_name, **arg_params)
-        if restrict_by_username or restrict_by_food_truck or procedure.startswith('cus_') or procedure.startswith('mn_') or procedure.startswith('ad_'):
+        restricted = restrict_by_username or restrict_by_food_truck or procedure.startswith('cus_') or procedure.startswith('mn_') or procedure.startswith('ad_')
+        if restricted:
             parser.add_argument('token', type=str, required=True)
         a = parser.parse_args()
-        print(list(a.values()))
-        token = a['token']
-        del a['token']
+        print('Request: ' + repr(a))
+        if restricted:
+            token = a['token']
+            del a['token']
 
         try:
             if procedure.startswith('cus_'):
@@ -87,7 +88,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 cursor.execute("SELECT foodTruckName FROM FoodTruck WHERE managerUsername = %s", (a['manager_username']))
                 assert a['food_truck_name'] in cursor.fetchall()
         except AssertionError as e:
-            print(str(e))
+            print(repr(e))
 
         try:
             cursor.callproc(procedure, args=tuple(a.values()))
@@ -96,26 +97,29 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 # The next two lines are from https://stackoverflow.com/a/17534004/5139284 by juandesant, CC-BY-SA 4.0
                 fields = map(lambda x: x[0], cursor.description)
                 result = [dict(zip(fields, row)) for row in cursor.fetchall()]
-                print(result)
+                if len(result) == 1:
+                    result = result[0]
                 if procedure == 'login' and result:
+                    # TODO: don't generate a new token if the user already exists
                     new_token = token_hex(64)
                     tokens[new_token] = Auth(a['username'], result['userType'])
                     result['token'] = new_token
-                return jsonify(*result)
+                print(f'Response: {result}')
+                return jsonify(result)
             else:
                 return jsonify({})
             
         except ValueError as e:
             message = 'Incorrect parameter types'
-            print(message + ' ' + str(e))
+            print(message + ' ' + repr(e))
             return {'error': message}, 405
-        except mysql.connector.Error as error:
-            print('Failed to register: ' + str(error))
-            return {'error': error}, 405
+        except mysql.connector.Error as e:
+            print('Failed to register: ' + repr(e))
+            return {'error': repr(e)}, 405
         except Exception as e:
-            message = 'Unknown error: ' + str(e)
-            print(message)
-            return {'error': e}, 400
+            message = 'Unknown error: ' + repr(e)
+            print(locals())
+            return {'error': repr(e)}, 400
 
     return new_api
 

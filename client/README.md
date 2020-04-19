@@ -28,7 +28,7 @@ Alternatively, you can use GitHub's template feature with the [sapper-template-r
 However you get the code, you can install dependencies and run the project in development mode with:
 
 ```bash
-cd my-app
+cd client
 npm install # or yarn
 npm run dev
 ```
