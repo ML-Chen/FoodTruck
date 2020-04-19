@@ -43,8 +43,8 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
     Parameters:
     - procedure: name of the MySQL stored procedure which we will call.
         - The URL for the API endpoint is just '/' plus the name of the procedure (e.g., '/login').
-        - Access to the API will be restricted to certain user types if `procedure` begins with 'ad_', 'mn_', or 'cus_'. In this case, an additional required `token` request parameter is automatically.
-        - A procedure named 'login' will create a token for the user and return that.
+        - Access to the API will be restricted to certain user types if `procedure` begins with 'ad_', 'mn_', or 'cus_'. In this case, either a 'token' cookie or a `token` request parameter is expected (or both, the `token` request parameter taking precedence).
+        - A procedure named 'login' will create a token for the user and set a cookie for that, and also return that in the response.
     - http_methods: HTTP methods, such as ['GET'] (if the operation is just fetching data and doesn't modify the database), or ['POST']
     - inputs: request parameters, which will be passed into the stored procedure. These arguments should be in the same order as the SQL stored procedure, but can be called anything you like.
         - Example: [('username', {'type': str, 'required': True}), ('balance', {'type': int, 'default': 0})]
@@ -61,7 +61,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
 
     Be aware of the potential for SQL injection in the following line:
         cursor.execute(f"SELECT * FROM {procedure + '_result'};")
-    Don't let users have access to this function and pass in arbitrary `procedure`.
+    Don't let users have access to this function for creating endpoints and pass in arbitrary `procedure` name.
     """
     @app.route('/' + procedure, methods=http_methods, endpoint=procedure)
     def new_api() -> Response:
@@ -73,7 +73,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
             parser.add_argument(arg_name, **arg_params)
         restricted = restrict_by_username or restrict_by_food_truck or procedure.startswith('cus_') or procedure.startswith('mn_') or procedure.startswith('ad_')
         if restricted:
-            parser.add_argument('token', type=str, required=True)
+            parser.add_argument('token', type=str)
         try:
             a = parser.parse_args()
         except Exception as e:
@@ -81,8 +81,11 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
             return {'error': 'Bad request. Expected request arguments: ' + str(parser.args)}, 400
         print('Request: ' + repr(a))
         if restricted:
-            token = a['token']
-            del a['token']
+            if 'token' in a:
+                token = a.token
+                del a['token']  # don't send token to database stored procedures
+            else:
+                token = request.cookies.get('token')
 
         try:
             if procedure.startswith('cus_'):
@@ -99,10 +102,10 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 assert a['foodTruckName'] in cursor.fetchall()
         except AssertionError as e:
             print(repr(e))
-            return {'error': repr(e)}, 400
+            return {'error': "Your user type can't access this page: " + repr(e)}, 403
         except KeyError as e:
             print(repr(e))
-            return {'error': "Your token doesn't match a logged in user: " + repr(e)}, 400
+            return {'error': "Your token doesn't match a logged in user: " + repr(e)}, 403
 
         try:
             cursor.callproc(procedure, args=tuple(a.values()))
@@ -113,15 +116,20 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 result = [dict(zip(fields, row)) for row in cursor.fetchall()]
                 if len(result) == 1 and get_result == 1:
                     result = result[0]
+                # Create and send a token upon successful login
                 if procedure == 'login' and result:
                     # TODO: don't generate a new token if the user already exists (honestly not very important though)
                     new_token = token_hex(64)
                     tokens[new_token] = Auth(a['username'], result['userType'])
                     result['token'] = new_token
-                print(f'Response: {result}')
-                return jsonify(result)
+                    response = jsonify(result)
+                    response.set_cookie('token', new_token)
+                else:
+                    response = jsonify(result)
+                print(f'Result: {result}')
+                return response
             else:
-                return jsonify({})
+                return jsonify([])
             
         except ValueError as e:
             message = 'Incorrect parameter types'
@@ -400,7 +408,7 @@ cus_current_information_basic = db_api('cus_current_information_basic', ['GET'],
 
 # Query #29: cus_current_information_foodTruck [Screen #17 Customer Current Information]
 # Response:
-cus_current_information_foodTruck = db_api('cus_current_information_basic', ['GET'], [
+cus_current_information_foodTruck = db_api('cus_current_information_foodTruck', ['GET'], [
     ('customerUsername', {'type': str, 'required': True})
 ], get_result=2, restrict_by_username=True)
 
