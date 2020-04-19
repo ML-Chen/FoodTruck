@@ -11,6 +11,7 @@ import mysql.connector
 from mysql.connector import Error
 import re
 from secrets import token_hex
+import datetime
 
 app = Flask(__name__)
 cors = CORS(app)  # allow CORS on all routes
@@ -36,8 +37,8 @@ class Auth(NamedTuple):
 # TODO: store tokens in and retrieve tokens from database. Not that important. Or, load tokens from a local text file so that whenever I restart the server I don't have to log users back in again.
 tokens: Dict[str, Auth] = {}
 
-def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict[str, Any]]], get_result: bool = False,
-           get_one_result: bool = False, restrict_by_username: bool = False, restrict_by_food_truck: bool = False) -> Callable[[None], Response]:
+def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict[str, Any]]], get_result: int = 0,
+           restrict_by_username: bool = False, restrict_by_food_truck: bool = False) -> Callable[[None], Response]:
     """
     Parameters:
     - procedure: name of the MySQL stored procedure which we will call.
@@ -49,8 +50,10 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         - Example: [('username', {'type': str, 'required': True}), ('balance', {'type': int, 'default': 0})]
         - See reqparse (https://flask-restful.readthedocs.io/en/latest/reqparse.html) for documentation on other keys we can have in the dictionary, besides 'type', 'required', 'default', etc.
         - When contacting the API, the client can pass these parameters in as query parameters or form body parameters.
-    - get_result: whether the procedure creates a table named `procedure + '_result'` (e.g., 'login_result'). If so, we'll make another SELECT query to get that table, after we call the procedure. Then, the response of the API endpoint is the result. Otherwise, the response an empty JSON object {}.
-    - get_one_result: is the database query expected to return one result or a list of results?
+    - get_result: whether the procedure creates a table named `procedure + '_result'` (e.g., 'login_result'), and if it does, whether it returns one or many rows. If so, we'll make another SELECT query to get that table, after we call the procedure. Then, the response of the API endpoint is the result. Otherwise, the response an empty JSON object [].
+        0: the procedure does not create a "_result" table. The API endpoint will return an empty list, [].
+        1: the procedure is expected to create a "_result" table with one result
+        2: the procedure is expected to create a list of results
     - restrict_by_username: restrict access to this API endpoint to people whose token corresponds to a user with a 'username', 'customerUsername', or 'managerUsername' field in inputs.
     - restrict_by_food_truck: restrict access to this API endpoint to people whose token corresponds to a user with a username 'managerUsername' in inputs that manages the food truck with the 'food_truck_name' in inputs.
 
@@ -108,7 +111,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 # The next two lines are from https://stackoverflow.com/a/17534004/5139284 by juandesant, CC-BY-SA 4.0
                 fields = map(lambda x: x[0], cursor.description)
                 result = [dict(zip(fields, row)) for row in cursor.fetchall()]
-                if len(result) == 1 and get_one_result:
+                if len(result) == 1 and get_result == 1:
                     result = result[0]
                 if procedure == 'login' and result:
                     # TODO: don't generate a new token if the user already exists (honestly not very important though)
@@ -139,7 +142,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
 login = db_api('login', ['POST'], [
     ('username', {'type': str, 'required': True}),
     ('password', {'type': str, 'required': True}),
-], get_result=True, get_one_result=True)
+], get_result=1)
 
 # Query #2: register [Screen #2 Register]
 # Response: []
@@ -163,7 +166,7 @@ ad_filter_building_station = db_api('ad_filter_building_station', ['GET'], [
     ('stationName', {'type': str}),
     ('minCapacity', {'type': str}),
     ('maxCapacity', {'type': str}),
-], get_result=True)
+], get_result=2)
 
 # Query #4: ad_delete_building [Screen #4 Admin Manage Building & Station]
 # Response: []
@@ -202,13 +205,13 @@ ad_create_building = db_api('ad_create_building', ['POST'], [
 # Response: 
 ad_view_building_general = db_api('ad_view_building_general', ['GET'], [
     ('buildingName', {'type': str, 'required': True})
-], get_result=True)
+], get_result=2)
 
 # Query #8b: ad_view_building_tags [Screen #6 Admin Update Building]
 # Response: 
 ad_view_building_tags  = db_api('ad_view_building_tags', ['GET'], [
     ('buildingName', {'type': str, 'required': True})
-], get_result=True)
+], get_result=2)
 
 # Query #9: ad_update_building [Screen #6 Admin Update Building]
 # Response: []
@@ -222,7 +225,7 @@ ad_update_building = db_api('ad_update_building', ['POST'], [
 # Response: 
 ad_get_available_building = db_api('ad_get_available_building', ['GET'], [
     ('buildingName', {'type': str, 'required': True})
-], get_one_result=True)
+], get_result=1)
 
 # Query #11: ad_create_station [Screen #7 Admin Create Station]
 # Response: 
@@ -236,7 +239,7 @@ ad_create_station = db_api('ad_create_station', ['POST'], [
 # Rresponse:
 ad_view_station = db_api('ad_view_station', ['GET'], [
     ('stationName', {'type': str, 'required': True})
-], get_result=True)
+], get_result=2)
 
 # Query #13: ad_update_station [Screen #8 Admin Update Station]
 # Response:
@@ -252,7 +255,7 @@ ad_filter_food = db_api('ad_filter_food', ['GET'], [
     ('foodName', {'type': str, 'required': True}),
     ('sortedBy', {'type': float, 'required': True, 'choices': ('name', 'menuCount', 'purchaseCount')}),
     ('sortDirection', {'type': float, 'required':True, 'choices': ('ASC', 'DESC')})
-], get_result=True)
+], get_result=2)
 
 # Query #15: ad_delete_food [Screen #9 Admin Manage Food]
 # Response:
@@ -275,11 +278,11 @@ mn_filter_foodTruck = db_api('mn_filter_foodTruck', ['GET'], [
     ('minStaffCount', {'type': int, 'required': True}),
     ('maxStaffCount', {'type': int, 'required': True}),
     ('hasRemainingCapacity', {'type': bool, 'required': True})
-], get_result=True, restrict_by_username=True, restrict_by_food_truck=True)
+], get_result=2, restrict_by_username=True, restrict_by_food_truck=True)
 
 # Query #18: mn_delete_foodTruck [Screen #11 Manager Manage Food Truck]
 # Response :
- mn_delete_foodTruck = db_api('mn_delete_foodTruck', ['POST'], [
+mn_delete_foodTruck = db_api('mn_delete_foodTruck', ['POST'], [
     ('foodTruckName', {'type': str, 'required': True})
  ], restrict_by_food_truck=True)
 
@@ -311,23 +314,23 @@ mn_create_foodTruck_add_MenuItem = db_api('mn_create_foodTruck_add_MenuItem', ['
 mn_view_foodTruck_available_staff = db_api('mn_view_foodTruck_available_staff', ['GET'], [
     ('managerUsername', {'type': str, 'required': True}),
     ('foodTruckName', {'type': str, 'required': True})
-], get_result=True, restrict_by_food_truck=True, restrict_by_username=True)
+], get_result=2, restrict_by_food_truck=True, restrict_by_username=True)
 
 # Query #20b: mn_view_foodTruck_staff [Screen #13 Manager Update Food Truck]
 # Response: 
 mn_view_foodTruck_staff = db_api('mn_view_foodTruck_staff', ['GET'], [
     ('foodTruckName', {'type': str, 'required': True})
- ], get_result=True, restrict_by_food_truck=True)
+ ], get_result=2, restrict_by_food_truck=True)
 
 # Query #21: mn_view_foodTruck_menu [Screen #13 Manager Update Food Truck]
 # Response:
 mn_view_foodTruck_menu = db_api('mn_view_foodTruck_menu', ['GET'], [
     ('foodTruckName', {'type': str, 'required': True})
- ], get_result=True, restrict_by_food_truck=True)
+ ], get_result=2, restrict_by_food_truck=True)
 
 # Query #22a: mn_update_foodTruck_station [Screen #13 Manager Update Food Truck]
 # Response:
-mn_update_foodTruck_station = (' mn_update_foodTruck_station', ['POST'], [
+mn_update_foodTruck_station = db_api('mn_update_foodTruck_station', ['POST'], [
     ('foodTruckName', {'type': str, 'required': True}),
     ('stationName', {'type': str, 'required': True})
 ], restrict_by_food_truck=True)
@@ -351,7 +354,7 @@ mn_update_foodTruck_MenuItem = db_api('mn_update_foodTruck_MenuItem', ['POST'], 
 # Response:
 mn_get_station = db_api('mn_get_station', ['GET'], [
     ('managerUsername', {'type': str, 'required': True}),
-], get_result=True, restrict_by_username=True)
+], get_result=2, restrict_by_username=True)
 
 # Query #24: mn_filter_summary [Screen #14 Manager Food Truck Summary]
 # Response:
@@ -363,7 +366,7 @@ mn_filter_summary = db_api('mn_filter_summary', ['GET'], [
     ('maxDate', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date()}),
     ('sortedBy', {'type': float, 'choices': ('foodTruckName', 'totalOrder', 'totalRevenue', 'totalCustomer')}),
     ('sortDirection', {'type': float, 'choices': ('ASC', 'DESC')})
-], get_result=True, restrict_by_username=True)
+], get_result=2, restrict_by_username=True)
 # no need to do restrict_by_food_truck=True because the query already does a join with the manager's username
 
 # Query #25: mn_summary_detail [Screen #15 Manager Summary Detail]
@@ -371,7 +374,7 @@ mn_filter_summary = db_api('mn_filter_summary', ['GET'], [
 mn_summary_detail = db_api('mn_summary_detail', ['POST'], [
     ('managerUsername', {'type': str, 'required': True}),
     ('foodTruckName', {'type': str, 'required': True})
-], get_result=True, restrict_by_username=True)
+], get_result=2, restrict_by_username=True)
 # no need to do restrict_by_food_truck=True because the query already does a join with the manager's username
 
 # Query #26: cus_filter_explore [Screen #16 Customer Explore]
@@ -382,7 +385,7 @@ cus_filter_explore = db_api('cus_filter_explore', ['GET'], [
     ('buildingTag', {'type': str}),
     ('foodTruckName', {'type': str}),
     ('foodName', {'type': str})
-], get_result=True, restrict_by_food_truck=True)
+], get_result=2, restrict_by_food_truck=True)
 
 # Query #27: cus_select_location [Screen #16 Customer Explore]
 # Response:
@@ -395,24 +398,24 @@ cus_select_location = db_api('cus_select_location', ['POST'], [
 # Response:
 cus_current_information_basic = db_api('cus_current_information_basic', ['GET'], [
     ('customerUsername', {'type': str, 'required': True})
-], get_result=True, restrict_by_username=True)
+], get_result=2, restrict_by_username=True)
 
 # Query #29: cus_current_information_foodTruck [Screen #17 Customer Current Information]
 # Response:
 cus_current_information_foodTruck = db_api('cus_current_information_basic', ['GET'], [
     ('customerUsername', {'type': str, 'required': True})
-], get_result=True, restrict_by_username=True)
+], get_result=2, restrict_by_username=True)
 
 # Query #30: cus_order [Screen #18 Customer Order]
 # Response:
 cus_order = db_api('cus_order', ['POST'], [
-    ('date', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date(), 'required': True})),
+    ('date', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date(), 'required': True}),
     ('customerUsername', {'type': str, 'required': True})
 ], restrict_by_username=True)
 
 # Query #31: cus_add_item_to_order [Screen #18 Customer Order]
 # Response:
-cus_add_item_to_order = ('cus_add_item_to_order', ['POST'], [
+cus_add_item_to_order = db_api('cus_add_item_to_order', ['POST'], [
     ('foodTruckName', {'type': str, 'required': True}),
     ('foodName', {'type': str, 'required': True}),
     ('purchaseQuantity', {'type': int, 'required': True}),
@@ -423,7 +426,7 @@ cus_add_item_to_order = ('cus_add_item_to_order', ['POST'], [
 # Response:
 cus_order_history = db_api('cus_order_history', ['GET'], [
     ('customerUsername', {'type': str, 'required': True})
-], get_result=True, restrict_by_username=True)
+], get_result=2, restrict_by_username=True)
 
 def close_connection() -> None:
     connection.close()
