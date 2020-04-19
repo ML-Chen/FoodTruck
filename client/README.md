@@ -9,7 +9,12 @@ npm install
 npm run dev
 ```
 
-If it says "Your app should probably have loaded by now", try temporarily making sure that no other servers are running.
+If it says "Your app should probably have loaded by now", try temporarily making sure that no other servers are running. Or, you can try:
+
+```
+npm run build
+npm run serve
+```
 
 ### Npm scripts
 

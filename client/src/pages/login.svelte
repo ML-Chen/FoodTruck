@@ -1,30 +1,45 @@
 <!-- Screen 1: Login -->
 
 <script>
-    import { setContext } from 'svelte';
-    import wretch from 'wretch';
+    import { token, userType } from './_store.js';
+    import { url } from '@sveltech/routify';
+
+    token.useLocalStorage();
+    userType.useLocalStorage();
 
     let username;
     let password;
     let errorMsg;
 
     export async function handleLogin() {
-        const response = await fetch('http://127.0.0.1:4000/login', {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username, password })
-        });
-        const json = await response.json();
-        if (json === []) {
-            errorMsg = 'Username and/or password incorrect';
-        } else if (json.error) {
-            errorMsg = json.error;
+        if (!username) {
+            errorMsg = 'Username must not be blank';
+        } else if (!password || password.length < 8) {
+            errorMsg = 'Password must be at least 8 characters long'
         } else {
-            setContext('token', json.token);
-            setContext('userType', json.userType);
+            try {
+                const response = await fetch('http://127.0.0.1:4000/login', {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                const json = await response.json();
+                console.log(json);
+                if (json.length === 0) {
+                    errorMsg = 'Username and/or password incorrect';
+                } else if (json.error) {
+                    errorMsg = json.error;
+                } else {
+                    token.set(json.token);
+                    userType.set(json.userType);
+                }
+            } catch (error) {
+                console.log(error);
+                errorMsg = 'Network error. Maybe the server is down?';
+            }
         }
     }
 </script>
@@ -39,9 +54,10 @@
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" bind:value={username} />
     <label for="password">Password:</label>
-    <input type="text" id="password" name="password" bind:value={password} />
+    <input type="password" id="password" name="password" bind:value={password} />
+    <br>
     <button type="submit">Login</button>
-    <button type="button">Register</button>
+    <p>or <a href={$url('../register')}>Register</a></p>
     {#if errorMsg}
         <p class="error">{errorMsg}</p>
     {/if}
