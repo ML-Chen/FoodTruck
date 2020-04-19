@@ -23,7 +23,7 @@ try:
         host='127.0.0.1',
         database='cs4400spring2020',
         user='root',
-        password='E55yT^$f&n4Nc&5k'
+        password="ENTERMYSQLPASSWORD"
     )
     cursor = connection.cursor(buffered=True)
 except mysql.connector.Error as error:
@@ -161,7 +161,7 @@ register = db_api('register', ['POST'], [
     ('lastName', {'type': str, 'required': True}),
     ('password', {'type': str, 'required': True}),
     ('balance', {'type': float}),
-    ('type', {'type': float, 'required': True, 'choices': ('Admin', 'Manager', 'Staff')}),
+    ('type', {'type': str, 'required': True, 'choices': ('Admin', 'Manager', 'Staff')}),
 ])
 
 # Query #3: ad_filter_building_station [Screen #4 Admin Manage Building & Station]
