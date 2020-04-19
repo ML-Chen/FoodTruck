@@ -156,7 +156,7 @@ register = db_api('register', ['POST'], [
 # Query #3: ad_filter_building_station [Screen #4 Admin Manage Building & Station]
 # As mentioned above in the definition of `db_api`, endpoints beginning with 'ad_' will be restricted to admins.
 # The request will need an additional 'token' field which belongs to an admin that has logged in.
-# Response: [{buildingName: str, tags: str, stationName: str, capacity: int, foodTruckNames: str}]
+# Response: [{buildingName: string, tags: string, stationName: string, capacity: int, foodTruckNames: string}]
 ad_filter_building_station = db_api('ad_filter_building_station', ['GET'], [
     ('buildingName', {'type': str}),
     ('buildingTag', {'type': str}),
@@ -228,7 +228,7 @@ mn_update_foodTruck_staff = db_api('mn_update_foodTruck_staff', ['POST'], [
 ], restrict_by_food_truck=True)
 
 # Query #25: mn_summary_detail [Screen #15 Manager Summary Detail]
-# Response: [{ date: str, customerName: str, totalPurchase: decimal, orderCount: int, foodNames: str }]
+# Response: [{ date: string, customerName: string, totalPurchase: decimal, orderCount: int, foodNames: string }]
 mn_summary_detail = db_api('mn_summary_detail', ['POST'], [
     ('managerUsername', {'type': str, 'required': True}),
     ('foodTruckName', {'type': str, 'required': True})
