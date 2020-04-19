@@ -223,9 +223,7 @@ ad_update_building = db_api('ad_update_building', ['POST'], [
 
 # Query #10: ad_get_available_building [Screen #7 Admin Create Station]
 # Response: 
-ad_get_available_building = db_api('ad_get_available_building', ['GET'], [
-    ('buildingName', {'type': str, 'required': True})
-], get_result=1)
+ad_get_available_building = db_api('ad_get_available_building', ['GET'], [], get_result=2)
 
 # Query #11: ad_create_station [Screen #7 Admin Create Station]
 # Response: 

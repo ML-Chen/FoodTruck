@@ -8,6 +8,8 @@ By Michael Chen, Min Htat Kyaw (Reynold), Jingxuan (Julia) Qiu, Duncan Siebert, 
 
 ## Getting started: server
 
+Make sure you have [Python ≥3.7](https://www.python.org/downloads/) installed.
+
 These steps should be in a terminal in the /server folder (`cd server`).
 
 ### Set up virtual environment
@@ -51,7 +53,17 @@ Next, we need to install the project dependencies, which are listed in `requirem
 
 ### Set your database password
 
-See `main.py` for the database name and password that the Flask server expects.
+See `main.py` (excerpted below) for the database name and password that the Flask server expects.
+
+```
+# Check MySQL Workbench > Database > Connect to Database > Test Connection for the host name, etc.
+connection = mysql.connector.connect(
+    host='127.0.0.1',
+    database='cs4400spring2020',
+    user='root',
+    password='E55yT^$f&n4Nc&5k'
+)
+```
 
 ### Start the server
 
@@ -64,3 +76,16 @@ flask run -p 4000
 ## Tips
 
 To test the backend, you can use the application [Postman](https://www.postman.com/).
+
+## Getting started: client
+
+Install [Node.js](https://nodejs.org/en/).
+
+Now, in a separate terminal in the /client folder (`cd client`), run:
+
+```
+npm install
+npm run dev
+```
+
+The website will be available at http://localhost:5000.
