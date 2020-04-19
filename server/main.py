@@ -32,6 +32,7 @@ class Auth(NamedTuple):
     user_type: str
 
 # Maps tokens to their username and user type
+# TODO: store tokens in and retrieve tokens from database. Not that important. Or, load tokens from a local text file so that whenever I restart the server I don't have to log users back in again.
 tokens: Dict[str, Auth] = {}
 
 def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict[str, Any]]], get_result: bool = False,
@@ -87,10 +88,10 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 assert 'Manager' in tokens[token].user_type
             
             if restrict_by_username:
-                assert tokens[token].username in (a['username'], a['customer_username'], a['manager_username'])
+                assert tokens[token].username in (a['username'], a['customerUsername'], a['managerUsername'])
             if restrict_by_food_truck:
-                cursor.execute("SELECT foodTruckName FROM FoodTruck WHERE managerUsername = %s", (a['manager_username']))
-                assert a['food_truck_name'] in cursor.fetchall()
+                cursor.execute("SELECT foodTruckName FROM FoodTruck WHERE managerUsername = %s", (a['managerUsername']))
+                assert a['foodTruckName'] in cursor.fetchall()
         except AssertionError as e:
             print(repr(e))
             return {'error': repr(e)}, 400
@@ -143,11 +144,11 @@ login = db_api('login', ['POST'], [
 register = db_api('register', ['POST'], [
     ('username', {'type': str, 'required': True}),
     ('email', {'type': str, 'required': True}),
-    ('first_name', {'type': str, 'required': True}),
-    ('last_name', {'type': str, 'required': True}),
+    ('firstName', {'type': str, 'required': True}),
+    ('lastName', {'type': str, 'required': True}),
     ('password', {'type': str, 'required': True}),
     ('balance', {'type': float}),
-    ('i_type', {'type': float, 'required': True, 'choices': ('Admin', 'Manager', 'Staff')}),
+    ('type', {'type': float, 'required': True, 'choices': ('Admin', 'Manager', 'Staff')}),
 ])
 
 # Query #3: ad_filter_building_station [Screen #4 Admin Manage Building & Station]
@@ -155,36 +156,36 @@ register = db_api('register', ['POST'], [
 # The request will need an additional 'token' field which belongs to an admin that has logged in.
 # Response: {buildingName: str, tags: str, stationName: str, capacity: int, foodTruckNames: str}
 ad_filter_building_station = db_api('ad_filter_building_station', ['GET'], [
-    ('building_name', {'type': str, 'required': True}),
-    ('building_tag', {'type': str, 'required': True}),
-    ('station_name', {'type': str, 'required': True}),
-    ('min_capacity', {'type': str, 'required': True}),
-    ('max_capacity', {'type': str, 'required': True}),
+    ('buildingName', {'type': str, 'required': True}),
+    ('buildingTag', {'type': str, 'required': True}),
+    ('stationName', {'type': str, 'required': True}),
+    ('minCapacity', {'type': str, 'required': True}),
+    ('maxCapacity', {'type': str, 'required': True}),
 ], True)
 
 # Query #4: ad_delete_building [Screen #4 Admin Manage Building & Station]
 # Response: {}
 ad_delete_building = db_api('ad_delete_building', ['POST'], [
-    ('building_name', {'type': str, 'required': True})
+    ('buildingName', {'type': str, 'required': True})
 ])
 
 # Query #5: ad_delete_station [Screen #4 Admin Manage Building & Station]
 # Response: {}
 ad_delete_station = db_api('ad_delete_station', ['POST'], [
-    ('station_name', {'type': str, 'required': True})
+    ('stationName', {'type': str, 'required': True})
 ])
 
 # Query #6a: ad_add_building_tag [Screen #5 Admin Add Building Tag]
 # Response: {}
 ad_add_building_tag = db_api('ad_add_building_tag', ['POST'], [
-    ('building_name', {'type': str, 'required': True}),
+    ('buildingName', {'type': str, 'required': True}),
     ('tag', {'type': str, 'required': True})
 ])
 
 # Query #6b: ad_remove_building_tag [Screen #5 Admin Remove Building Tag]
 # Response: {}
 ad_remove_building_tag = db_api('ad_remove_building_tag', ['POST'], [
-    ('building_name', {'type': str, 'required': True}),
+    ('buildingName', {'type': str, 'required': True}),
     ('tag', {'type': str, 'required': True})
 ])
 # query #7 etc.
@@ -192,15 +193,15 @@ ad_remove_building_tag = db_api('ad_remove_building_tag', ['POST'], [
 # Query #22b: mn_update_foodTruck_staff [Screen #13 Manager Update Food Truck]
 # Response: {}
 mn_update_foodTruck_staff = db_api('mn_update_foodTruck_staff', ['POST'], [
-    ('food_truck_name', {'type': str, 'required': True}),
-    ('staff_username', {'type': str, 'required': True})
+    ('foodTruckName', {'type': str, 'required': True}),
+    ('staffUsername', {'type': str, 'required': True})
 ], restrict_by_food_truck=True)
 
 # Query #25: mn_summary_detail [Screen #15 Manager Summary Detail]
 # Response: [{ date: str, customerName: str, totalPurchase: decimal, orderCount: int, foodNames: str }]
 mn_summary_detail = db_api('mn_summary_detail', ['POST'], [
-    ('manager_username', {'type': str, 'required': True}),
-    ('food_truck_name', {'type': str, 'required': True})
+    ('managerUsername', {'type': str, 'required': True}),
+    ('foodTruckName', {'type': str, 'required': True})
 ], get_result=True, restrict_by_username=True)
 # no need to do restrict_by_food_truck=True because the query already does a join with the manager's username
 
