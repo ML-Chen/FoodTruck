@@ -68,7 +68,11 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         restricted = restrict_by_username or restrict_by_food_truck or procedure.startswith('cus_') or procedure.startswith('mn_') or procedure.startswith('ad_')
         if restricted:
             parser.add_argument('token', type=str, required=True)
-        a = parser.parse_args()
+        try:
+            a = parser.parse_args()
+        except Exception as e:
+            print(repr(e))
+            return {'error': 'Bad request. Expected request arguments: ' + str(parser.args)}, 400
         print('Request: ' + repr(a))
         if restricted:
             token = a['token']
@@ -89,6 +93,10 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 assert a['food_truck_name'] in cursor.fetchall()
         except AssertionError as e:
             print(repr(e))
+            return {'error': repr(e)}, 400
+        except KeyError as e:
+            print(repr(e))
+            return {'error': "Your token doesn't match a logged in user: " + repr(e)}, 400
 
         try:
             cursor.callproc(procedure, args=tuple(a.values()))
@@ -100,7 +108,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 if len(result) == 1:
                     result = result[0]
                 if procedure == 'login' and result:
-                    # TODO: don't generate a new token if the user already exists
+                    # TODO: don't generate a new token if the user already exists (honestly not very important though)
                     new_token = token_hex(64)
                     tokens[new_token] = Auth(a['username'], result['userType'])
                     result['token'] = new_token
@@ -144,6 +152,7 @@ register = db_api('register', ['POST'], [
 
 # Query #3: ad_filter_building_station [Screen #4 Admin Manage Building & Station]
 # As mentioned above in the definition of `db_api`, endpoints beginning with 'ad_' will be restricted to admins.
+# The request will need an additional 'token' field which belongs to an admin that has logged in.
 # Response: {buildingName: str, tags: str, stationName: str, capacity: int, foodTruckNames: str}
 ad_filter_building_station = db_api('ad_filter_building_station', ['GET'], [
     ('building_name', {'type': str, 'required': True}),
