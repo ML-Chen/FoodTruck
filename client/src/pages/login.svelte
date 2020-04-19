@@ -2,7 +2,7 @@
 
 <script>
     import { token, userType } from './_store.js';
-    import { url } from '@sveltech/routify';
+    import { url, goto } from '@sveltech/routify';
 
     token.useLocalStorage();
     userType.useLocalStorage();
@@ -35,6 +35,7 @@
                 } else {
                     token.set(json.token);
                     userType.set(json.userType);
+                    $goto('../home')
                 }
             } catch (error) {
                 console.log(error);
