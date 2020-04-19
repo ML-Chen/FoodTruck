@@ -275,8 +275,7 @@ mn_filter_foodTruck = db_api('mn_filter_foodTruck', ['GET'], [
     ('minStaffCount', {'type': int, 'required': True}),
     ('maxStaffCount', {'type': int, 'required': True}),
     ('hasRemainingCapacity', {'type': bool, 'required': True})
-], get_result=True, restrict_by_username=True)
-# no need to do restrict_by_food_truck=True because the query already does a join with the manager's username
+], get_result=True, restrict_by_username=True, restrict_by_food_truck=True)
 
 # Query #18: mn_delete_foodTruck [Screen #11 Manager Manage Food Truck]
 # Response :
@@ -340,6 +339,33 @@ mn_update_foodTruck_staff = db_api('mn_update_foodTruck_staff', ['POST'], [
     ('staffUsername', {'type': str, 'required': True})
 ], restrict_by_food_truck=True)
 
+# Query #22c: mn_update_foodTruck_MenuItem [Screen #13 Manager Update Food Truck]
+# Response:
+mn_update_foodTruck_MenuItem = db_api('mn_update_foodTruck_MenuItem', ['POST'], [
+    ('foodTruckName', {'type': str, 'required': True}),
+    ('price', {'type': float, 'required': True}),
+    ('foodName', {'type': str, 'required': True})
+], restrict_by_food_truck=True)
+
+# Query #23: mn_get_station [Screen #14 Manager Food Truck Summary]
+# Response:
+mn_get_station = db_api('mn_get_station', ['GET'], [
+    ('managerUsername', {'type': str, 'required': True}),
+], get_result=True, restrict_by_username=True)
+
+# Query #24: mn_filter_summary [Screen #14 Manager Food Truck Summary]
+# Response:
+mn_filter_summary = db_api('mn_filter_summary', ['GET'], [
+    ('managerUsername', {'type': str, 'required': True}),
+    ('foodTruckName', {'type': str, 'required': True}),
+    ('stationName', {'type': str, 'required': True}),
+    ('minDate', {'type': date, 'required': True}),
+    ('maxDate', {'type': date, 'required': True}),
+    ('sortedBy', {'type': float, 'required': True, 'choices': ('foodTruckName', 'totalOrder', 'totalRevenue', 'totalCustomer')}),
+    ('sortDirection', {'type': float, 'required':True, 'choices': ('ASC', 'DESC')})
+], get_result=True, restrict_by_username=True)
+# no need to do restrict_by_food_truck=True because the query already does a join with the manager's username
+
 # Query #25: mn_summary_detail [Screen #15 Manager Summary Detail]
 # Response: [{ date: string, customerName: string, totalPurchase: decimal, orderCount: int, foodNames: string }]
 mn_summary_detail = db_api('mn_summary_detail', ['POST'], [
@@ -347,6 +373,8 @@ mn_summary_detail = db_api('mn_summary_detail', ['POST'], [
     ('foodTruckName', {'type': str, 'required': True})
 ], get_result=True, restrict_by_username=True)
 # no need to do restrict_by_food_truck=True because the query already does a join with the manager's username
+
+
 
 def close_connection() -> None:
     connection.close()
