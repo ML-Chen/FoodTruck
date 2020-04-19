@@ -1,6 +1,6 @@
 {
-  "name": "TODO",
-  "description": "TODO",
+  "name": "food-truck",
+  "description": "Food truck application for CS 4400, Spring 2020",
   "version": "0.0.1",
   "scripts": {
     "dev": "sapper dev",
