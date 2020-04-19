@@ -51,8 +51,8 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         - When contacting the API, the client can pass these parameters in as query parameters or form body parameters.
     - get_result: whether the procedure creates a table named `procedure + '_result'` (e.g., 'login_result'). If so, we'll make another SELECT query to get that table, after we call the procedure. Then, the response of the API endpoint is the result. Otherwise, the response an empty JSON object {}.
     - get_one_result: is the database query expected to return one result or a list of results?
-    - restrict_by_username: restrict access to this API endpoint to people whose token corresponds to a user with a 'username', 'customer_username', or 'manager_username' field in inputs.
-    - restrict_by_food_truck: restrict access to this API endpoint to people whose token corresponds to a user with a username 'manager_username' in inputs that manages the food truck with the 'food_truck_name' in inputs.
+    - restrict_by_username: restrict access to this API endpoint to people whose token corresponds to a user with a 'username', 'customerUsername', or 'managerUsername' field in inputs.
+    - restrict_by_food_truck: restrict access to this API endpoint to people whose token corresponds to a user with a username 'managerUsername' in inputs that manages the food truck with the 'food_truck_name' in inputs.
 
     Returns a function that works as a Flask API endpoint.
 
@@ -214,7 +214,7 @@ ad_view_building_tags  = db_api('ad_view_building_tags', ['GET'], [
 # Response: []
 ad_update_building = db_api('ad_update_building', ['POST'], [
     ('oldBuildingName', {'type': str, 'required': True}),
-    ('newBuildingname', {'type': str, 'required': True}),
+    ('newBuildingName', {'type': str, 'required': True}),
     ('description', {'type':str, 'required': True})
 ])
 
@@ -228,7 +228,7 @@ ad_get_available_building = db_api('ad_get_available_building', ['GET'], [
 # Response: 
 ad_create_station = db_api('ad_create_station', ['POST'], [
     ('stationName', {'type': str, 'required': True}),
-    ('buildingname', {'type': str, 'required': True}),
+    ('buildingName', {'type': str, 'required': True}),
     ('capacity', {'type':int, 'required': True})
 ])
 
@@ -243,7 +243,7 @@ ad_view_station = db_api('ad_view_station', ['GET'], [
 ad_update_station = db_api('ad_update_station', ['POST'], [
     ('stationName', {'type': str, 'required': True}),
     ('capacity', {'type':int, 'required': True}),
-    ('buildingname', {'type': str, 'required': True})
+    ('buildingName', {'type': str, 'required': True})
 ])
 
 # Query #14: ad_filter_food [Screen #9 Admin Manage Food]
@@ -269,8 +269,8 @@ ad_create_food = db_api(' ad_create_food', ['POST'], [
 # Query #17: mn_filter_foodTruck [Screen #11 Manager Manage Food Truck]
 # Response: 
 mn_filter_foodTruck = db_api('mn_filter_foodTruck', ['GET'], [
-    ('managerUsername', {'type': str, 'required': True}),
-    ('foodTruckName', {'type': str, 'required': True}),
+    ('managerUsername', {'type': str}),
+    ('foodTruckName', {'type': str}),
     ('stationName', {'type': str, 'required': True}),
     ('minStaffCount', {'type': int, 'required': True}),
     ('maxStaffCount', {'type': int, 'required': True}),
@@ -356,13 +356,13 @@ mn_get_station = db_api('mn_get_station', ['GET'], [
 # Query #24: mn_filter_summary [Screen #14 Manager Food Truck Summary]
 # Response:
 mn_filter_summary = db_api('mn_filter_summary', ['GET'], [
-    ('managerUsername', {'type': str, 'required': True}),
-    ('foodTruckName', {'type': str, 'required': True}),
-    ('stationName', {'type': str, 'required': True}),
-    ('minDate', {'type': date, 'required': True}),
-    ('maxDate', {'type': date, 'required': True}),
-    ('sortedBy', {'type': float, 'required': True, 'choices': ('foodTruckName', 'totalOrder', 'totalRevenue', 'totalCustomer')}),
-    ('sortDirection', {'type': float, 'required':True, 'choices': ('ASC', 'DESC')})
+    ('managerUsername', {'type': str}),
+    ('foodTruckName', {'type': str}),
+    ('stationName', {'type': str}),
+    ('minDate', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date()}),
+    ('maxDate', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date()}),
+    ('sortedBy', {'type': float, 'choices': ('foodTruckName', 'totalOrder', 'totalRevenue', 'totalCustomer')}),
+    ('sortDirection', {'type': float, 'choices': ('ASC', 'DESC')})
 ], get_result=True, restrict_by_username=True)
 # no need to do restrict_by_food_truck=True because the query already does a join with the manager's username
 
@@ -374,7 +374,56 @@ mn_summary_detail = db_api('mn_summary_detail', ['POST'], [
 ], get_result=True, restrict_by_username=True)
 # no need to do restrict_by_food_truck=True because the query already does a join with the manager's username
 
+# Query #26: cus_filter_explore [Screen #16 Customer Explore]
+# Response:
+cus_filter_explore = db_api('cus_filter_explore', ['GET'], [
+    ('buildingName', {'type': str}),
+    ('stationName', {'type': str}),
+    ('buildingTag', {'type': str}),
+    ('foodTruckName', {'type': str}),
+    ('foodName', {'type': str})
+], get_result=True, restrict_by_food_truck=True)
 
+# Query #27: cus_select_location [Screen #16 Customer Explore]
+# Response:
+cus_select_location = db_api('cus_select_location', ['POST'], [
+    ('customerUsername', {'type': str, 'required': True}),
+    ('stationName', {'type': str, 'required': True})
+], restrict_by_username=True)
+
+# Query #28: cus_current_information_basic [Screen #17 Customer Current Information]
+# Response:
+cus_current_information_basic = db_api('cus_current_information_basic', ['GET'], [
+    ('customerUsername', {'type': str, 'required': True})
+], get_result=True, restrict_by_username=True)
+
+# Query #29: cus_current_information_foodTruck [Screen #17 Customer Current Information]
+# Response:
+cus_current_information_foodTruck = db_api('cus_current_information_basic', ['GET'], [
+    ('customerUsername', {'type': str, 'required': True})
+], get_result=True, restrict_by_username=True)
+
+# Query #30: cus_order [Screen #18 Customer Order]
+# Response:
+cus_order = db_api('cus_order', ['POST'], [
+    ('date', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date(), 'required': True})),
+    ('customerUsername', {'type': str, 'required': True})
+], restrict_by_username=True)
+
+# Query #31: cus_add_item_to_order [Screen #18 Customer Order]
+# Response:
+cus_add_item_to_order = ('cus_add_item_to_order', ['POST'], [
+    ('foodTruckName', {'type': str, 'required': True}),
+    ('foodName', {'type': str, 'required': True}),
+    ('purchaseQuantity', {'type': int, 'required': True}),
+    ('orderID', {'type': int, 'required': True})
+], restrict_by_food_truck=True)
+
+# Query #32: cus_order_history [Screen #19 Customer Order History]
+# Response:
+cus_order_history = db_api('cus_order_history', ['GET'], [
+    ('customerUsername', {'type': str, 'required': True})
+], get_result=True, restrict_by_username=True)
 
 def close_connection() -> None:
     connection.close()
