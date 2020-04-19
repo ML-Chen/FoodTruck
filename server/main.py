@@ -123,7 +123,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                     tokens[new_token] = Auth(a['username'], result['userType'])
                     result['token'] = new_token
                     response = jsonify(result)
-                    response.set_cookie('token', a.token)
+                    response.set_cookie('token', new_token)
                 else:
                     response = jsonify(result)
                 print(f'Result: {result}')
