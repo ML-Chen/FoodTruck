@@ -41,14 +41,14 @@
             errorMsg = 'Description must not be blank';
         } else {
             try {
-                const json = (await axios.post('http://localhost:4000/ad_create_foodTruck', { foodTruckName, description, token: $token })).data;
+                const json = (await axios.post('http://localhost:4000/mn_create_foodTruck_add_station', { foodTruckName, stationName: selectedStation, token: $token })).data;
                     if (json.error) {
                         errorMsg = json.error;
                     } else {
-                        for (let Food of foods) {
-                            axios.post('http://localhost:4000/ad_add_foodTruck_Food', { foodTruckName, Food, token: $token })
+                        for (let foodName of foods) {
+                            axios.post('http://localhost:4000/mn_create_foodTruck_add_MenuItem', { foodTruckName, foodName, price: -1, token: $token })
                         }
-                        foodTruckName = description = wipFood = errorMsg = '';
+                        foodTruckName = description = wipFoods = errorMsg = '';
                         foods = [];
                     }
             } catch (error) {
@@ -75,6 +75,7 @@
         {/if}
     </select>
 
+    <!-- TODO: add price -->
     <label for="foods">Menu Item</label>
         {#each foods as food, index (food)}
             <button type="button" on:click={() => { foods = foods.filter((_, i) => i !== index) }} aria-label="Remove Food {food}">−</button>{food}<br />

@@ -325,7 +325,7 @@ ad_delete_food = db_api('ad_delete_food', ['POST'], [
 
 # Query #16: ad_create_food [Screen #10 Admin Create Food]
 # Response:
-ad_create_food = db_api(' ad_create_food', ['POST'], [
+ad_create_food = db_api('ad_create_food', ['POST'], [
     ('foodName', {'type': str, 'required': True})
 ])
 
@@ -352,7 +352,7 @@ mn_create_foodTruck_add_station = db_api('mn_create_foodTruck_add_station', ['PO
     ('foodTruckName', {'type': str, 'required': True}),
     ('stationName', {'type': str, 'required': True}),
     ('managerUsername', {'type': str, 'required': True})
-], restrict_by_food_truck=True, restrict_by_username=True)
+], restrict_by_username=True)
 
 # Query #19b: mn_create_foodTruck_add_staff [Screen #12 Manager Create Food Truck]
 # Response:
