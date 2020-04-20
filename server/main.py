@@ -103,7 +103,8 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         try:
             a = parser.parse_args()
         except Exception as e:
-            print(request.__dict__)
+            # print(request.__dict__)
+            print(request.__dict__._cached_json)
             print(repr(e))
             return {'error': 'Bad request. Expected request arguments: ' + str(parser.args)}, 400
         print('Request: ' + repr(a))

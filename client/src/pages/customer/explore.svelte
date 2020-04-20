@@ -49,7 +49,7 @@
         console.log(selectedBuilding)
         try {
             const response = await axios.post('http://localhost:4000/cus_select_location', {
-                customerName: $storeUsername,
+                customerUsername: $storeUsername,
                 stationName: selectedBuilding.stationName, token: $token
             });
             await fetchBuildings();
@@ -74,8 +74,8 @@
     <label for="username">Building Name:</label>
     <select id="building-name" name="station-name" bind:value={buildingName}>
         {#if buildings}
-            {#each buildings.map(building => building.buildingName) as bName}
-                <option value={bName}>{bName}</option>
+            {#each [null].concat(buildings.map(building => building.buildingName)) as bName}
+                <option value={bName}>{bName || ''}</option>
             {/each}
         {/if}
     </select>
@@ -83,8 +83,8 @@
     <label for="station-name">Station Name:</label>
     <select id="building-name" name="station-name" bind:value={stationName}>
         {#if buildings}
-            {#each Array.from(new Set(buildings.map(building => building.stationName))) as sName}
-                <option value={sName}>{sName}</option>
+            {#each [null].concat(Array.from(new Set(buildings.map(building => building.stationName)))) as sName}
+                <option value={sName}>{sName || ''}</option>
             {/each}
         {/if}
     </select>
