@@ -10,6 +10,7 @@
     storeUsername.useLocalStorage();
     // Data fetched from the database
     let foodTrucks;
+    let foofTruckName
     let foodNames;
     let foodName;
     let price;
@@ -51,9 +52,7 @@
 
 <h1>Order</h1>
 
-<form on:submit|preventDefault={fetchFoodTrucks}>
-    <label for="food-truck-name">Food Truck name:</label>
-    <input type="text" name="food-truck-name" bind:value={foodTruckName}>
+<p>Food Truck: {foodTruckName}</p>
 
     <br>
     {#if errorMsg}
