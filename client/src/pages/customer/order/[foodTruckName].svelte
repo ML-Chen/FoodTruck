@@ -58,7 +58,6 @@
     {#if errorMsg}
         <p class="error">{errorMsg}</p>
     {/if}
-</form>
 
 <table>
     <thead>
