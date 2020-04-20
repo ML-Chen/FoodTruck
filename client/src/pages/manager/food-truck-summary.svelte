@@ -26,7 +26,10 @@
     /** @type {{ foodTruckName: string, stationName: string }} */
     let selectedFoodTruck; // name of the selected foodTruck in the table
 
-    onMount(fetchFoodTrucks);
+    onMount(async () => {
+        await fetchStations();
+        await fetchFoodTrucks();
+    });
 
     async function fetchStations() {
         try {

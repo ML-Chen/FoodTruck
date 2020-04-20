@@ -125,9 +125,9 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 assert tokens[token].username in (a.get('username', ''), a.get('customerUsername', ''), a.get('managerUsername', ''))
             if restrict_by_food_truck:
                 cursor.execute("SELECT foodTruckName FROM FoodTruck WHERE managerUsername = '{}' ".format(a['managerUsername']))
-                print("errr")
-                print(cursor.fetchall())
-                assert not a.get('foodTruckName', '') or a['foodTruckName'] in cursor.fetchall()
+                food_trucks = list(map(lambda x: x[0], cursor.fetchall()))
+                print(food_trucks)
+                assert not a.get('foodTruckName', '') or a['foodTruckName'] in food_trucks
         except AssertionError as e:
             print(repr(e))
             print('Your user type')
@@ -144,10 +144,10 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 # The next two lines are from https://stackoverflow.com/a/17534004/5139284 by juandesant, CC-BY-SA 4.0
                 fields = map(lambda x: x[0], cursor.description)
                 result = [dict(zip(fields, row)) for row in cursor.fetchall()]
-                print(result)
-                print(procedure + '_result')
                 if len(result) == 1 and get_result == 1:
                     result = result[0]
+                else:
+                    result = list(filter(lambda x: x != {}, result))
                 # Create and send a token upon successful login
                 if procedure == 'login' and result:
                     # TODO: don't generate a new token if the user already exists (honestly not very important though)
@@ -156,7 +156,6 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                     result['token'] = new_token
                     response = jsonify(result)
                     response.set_cookie('token', new_token)
-                    print(f'Tokens: {tokens}')
                     with open('tokens.txt', 'w+') as f:
                         f.write(str(tokens))
                 else:
@@ -319,7 +318,7 @@ mn_filter_foodTruck = db_api('mn_filter_foodTruck', ['GET'], [
     ('minStaffCount', {'type': int}),
     ('maxStaffCount', {'type': int}),
     ('hasRemainingCapacity', {'type': bool, 'required': True})
-], get_result=2, restrict_by_username=False, restrict_by_food_truck=True)
+], get_result=2, restrict_by_username=True, restrict_by_food_truck=True)
 
 # Query #18: mn_delete_foodTruck [Screen #11 Manager Manage Food Truck]
 # Response :
