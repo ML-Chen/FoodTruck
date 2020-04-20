@@ -1,6 +1,7 @@
 <!-- Screen #12 Manager Create Food Truck -->
 
 <script>
+    import { onMount } from 'svelte';
     import { url, goto } from '@sveltech/routify';
     import { token, userType } from '../_store.js';
     import axios from 'axios';
@@ -9,24 +10,30 @@
     userType.useLocalStorage();
 
     // Data fetched from the database
-    let stations;
-    let staffs;
+    let stations = [];
+    let staffs = [];
 
     let foodTruckName;
     let selectedStation;
+    let selectedStaffs;
     let foods = [];
+    let prices = [];
     let wipFoods;
+    let wipPrices;
     let errorMsg;
 
+    onMount(callHelpers);
     async function callHelpers() {
             try {
-                const stationsJson = (await axios.post('http://localhost:4000/ad_create_foodTruck', { foodTruckName, description, token: $token })).data;
-                const staffsJson = (await axios.post('http://localhost:4000/ad_create_foodTruck', { foodTruckName, description, token: $token })).data;
+                const stationsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Station'}})).data;
+                const staffsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Staff'}})).data;
                 if (stationsJson.error || staffsJson.error) {
                     errorMsg = stationsJson.error;
                 } else {
                     stations = stationsJson.filter(station => Object.keys(station).length !== 0);
                     staffs = staffsJson.filter(staff => Object.keys(staff).length !== 0);
+                    console.log(stations)
+                    console.log(staffs)
                 }
             } catch (error) {
                 console.log(error.response.data)
@@ -73,14 +80,36 @@
             {/each}
         {/if}
     </select>
+    <label for="selectedStaffs">Assign Staffs:</label>
+ 
+    <select multiple bind:value={selectedStaffs}>
+        {#each staffs as staff}
+            <option value={staff.staffUsername}>
+                {staff.staffName}
+            </option>
+        {/each}
+    </select>
+
 
     <!-- TODO: add price -->
     <label for="foods">Menu Item</label>
         {#each foods as food, index (food)}
-            <button type="button" on:click={() => { foods = foods.filter((_, i) => i !== index) }} aria-label="Remove Food {food}">−</button>{food}<br />
+            <button type="button" on:click={() => { 
+                foods = foods.filter((_, i) => i !== index)
+                prices = prices.filter((_, i) => i !== index)
+                }} 
+                aria-label="Remove Food {food}">−</button>Food: {food} Price: {prices[index]}<br />
         {/each}
-    <button type="button" on:click={() => { if (wipFoods) { foods = foods.concat(wipFoods); wipFoods=''; }}} aria-label="Add Food {wipFoods}">+</button>
+    <button type="button" on:click={() => { 
+        if (wipFoods && wipPrices) {
+            foods = foods.concat(wipFoods); 
+            prices = prices.concat(wipPrices);
+            wipFoods='';
+            wipPrices= 0; 
+            }
+        }} aria-label="Add Food {wipFoods}">+</button>
     <input type="text" bind:value={wipFoods} /><br />
+    <input type="number" bind:value={wipPrices} /><br />
     <button type="submit">Create</button>
 </form>
 

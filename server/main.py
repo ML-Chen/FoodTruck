@@ -111,9 +111,9 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         # helper endpoint handling:
         if helper:
             if a['queryType'] == 'Station':
-                cursor.execute('select distinct(capacityInfo.stationName) FROM FoodTruck INNER JOIN (select (capacity - count(foodTruckName)) as remainingCapacity, Station.stationName from Station inner join FoodTruck on Station.stationName = FoodTruck.stationName group by Station.stationName) as capacityInfo ON FoodTruck.stationName = capacityInfo.stationName where remainingCapacity>0;')
+                cursor.execute('select distinct(capacityInfo.stationName) as stationName FROM FoodTruck INNER JOIN (select (capacity - count(foodTruckName)) as remainingCapacity, Station.stationName from Station inner join FoodTruck on Station.stationName = FoodTruck.stationName group by Station.stationName) as capacityInfo ON FoodTruck.stationName = capacityInfo.stationName where remainingCapacity>0;')
             elif a['queryType'] == 'Staff':
-                cursor.execute('select * from Staff where foodTruckName =null;')
+                cursor.execute('select Staff.username as staffUsername, CONCAT(firstName," ", lastName) as staffName from Staff left join `user` on Staff.username = `user`.username')
             fields = [col[0] for col in cursor.description]
             result = [dict(zip(fields, row)) for row in cursor.fetchall()]
             result = list(filter(lambda x: x != {}, result))
@@ -488,9 +488,9 @@ cus_order_history = db_api('cus_order_history', ['GET'], [
     ('customerUsername', {'type': str, 'required': True})
 ], get_result=2, restrict_by_username=True)
 
-# Helper Query #1: help_station_capacity [Screen #12 Create Food Truck]
-# Response: [{'stationName': string}]
-help_station_capacity = db_api('help_station_capacity', ['GET'], 
+# Helper Query #1: help_create_food_truck [Screen #12 Create Food Truck]
+# Response: [{'stationName': string}] or [{'staffName': string}]
+help_create_food_truck = db_api('help_create_food_truck', ['GET'], 
 [('queryType',{'type': str, 'required': True, 'choices': ('Station', 'Staff')})], helper=True)
 def close_connection() -> None:
     connection.close()
