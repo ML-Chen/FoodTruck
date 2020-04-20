@@ -107,12 +107,12 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 assert 'Manager' in tokens[token].user_type
             
             if restrict_by_username:
-                assert tokens[token].username in (a['username'], a['customerUsername'], a['managerUsername'])
+                assert tokens[token].username in (a.get('username', ''), a.get('customerUsername', ''), a.get('managerUsername', ''))
             if restrict_by_food_truck:
                 cursor.execute("SELECT foodTruckName FROM FoodTruck WHERE managerUsername = '{}' ".format(a['managerUsername']))
                 print("errr")
                 print(cursor.fetchall())
-                assert not a['foodTruckName'] or a['foodTruckName'] in cursor.fetchall()
+                assert not a.get('foodTruckName', '') or a['foodTruckName'] in cursor.fetchall()
         except AssertionError as e:
             print(repr(e))
             return {'error': "Your user type can't access this page: " + repr(e)}, 403
@@ -139,6 +139,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                     result['token'] = new_token
                     response = jsonify(result)
                     response.set_cookie('token', new_token)
+                    print(f'Tokens: {tokens}')
                 else:
                     response = jsonify(result)
                 print(f'Result: {result}')
