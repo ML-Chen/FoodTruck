@@ -44,8 +44,12 @@ class Auth(NamedTuple):
     user_type: str
 
 # Maps tokens to their username and user type
-# TODO: store tokens in and retrieve tokens from database. Not that important. Or, load tokens from a local text file so that whenever I restart the server I don't have to log users back in again.
-tokens: Dict[str, Auth] = {}
+# Security warning: please ensure that tokens.txt contains no malicious Python code and is a normal dictionary
+try:
+    with open('tokens.txt', 'r') as f:
+        tokens: Dict[str, Auth] = eval(f.readline())
+except IOError as e:
+    tokens = {}
 
 def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict[str, Any]]], get_result: int = 0,
            restrict_by_username: bool = False, restrict_by_food_truck: bool = False) -> Callable[[None], Response]:
@@ -140,6 +144,8 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                     response = jsonify(result)
                     response.set_cookie('token', new_token)
                     print(f'Tokens: {tokens}')
+                    with open('tokens.txt', 'w+') as f:
+                        f.write(str(tokens))
                 else:
                     response = jsonify(result)
                 print(f'Result: {result}')
