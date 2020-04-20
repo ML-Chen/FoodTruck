@@ -89,3 +89,10 @@ npm run dev
 ```
 
 The website will be available at http://localhost:5000.
+
+If that doesn't work, try:
+
+```
+npm run build
+npm run serve
+```

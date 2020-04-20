@@ -28,7 +28,7 @@
     async function fetchBuildings() {
       try {
             const json = (await axios.get('http://localhost:4000/cus_filter_explore', {
-                params: { buildingName, stationName, buildingTag, foodTruckName, foodName, errorMsg, selectedBuilding, token: $token }
+                params: { buildingName, stationName, buildingTag, foodTruckName, foodName, token: $token }
             })).data;
             if (json.error) {
                 errorMsg = json.error
@@ -48,7 +48,8 @@
         console.log(selectedBuilding)
         try {
             const response = await axios.post('http://localhost:4000/cus_select_location', {
-                buildingName: selectedBuilding.buildingName, token: $token
+                customerName: 'TODO', // TODO
+                stationName: selectedBuilding.stationName, token: $token
             });
             await fetchBuildings();
             errorMsg = null;
