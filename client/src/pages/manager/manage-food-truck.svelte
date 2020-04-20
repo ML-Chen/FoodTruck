@@ -31,7 +31,7 @@
     async function fetchFoodTrucks() {
         try {
             const json = (await axios.get('http://localhost:4000/mn_filter_foodTruck', {
-                params: { managerUsername, foodTruckName, stationName, minStaffCount, maxStaffCount, hasRemainingCapacity, errorMsg, selectedFoodTruck, token: $token }
+                params: { managerUsername, foodTruckName, stationName, minStaffCount, maxStaffCount, hasRemainingCapacity, selectedFoodTruck, token: $token }
             })).data;
             console.log(json);
             if (json.error) {

@@ -18,10 +18,8 @@
             errorMsg = 'Password must be greater 8 characters'
         } else if (password != confirmPassword) {
             errorMsg = 'Confirm password must match password'
-        } else if (!email && type) {
-            errorMsg = 'Cannot be employee without email. Please enter email or refresh page if you are a customer'
         } else if (!type && email) {
-            errorMsg = "If you have an email, you are an employee"
+            errorMsg = "If you have an email, you must select a type of employee to be"
         } else if (balance && balance <= 0) {
             errorMsg = 'Balance must be a positive number'
         } else if (!type && (!balance || balance <= 0)) {
@@ -67,9 +65,6 @@
     <br />
 
     {#if email}
-        <input type="radio" id="notEmployee" name="type" value={undefined} bind:group={type}>
-        <label for="notEmployee" class="radio">Not Employee</label>
-
         <input type="radio" id="admin" name="type" value="Admin" bind:group={type}>
         <label for="admin" class="radio">Admin</label>
 
