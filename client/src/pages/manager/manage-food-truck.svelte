@@ -23,7 +23,6 @@
     let hasRemainingCapacity = false;
     let errorMsg;
     let errorMsg2;
-    /** @type {{ foodTruckName: string, stationName: string }} */
     let selectedFoodTruck; // name of the selected foodTruck in the table
 
     onMount(fetchFoodTrucks);
@@ -31,7 +30,7 @@
     async function fetchFoodTrucks() {
         try {
             const json = (await axios.get('http://localhost:4000/mn_filter_foodTruck', {
-                params: { managerUsername, foodTruckName, stationName, minStaffCount, maxStaffCount, hasRemainingCapacity, selectedFoodTruck, token: $token }
+                params: { managerUsername, foodTruckName, stationName, minStaffCount, maxStaffCount, hasRemainingCapacity, token: $token }
             })).data;
             console.log(json);
             if (json.error) {
@@ -122,9 +121,9 @@
                 <tr>
                     <td>
                         <label>
-                            <input type="radio" bind:group={selectedFoodTruck} value={{ foodTruckName: foodTruck.foodTruckName, stationName: foodTruck.stationName }}/>
+                            <input type="radio" bind:group={selectedFoodTruck} value={foodTruck.foodTruckName}/>
+                            {foodTruck.foodTruckName}
                         </label>
-                        {foodTruck.foodTruckName}
                     </td>
                     <td>{foodTruck.stationName}</td>
                     <td>{foodTruck.remainingCapacity}</td>
@@ -142,7 +141,7 @@
 <a href={$url('../../home')}>Back</a>
 
 <a href={$url('../create-food-truck')}>Create foodTruck</a>
-<a href={$url('../update-food-truck')} scoped={{selectedFoodTruck}}>Update foodTruck</a>
+<a href={$url(`../update-food-truck/${selectedFoodTruck}`)}>Update foodTruck</a>
 <button on:click={deleteFoodTruck}>Delete Food Truck</button>
 
 <style>
