@@ -2,22 +2,23 @@
 
 <script>
     import { onMount } from 'svelte';
-    import { token, userType, storeUsername } from '../_store.js';
+    import { token, userType, storeUsername } from '../../_store.js';
     import { Router, url, goto } from '@sveltech/routify';
-    import selectedFoodTruck from './food-truck-summary.svelte';
     import axios from 'axios';
 
     token.useLocalStorage();
     userType.useLocalStorage();
     storeUsername.useLocalStorage();
 
+    export let foodTruckName;
+    foodTruckName = decodeURIComponent(foodTruckName);
+
     // Data fetched from the database
     let orders;
 
     //props
     // Form values
-    let managerUsername = $storeUsername
-    let foodTruckName = 'NachoBizness'; //TO DO: GET PROPS WORKING
+    let managerUsername = $storeUsername;
     let errorMsg;
     let errorMsg2;
     /** @type {{ foodTruckName: string, stationName: string }} */
@@ -84,7 +85,7 @@
     <p class="error">{errorMsg2}</p>
 {/if}
 
-<a href={$url('../../home')}>Back</a>
+<a href={$url('../../food-truck-summary')}>Back</a>
 
 <style>
     .error {

@@ -21,11 +21,12 @@
     // Form values
     let errorMsg;
     let errorMsg2;
-    let selectedTruck; // name of the selected foodTruck in the table
+    /** @type {{foodTruckName: string, managerName: string, foodNames: string}} */
+    let selectedTruck = {foodTruckName: null, managerName: null, foodNames: null};
 
     onMount(async () => {
-        fetchCustomerInfo();
-        fetchTrucks();
+        await fetchCustomerInfo();
+        await fetchTrucks();
     });
 
     async function fetchTrucks() {
@@ -56,6 +57,7 @@
             } else {
                 /** @type {[{stationName: string, buildingName: string, tags: string, description: string, balance: float}]} */
                 ({ stationName, buildingName, tags, description, balance } = json);
+                console.log(json);
             }
             errorMsg = null;
         } catch (error) {
@@ -94,8 +96,8 @@
                     <td>
                         <label>
                             <input type="radio" value={foodTruck} bind:group={selectedTruck} />
+                            {foodTruck.foodTruckName}
                         </label>
-                        {foodTruck.foodTruckName}
                     </td>
                     <td>{foodTruck.managerName}</td>
                     <td>{foodTruck.foodNames}</td>
@@ -110,7 +112,7 @@
 
 <a href={$url('../../home')}>Back</a>
 
-<a href={$url('../order')}>Order</a>
+<a href={$url(`../order/${selectedTruck['foodTruckName']}`)}>Order</a>
 
 <style>
     .error {

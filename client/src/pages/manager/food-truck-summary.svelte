@@ -25,7 +25,7 @@
     let errorMsg;
     let errorMsg2;
     /** @type {{ foodTruckName: string, stationName: string }} */
-    let selectedFoodTruck; // name of the selected foodTruck in the table
+    let selectedFoodTruck = { foodTruckName: null, stationName: null }
 
     onMount(async () => {
         await fetchStations();
@@ -88,7 +88,7 @@
     <label for="station-name">Station name:</label>
     <select id="foodTruck-name" name="station-name" bind:value={stationName}>
         {#if stations}
-            {#each Array.from(new Set(stations.map(station => station.stationName))) as sName}
+            {#each stations.map(station => station.stationName) as sName}
                 <option value={sName}>{sName}</option>
             {/each}
         {/if}
@@ -124,8 +124,8 @@
                     <td>
                         <label>
                             <input type="radio" bind:group={selectedFoodTruck} value={{ foodTruckName: foodTruck.foodTruckName, stationName: foodTruck.stationName }}/>
+                            {foodTruck.foodTruckName}
                         </label>
-                        {foodTruck.foodTruckName}
                     </td>
                     <td>{foodTruck.totalOrder}</td>
                     <td>{foodTruck.totalRevenue}</td>
@@ -140,7 +140,7 @@
 {/if}
 
 <a href={$url('../../home')}>Back</a>
-<a href={$url('../summary-detail')} scoped={{selectedFoodTruck}}>Detail</a>
+<a href={$url(`../summary-detail/${selectedFoodTruck['foodTruckName']}`)}>Detail</a>
 <style>
     .error {
         color: red;

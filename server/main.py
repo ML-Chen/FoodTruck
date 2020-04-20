@@ -446,7 +446,7 @@ cus_select_location = db_api('cus_select_location', ['POST'], [
 # Response:
 cus_current_information_basic = db_api('cus_current_information_basic', ['GET'], [
     ('customerUsername', {'type': str, 'required': True})
-], get_result=2, restrict_by_username=True)
+], get_result=1, restrict_by_username=True)
 
 # Query #29: cus_current_information_foodTruck [Screen #17 Customer Current Information]
 # Response:
