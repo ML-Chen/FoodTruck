@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, Response
 from flask_restful import reqparse, Api, Resource
+from flask_restful.inputs import boolean
 from flask_cors import CORS
 import sys
 import os
@@ -317,7 +318,7 @@ mn_filter_foodTruck = db_api('mn_filter_foodTruck', ['GET'], [
     ('stationName', {'type': str}),
     ('minStaffCount', {'type': int}),
     ('maxStaffCount', {'type': int}),
-    ('hasRemainingCapacity', {'type': bool, 'required': True})
+    ('hasRemainingCapacity', {'type': boolean, 'required': True})
 ], get_result=2, restrict_by_username=True, restrict_by_food_truck=True)
 
 # Query #18: mn_delete_foodTruck [Screen #11 Manager Manage Food Truck]
