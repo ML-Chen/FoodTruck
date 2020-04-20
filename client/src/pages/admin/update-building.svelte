@@ -13,7 +13,25 @@
     let tags = [];
     let wipTag;
     let errorMsg;
-    onMount(updateBuilding)
+    onMount(FetchBuilding)
+    async function fetchBuildings() {
+        try {
+            const json = (await axios.get('http://localhost:4000/ad_filter_building_station', {
+                params: { buildingName, stationName, buildingTag, minCapacity, maxCapacity, errorMsg, selectedBuilding, token: $token }
+            })).data;
+            if (json.error) {
+                errorMsg = json.error
+            } else {
+                /** @type {[{buildingName: string, tags: string, stationName: string, capacity: int, foodTruckNames: string}]} */
+                buildings = json.filter(building => Object.keys(building).length !== 0);
+            }
+            errorMsg = null;
+            errorMsg2 = null;
+        } catch (error) {
+            console.log(error);
+            errorMsg = 'Network error. Maybe the server is down?';
+        }
+    }
     async function updateBuilding() {
         try {
             const json = (await axios.post('http://localhost:4000/ad_update_building', { buildingName, description, token: $token })).data;
