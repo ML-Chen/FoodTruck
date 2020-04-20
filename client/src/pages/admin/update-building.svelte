@@ -24,16 +24,15 @@
 
     async function fetchBuilding() {
         try {
-            const json = (await axios.get('http://localhost:4000/ad_filter_building_station', {
-                params: { buildingName: oldBuildingName, stationName, buildingTag, minCapacity, maxCapacity, selectedBuilding, token: $token }
+            const building = (await axios.get('http://localhost:4000/ad_view_building_general', {
+                params: { buildingName: oldBuildingName }
             })).data;
-            if (json.error) {
-                errorMsg = json.error
+            if (building.error) {
+                errorMsg = building.error
             } else {
-                building = json[0]
+                errorMsg = null;
+                errorMsg2 = null;
             }
-            errorMsg = null;
-            errorMsg2 = null;
         } catch (error) {
             console.log(error);
             errorMsg = 'Network error. Maybe the server is down?';

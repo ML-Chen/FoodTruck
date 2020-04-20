@@ -24,7 +24,7 @@
     async function fetchFoods() {
         try {
             const json = (await axios.get('http://localhost:4000/ad_filter_food', {
-                params: { foodName: foodNameFilter, menuCount, errorMsg, selectedFood, token: $token }
+                params: { foodName: foodNameFilter }
             })).data;
             if (json.error) {
                 errorMsg = json.error

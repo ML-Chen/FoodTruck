@@ -247,7 +247,7 @@ ad_create_building = db_api('ad_create_building', ['POST'], [
 # Response: 
 ad_view_building_general = db_api('ad_view_building_general', ['GET'], [
     ('buildingName', {'type': str, 'required': True})
-], get_result=2)
+], get_result=1)
 
 # Query #8b: ad_view_building_tags [Screen #6 Admin Update Building]
 # Response: 
