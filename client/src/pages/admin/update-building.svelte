@@ -45,10 +45,10 @@
                     errorMsg = json.error;
                 } else {
                     for (let tag of tagsAdded) {
-                        axios.post('http://localhost:4000/ad_add_building_tag', { buildingName, tag, token: $token })
+                        await axios.post('http://localhost:4000/ad_add_building_tag', { buildingName, tag, token: $token })
                     }
                     for (let tag of tagsRemoved) {
-                        axios.post('http://localhost:4000/ad_remove_building_tag', { buildingName, tag, token: $token })
+                        await axios.post('http://localhost:4000/ad_remove_building_tag', { buildingName, tag, token: $token })
                     }
                 }
         } catch (error) {

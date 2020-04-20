@@ -48,12 +48,12 @@ Powershell:
 Next, we need to install the project dependencies, which are listed in `requirements.txt`.
 
 ```
-(venv) $ pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ### Set your database password
 
-Change `.env` to your match your datbase address, password, etc.
+Change `.env` to your match your database address, password, etc.
 
 ### Start the server
 
@@ -62,6 +62,12 @@ Start the server on port 4000:
 ```
 flask run -p 4000
 ```
+
+It may be helpful to first enable debug mode beforehand:
+
+- Git Bash, Unix (Linux, Mac, or Windows Subsystem on Linux): `export FLASK_ENV=development`
+- Windows Command Prompt (CMD): `set FLASK_ENV="development"`
+- PowerShell: `$env:FLASK_ENV="development"`
 
 ## Tips
 

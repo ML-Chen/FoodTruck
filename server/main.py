@@ -64,7 +64,7 @@ except IOError as e:
     tokens = {}
 
 def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict[str, Any]]], get_result: int = 0,
-           restrict_by_username: bool = False, restrict_by_food_truck: bool = False) -> Callable[[None], Response]:
+           restrict_by_username: bool = False, restrict_by_food_truck: bool = False, restrict_by_order: bool = False) -> Callable[[None], Response]:
     """
     Parameters:
     - procedure: name of the MySQL stored procedure which we will call.
@@ -97,7 +97,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         parser = reqparse.RequestParser()
         for arg_name, arg_params in inputs:
             parser.add_argument(arg_name, **arg_params)
-        restricted = restrict_by_username or restrict_by_food_truck or procedure.startswith('cus_') or procedure.startswith('mn_') or procedure.startswith('ad_')
+        restricted = restrict_by_username or restrict_by_food_truck or restrict_by_order or procedure.startswith('cus_') or procedure.startswith('mn_') or procedure.startswith('ad_')
         if restricted:
             parser.add_argument('token', type=str)
         try:
@@ -121,28 +121,33 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 assert 'Admin' in tokens[token].user_type
             elif procedure.startswith('mn_'):
                 assert 'Manager' in tokens[token].user_type
-            
+        except AssertionError as e:
+            print('Your user type' + repr(e))
+            return {'error': "Your user type can't access this page: " + repr(e)}, 403
+        except KeyError as e:
+            print("Your token doesn't match a logged in user:" + repr(e))
+            return {'error': "Your token doesn't match a logged in user: " + repr(e)}, 403
+        try:
             if restrict_by_username:
                 assert tokens[token].username in (a.get('username', ''), a.get('customerUsername', ''), a.get('managerUsername', ''))
             if restrict_by_food_truck:
                 cursor.execute("SELECT foodTruckName FROM FoodTruck WHERE managerUsername = '{}' ".format(a['managerUsername']))
                 food_trucks = list(map(lambda x: x[0], cursor.fetchall()))
                 print(food_trucks)
-                assert not a.get('foodTruckName', '') or a['foodTruckName'] in food_trucks
+                assert a['foodTruckName'] in food_trucks
+            if restrict_by_order:
+                cursor.execute("SELECT orderID FROM Orders WHERE customerUsername = '{}' ".format(tokens[token].username))
+                orders = list(map(lambda x: x[0], cursor.fetchall()))
+                print('Orders: ' + str(orders))
+                assert a.orderID in orders
         except AssertionError as e:
-            print(repr(e))
-            print('Your user type')
-            return {'error': "Your user type can't access this page: " + repr(e)}, 403
-        except KeyError as e:
-            print(repr(e))
-            print('Your token doesn''t match a logged in user:')
-            return {'error': "Your token doesn't match a logged in user: " + repr(e)}, 403
+            print("You don't have the right username or food truck or food order ownership to be able to do this: " + repr(e))
+            return {'error': "You don't have the right username or food truck or food order ownership to be able to do this: " + repr(e)}, 403
 
         try:
             cursor.callproc(procedure, args=tuple(a.values()))
             if get_result:
                 cursor.execute(f"SELECT * FROM {procedure + '_result'};")
-                # The next two lines are from https://stackoverflow.com/a/17534004/5139284 by juandesant, CC-BY-SA 4.0
                 fields = [col[0] for col in cursor.description]
                 result = [dict(zip(fields, row)) for row in cursor.fetchall()]
                 if len(result) == 1 and get_result == 1:
@@ -351,20 +356,20 @@ mn_create_foodTruck_add_MenuItem = db_api('mn_create_foodTruck_add_MenuItem', ['
 ], restrict_by_food_truck=True)
 
 # Query #20a: mn_view_foodTruck_available_staff [Screen #13 Manager Update Food Truck]
-# Response:
+# Response: [{availableStaff: string}]
 mn_view_foodTruck_available_staff = db_api('mn_view_foodTruck_available_staff', ['GET'], [
     ('managerUsername', {'type': str, 'required': True}),
     ('foodTruckName', {'type': str, 'required': True})
 ], get_result=2, restrict_by_food_truck=True, restrict_by_username=True)
 
 # Query #20b: mn_view_foodTruck_staff [Screen #13 Manager Update Food Truck]
-# Response: 
+# Response: [{assignedStaff: string}]
 mn_view_foodTruck_staff = db_api('mn_view_foodTruck_staff', ['GET'], [
     ('foodTruckName', {'type': str, 'required': True})
  ], get_result=2, restrict_by_food_truck=True)
 
 # Query #21: mn_view_foodTruck_menu [Screen #13 Manager Update Food Truck]
-# Response:
+# Response: 
 mn_view_foodTruck_menu = db_api('mn_view_foodTruck_menu', ['GET'], [
     ('foodTruckName', {'type': str, 'required': True})
  ], get_result=2, restrict_by_food_truck=True)
@@ -377,14 +382,14 @@ mn_update_foodTruck_station = db_api('mn_update_foodTruck_station', ['POST'], [
 ], restrict_by_food_truck=True)
 
 # Query #22b: mn_update_foodTruck_staff [Screen #13 Manager Update Food Truck]
-# Response: {}
+# Response: []
 mn_update_foodTruck_staff = db_api('mn_update_foodTruck_staff', ['POST'], [
     ('foodTruckName', {'type': str, 'required': True}),
     ('staffUsername', {'type': str, 'required': True})
 ], restrict_by_food_truck=True)
 
 # Query #22c: mn_update_foodTruck_MenuItem [Screen #13 Manager Update Food Truck]
-# Response:
+# Response: []
 mn_update_foodTruck_MenuItem = db_api('mn_update_foodTruck_MenuItem', ['POST'], [
     ('foodTruckName', {'type': str, 'required': True}),
     ('price', {'type': float, 'required': True}),
@@ -392,13 +397,13 @@ mn_update_foodTruck_MenuItem = db_api('mn_update_foodTruck_MenuItem', ['POST'], 
 ], restrict_by_food_truck=True)
 
 # Query #23: mn_get_station [Screen #14 Manager Food Truck Summary]
-# Response:
+# Response: [{stationName: string}]
 mn_get_station = db_api('mn_get_station', ['GET'], [
     ('managerUsername', {'type': str, 'required': True}),
 ], get_result=2, restrict_by_username=False)
 
 # Query #24: mn_filter_summary [Screen #14 Manager Food Truck Summary]
-# Response:
+# Response: [{foodTruckName: string, totalOrder: int, totalRevenue: decimal, totalCustomer: int}]
 mn_filter_summary = db_api('mn_filter_summary', ['GET'], [
     ('managerUsername', {'type': str, 'required': True}),
     ('foodTruckName', {'type': str}),
@@ -419,17 +424,17 @@ mn_summary_detail = db_api('mn_summary_detail', ['GET'], [
 # no need to do restrict_by_food_truck=True because the query already does a join with the manager's username
 
 # Query #26: cus_filter_explore [Screen #16 Customer Explore]
-# Response:
+# Response: [{stationName: string, buildingName: string, foodTruckNames: string, foodNames: string}]
 cus_filter_explore = db_api('cus_filter_explore', ['GET'], [
     ('buildingName', {'type': str}),
     ('stationName', {'type': str}),
     ('buildingTag', {'type': str}),
     ('foodTruckName', {'type': str}),
     ('foodName', {'type': str})
-], get_result=2, restrict_by_food_truck=True)
+], get_result=2)
 
 # Query #27: cus_select_location [Screen #16 Customer Explore]
-# Response:
+# Response: []
 cus_select_location = db_api('cus_select_location', ['POST'], [
     ('customerUsername', {'type': str, 'required': True}),
     ('stationName', {'type': str, 'required': True})
@@ -448,23 +453,23 @@ cus_current_information_foodTruck = db_api('cus_current_information_foodTruck', 
 ], get_result=2, restrict_by_username=True)
 
 # Query #30: cus_order [Screen #18 Customer Order]
-# Response:
+# Response: []
 cus_order = db_api('cus_order', ['POST'], [
     ('date', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date(), 'required': True}),
     ('customerUsername', {'type': str, 'required': True})
 ], restrict_by_username=True)
 
 # Query #31: cus_add_item_to_order [Screen #18 Customer Order]
-# Response:
+# Response: []
 cus_add_item_to_order = db_api('cus_add_item_to_order', ['POST'], [
     ('foodTruckName', {'type': str, 'required': True}),
     ('foodName', {'type': str, 'required': True}),
     ('purchaseQuantity', {'type': int, 'required': True}),
     ('orderID', {'type': int, 'required': True})
-], restrict_by_food_truck=True)
+], restrict_by_order=True)
 
 # Query #32: cus_order_history [Screen #19 Customer Order History]
-# Response:
+# Response: [{'date': date, orderID: string, orderTotal: decimal, foodNames: string, foodQuantity: int}]
 cus_order_history = db_api('cus_order_history', ['GET'], [
     ('customerUsername', {'type': str, 'required': True})
 ], get_result=2, restrict_by_username=True)

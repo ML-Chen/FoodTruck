@@ -1,4 +1,4 @@
-<!-- Screen 4: Admin Manage Food Truck -->
+<!-- Screen 11: Manager Manage Food Truck -->
 
 <script>
     import { onMount } from 'svelte';
