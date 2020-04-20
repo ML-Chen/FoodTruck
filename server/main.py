@@ -65,7 +65,7 @@ except IOError as e:
     tokens = {}
 
 def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict[str, Any]]], get_result: int = 0,
-           restrict_by_username: bool = False, restrict_by_food_truck: bool = False, restrict_by_order: bool = False) -> Callable[[None], Response]:
+           restrict_by_username: bool = False, restrict_by_food_truck: bool = False, restrict_by_order: bool = False, helper: bool = False) -> Callable[[None], Response]:
     """
     Parameters:
     - procedure: name of the MySQL stored procedure which we will call.
@@ -94,7 +94,6 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
     def new_api() -> Response:
         nonlocal inputs
         nonlocal get_result
-
         parser = reqparse.RequestParser()
         for arg_name, arg_params in inputs:
             parser.add_argument(arg_name, **arg_params)
@@ -108,6 +107,19 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
             print(repr(e))
             return {'error': 'Bad request. Expected request arguments: ' + str(parser.args)}, 400
         print('Request: ' + repr(a))
+
+        # helper endpoint handling:
+        if helper:
+            if a['queryType'] == 'Station':
+                cursor.execute('select distinct(capacityInfo.stationName) FROM FoodTruck INNER JOIN (select (capacity - count(foodTruckName)) as remainingCapacity, Station.stationName from Station inner join FoodTruck on Station.stationName = FoodTruck.stationName group by Station.stationName) as capacityInfo ON FoodTruck.stationName = capacityInfo.stationName where remainingCapacity>0;')
+            elif a['queryType'] == 'Staff':
+                cursor.execute('select * from Staff where foodTruckName =null;')
+            fields = [col[0] for col in cursor.description]
+            result = [dict(zip(fields, row)) for row in cursor.fetchall()]
+            result = list(filter(lambda x: x != {}, result))
+            print(result)
+            response = jsonify(result)
+            return response
         if restricted:
             if 'token' in a and a.token is not None:
                 token = a.token
@@ -326,7 +338,7 @@ mn_filter_foodTruck = db_api('mn_filter_foodTruck', ['GET'], [
     ('minStaffCount', {'type': int}),
     ('maxStaffCount', {'type': int}),
     ('hasRemainingCapacity', {'type': boolean, 'required': True})
-], get_result=2, restrict_by_username=True, restrict_by_food_truck=True)
+], get_result=2, restrict_by_username=True)
 
 # Query #18: mn_delete_foodTruck [Screen #11 Manager Manage Food Truck]
 # Response :
@@ -476,6 +488,10 @@ cus_order_history = db_api('cus_order_history', ['GET'], [
     ('customerUsername', {'type': str, 'required': True})
 ], get_result=2, restrict_by_username=True)
 
+# Helper Query #1: help_station_capacity [Screen #12 Create Food Truck]
+# Response: [{'stationName': string}]
+help_station_capacity = db_api('help_station_capacity', ['GET'], 
+[('queryType',{'type': str, 'required': True, 'choices': ('Station', 'Staff')})], helper=True)
 def close_connection() -> None:
     connection.close()
     print('MySQL connection closed')
