@@ -1,16 +1,22 @@
 # Food Truck
 
-Phase 4 final project of CS 4400: Intro to Databases, Spring 2020, with Dr. Mark Moss.
+Team 39 Phase 4 final project of CS 4400: Intro to Databases, Spring 2020, with Dr. Mark Moss.
 
 Using Flask, Svelte, and MySQL for a food truck management website.
 
-By Michael Chen, Min Htat Kyaw (Reynold), Jingxuan (Julia) Qiu, Duncan Siebert, and Alexander Trotter
+Contributors (and their primary Georgia Tech username):
+- Michael Chen (mchen419)
+- Min Htat Kyaw (mkyaw6)
+- Alexander Trotter (atrotter6)
+- Duncan Siebert (dsiebert3)
 
 ## Getting started: server
 
 Make sure you have [Python ≥3.7](https://www.python.org/downloads/) installed.
 
 These steps should be in a terminal in the /server folder (`cd server`).
+
+You can skip the "Set up virtual environment" and "Activate virtual environment" steps if you're okay with installing the pip packages globally on your computer. With bigger projects it would be a good idea to use a virtual environment, however.
 
 ### Set up virtual environment
 
@@ -25,23 +31,9 @@ virtualenv venv
 
 This should be done every time you open a new terminal
 
-Unix (Linux, Mac, or Windows Subsystem on Linux):
-
-```bash
-source venv/bin/activate
-```
-
-Git Bash on Windows:
-
-```bash
-source venv/Scripts/activate
-```
-
-Powershell:
-
-```powershell
-.\venv\Scripts\activate
-```
+- Unix (Linux, Mac, or Windows Subsystem on Linux): `source venv/bin/activate`
+- Git Bash on Windows: `source venv/Scripts/activate`
+- Powershell: `.\venv\Scripts\activate`
 
 ### Install project dependencies
 
@@ -69,7 +61,7 @@ It may be helpful to first enable debug mode beforehand:
 - Windows Command Prompt (CMD): `set FLASK_ENV="development"`
 - PowerShell: `$env:FLASK_ENV="development"`
 
-## Tips
+### Tips
 
 To test the backend, you can use the application [Postman](https://www.postman.com/).
 
