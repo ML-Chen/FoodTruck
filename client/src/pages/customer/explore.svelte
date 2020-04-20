@@ -16,16 +16,6 @@
     let buildingName;
     let stationName;
     let buildingTag;
-    let minCapacity;
-    let maxCapacity;
-    let errorMsg;
-     // Data fetched from the database
-    let buildings;
-
-    // Form values
-    let buildingName;
-    let stationName;
-    let buildingTag;
     let foodTruckName;
     let foodName;
     let errorMsg;
@@ -65,11 +55,7 @@
             errorMsg2 = null;
         } catch (error) {
             console.log(error);
-            if (error.response.data.error.includes('IntegrityError')) {
-                errorMsg2 = "Can't delete building because something depends on it"
-            } else {
-                errorMsg2 = 'Network error. Maybe the server is down?';
-            }
+            errorMsg2 = 'Error. Maybe the server is down?';
         }
     }
 
@@ -127,19 +113,19 @@
         </tr>
     </thead>
     <tbody>
-            {#if buildings}
-                {#each buildings as building}
-                    <td>
-                        <label>
-                            <input type="radio" bind:group={selectedBuilding} value={{ buildingName: building.buildingName, stationName: building.stationName }}/>
-                        </label>
-                        {building.stationName}
-                    </td>
-                    <td>{building.buildingName}</td>
-                    <td>{building.foodTruckNames}</td>
-                    <td>{building.foodNames}</td>
-                {/each}
-            {/if}
+        {#if buildings}
+            {#each buildings as building}
+                <td>
+                    <label>
+                        <input type="radio" bind:group={selectedBuilding} value={{ buildingName: building.buildingName, stationName: building.stationName }}/>
+                    </label>
+                    {building.stationName}
+                </td>
+                <td>{building.buildingName}</td>
+                <td>{building.foodTruckNames}</td>
+                <td>{building.foodNames}</td>
+            {/each}
+        {/if}
     </tbody>
 </table>
 {#if errorMsg2}
@@ -148,8 +134,7 @@
 
 <a href={$url('../../home')}>Back</a>
 
-<a href={$url('../select-as-current-location')} scoped={{selectedBuilding}}>Select As Current Location</a>
-<button on:click={selectAsCurrentLocation}>Delete building</button>
+<button type="button" on:click={selectLocation}>Select As Current Location</button>
 
 <style>
     .error {
