@@ -10,6 +10,7 @@
     storeUsername.useLocalStorage();
     // Data fetched from the database
     let foodTrucks;
+    let foodNames;
     let foodName;
     let price;
     let purchaseQuantity;
@@ -40,6 +41,14 @@
             errorMsg = error.response.data.error;
         }
     }
+    
+    <select multiple bind:value={foodNames}>
+	{#each foodNames as foodName}
+		<option value={foodName}>
+			{foodName}
+		</option>
+	{/each}
+    </select>
   
 </script>
   
@@ -74,7 +83,8 @@
                 <tr>
                     <td>
                         <label>
-                            <input type="radio" bind:value={{ foodName: foodTruck.foodName }}/>
+                            <input type=checkbox bind:group={foodNames} value={foodName}>
+                            {foodName}
                         </label>
                         {foodTruck.foodName}
                     </td>
