@@ -55,8 +55,12 @@ class Auth(NamedTuple):
     user_type: str
 
 # Maps tokens to their username and user type
-# TODO: store tokens in and retrieve tokens from database. Not that important. Or, load tokens from a local text file so that whenever I restart the server I don't have to log users back in again.
-tokens: Dict[str, Auth] = {}
+# Security warning: please ensure that tokens.txt contains no malicious Python code and is a normal dictionary
+try:
+    with open('tokens.txt', 'r') as f:
+        tokens: Dict[str, Auth] = eval(f.readline())
+except IOError as e:
+    tokens = {}
 
 def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict[str, Any]]], get_result: int = 0,
            restrict_by_username: bool = False, restrict_by_food_truck: bool = False) -> Callable[[None], Response]:
@@ -98,6 +102,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         try:
             a = parser.parse_args()
         except Exception as e:
+            print(request.__dict__)
             print(repr(e))
             return {'error': 'Bad request. Expected request arguments: ' + str(parser.args)}, 400
         print('Request: ' + repr(a))
@@ -117,14 +122,18 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 assert 'Manager' in tokens[token].user_type
             
             if restrict_by_username:
+<<<<<<< HEAD
                 print(tokens[token].username)
                 print(a['managerUsername'])
                 assert tokens[token].username == a['username'] or  tokens[token].username == a['customerUsername'] or tokens[token].username == a['managerUsername']
+=======
+                assert tokens[token].username in (a.get('username', ''), a.get('customerUsername', ''), a.get('managerUsername', ''))
+>>>>>>> 4c9568c59ea88b401adeccf5b8889da0c3b8436c
             if restrict_by_food_truck:
                 cursor.execute("SELECT foodTruckName FROM FoodTruck WHERE managerUsername = '{}' ".format(a['managerUsername']))
                 print("errr")
                 print(cursor.fetchall())
-                assert not a['foodTruckName'] or a['foodTruckName'] in cursor.fetchall()
+                assert not a.get('foodTruckName', '') or a['foodTruckName'] in cursor.fetchall()
         except AssertionError as e:
             print(repr(e))
             print('Your user type')
@@ -153,6 +162,9 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                     result['token'] = new_token
                     response = jsonify(result)
                     response.set_cookie('token', new_token)
+                    print(f'Tokens: {tokens}')
+                    with open('tokens.txt', 'w+') as f:
+                        f.write(str(tokens))
                 else:
                     response = jsonify(result)
                 print(f'Result: {result}')
@@ -190,7 +202,7 @@ register = db_api('register', ['POST'], [
     ('lastName', {'type': str, 'required': True}),
     ('password', {'type': str, 'required': True}),
     ('balance', {'type': float}),
-    ('type', {'type': str, 'required': True, 'choices': ('Admin', 'Manager', 'Staff')}),
+    ('type', {'type': str, 'choices': ('Admin', 'Manager', 'Staff')}),
 ])
 
 # Query #3: ad_filter_building_station [Screen #4 Admin Manage Building & Station]

@@ -1,6 +1,7 @@
 <!-- Screen 2: Register -->
 <script>
     import { url, goto } from '@sveltech/routify';
+    import axios from 'axios';
     let username;
     let email;
     let firstName;
@@ -17,18 +18,15 @@
             errorMsg = 'Password must be greater 8 characters'
         } else if (password != confirmPassword) {
             errorMsg = 'Confirm password must match password'
-        } else if (!email && type) {
-            errorMsg = 'Cannot be employee without email. Please enter email or refresh page if you are a customer'
-        }else {
-            const response = await fetch('http://127.0.0.1:4000/register', {
-                method: 'POST',
-                mode: 'cors',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, email, firstName, lastName, password, balance , type })
-            });
-            const json = await response.json();
+        } else if (!type && email) {
+            errorMsg = "If you have an email, you must select a type of employee to be"
+        } else if (balance && balance <= 0) {
+            errorMsg = 'Balance must be a positive number'
+        } else if (!type && (!balance || balance <= 0)) {
+            errorMsg = "If you're not an employee, you must have a positive balance"
+        } else {
+            const response = await axios.post('http://127.0.0.1:4000/register', { username, email, firstName, lastName, password, balance, type: email ? type : null });
+            const json = response.data;
             if (json === []) {
                 errorMsg = 'Error';
             } else if (json.error) {
@@ -66,17 +64,16 @@
     <input type="number" id="balance" name="balance" bind:value={balance} />
     <br />
 
-    <input type="radio" id="notEmployee" name="type" value=undefined bind:group={type}>
-    <label for="notEmployee" class="radio">Not Employee</label>
+    {#if email}
+        <input type="radio" id="admin" name="type" value="Admin" bind:group={type}>
+        <label for="admin" class="radio">Admin</label>
 
-    <input type="radio" id="admin" name="type" value="Admin" bind:group={type}>
-    <label for="admin" class="radio">Admin</label>
+        <input type="radio" id="manager" name="type" value="Manager" bind:group={type}>
+        <label for="manager" class="radio">Manager</label>
 
-    <input type="radio" id="manager" name="type" value="Manager" bind:group={type}>
-    <label for="manager" class="radio">Manager</label>
-
-    <input type="radio" id="staff" name="type" value="Staff" bind:group={type}>
-    <label for="staff" class="radio">Staff</label>
+        <input type="radio" id="staff" name="type" value="Staff" bind:group={type}>
+        <label for="staff" class="radio">Staff</label>
+    {/if}
     
     <br />
 

@@ -1,3 +1,5 @@
+tokens.txt
+
 *.pyc
 /backend
 /backend/db.sqlite3
