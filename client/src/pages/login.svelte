@@ -12,7 +12,7 @@
     let password;
     let errorMsg;
 
-    export async function handleLogin() {
+    async function handleLogin() {
         if (!username) {
             errorMsg = 'Username must not be blank';
         } else if (!password || password.length < 8) {
