@@ -158,11 +158,11 @@
 <a href={$url('../../home')}>Back</a>
 
 <a href={$url('../create-building')}>Create building</a>
-<a href={$url('../update-building')} scoped={{buildingName: selectedBuilding['buildingName']}}>Update building</a>
+<a href={$url(`../update-building/${selectedBuilding['buildingName']}`)}>Update building</a>
 <button on:click={deleteBuilding}>Delete building</button>
 
 <a href={$url('../create-station')}>Create station</a>
-<a href={$url('../update-station')} scoped={{stationName: selectedBuilding['stationName']}}>Update station</a>
+<a href={$url(`../update-station/${selectedBuilding['stationName']}`)}>Update station</a>
 <button on:click={deleteStation}>Delete station</button>
 
 <style>

@@ -3,16 +3,14 @@
 <script>
     import { onMount } from 'svelte';
     import { url, goto } from '@sveltech/routify';
-    import { token, userType } from '../_store.js';
+    import { token, userType } from '../../_store.js';
     import axios from 'axios';
 
     token.useLocalStorage();
     userType.useLocalStorage();
 
-    export let scoped;
-    const oldBuildingName = scoped.buildingName;
-    console.log(scoped);
-
+    export let buildingName;
+    const oldBuildingName = decodeURIComponent(buildingName);
     let newBuildingName = oldBuildingName;
     let description;
     let tags = [];
@@ -25,18 +23,33 @@
 
     async function fetchBuilding() {
         try {
-            const building = (await axios.get('http://localhost:4000/ad_view_building_general', {
+            const json = (await axios.get('http://localhost:4000/ad_view_building_general', {
                 params: { buildingName: oldBuildingName }
             })).data;
-            if (building.error) {
-                errorMsg = building.error
+            if (json.error) {
+                errorMsg = json.error
             } else {
+                newBuildingName = json.buildingName;
+                description = json.description;
                 errorMsg = null;
                 errorMsg2 = null;
             }
         } catch (error) {
             console.log(error);
-            errorMsg = 'Network error. Maybe the server is down?';
+            errorMsg = error;
+        }
+    }
+    async function fetchTags() {
+        try {
+            const json = (await axios.get('http://localhost:4000/ad_view_building_tags'), {
+                params: { buildingName: oldBuildingName }
+            })
+            if (json.error) {
+                errorMsg = json.error;
+            }
+        } catch (error) {
+            console.log(error);
+            errorMsg = error;
         }
     }
     async function updateBuilding() {
@@ -88,4 +101,14 @@
     <button type="submit">Update</button>
 </form>
 
+{#if errorMsg}
+    <p class="errorMsg">{errorMsg}</p>
+{/if}
+
 <a href={$url('../../home')}>Back</a>
+
+<style>
+    .errorMsg {
+        color: red;
+    }
+</style>

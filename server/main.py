@@ -108,7 +108,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
             return {'error': 'Bad request. Expected request arguments: ' + str(parser.args)}, 400
         print('Request: ' + repr(a))
         if restricted:
-            if 'token' in a:
+            if 'token' in a and a.token is not None:
                 token = a.token
                 del a['token']  # don't send token to database stored procedures
             else:
