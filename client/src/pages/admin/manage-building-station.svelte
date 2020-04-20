@@ -21,7 +21,7 @@
     let errorMsg;
     let errorMsg2;
     /** @type {{ buildingName: string, stationName: string }} */
-    let selectedBuilding; // name of the selected building in the table
+    let selectedBuilding = {buildingName: null, stationName: null};
 
     onMount(fetchBuildings);
 
@@ -139,8 +139,8 @@
                     <td>
                         <label>
                             <input type="radio" bind:group={selectedBuilding} value={{ buildingName: building.buildingName, stationName: building.stationName }}/>
+                            {building.buildingName}
                         </label>
-                        {building.buildingName}
                     </td>
                     <td>{building.tags}</td>
                     <td>{building.stationName}</td>
@@ -158,11 +158,11 @@
 <a href={$url('../../home')}>Back</a>
 
 <a href={$url('../create-building')}>Create building</a>
-<a href={$url('../update-building')} scoped={{buildingName: selectedBuilding.buildingName}}>Update building</a>
+<a href={$url('../update-building')} scoped={{buildingName: selectedBuilding['buildingName']}}>Update building</a>
 <button on:click={deleteBuilding}>Delete building</button>
 
 <a href={$url('../create-station')}>Create station</a>
-<a href={$url('../update-station')} scoped={{stationName: selectedBuilding.stationName}}>Update station</a>
+<a href={$url('../update-station')} scoped={{stationName: selectedBuilding['stationName']}}>Update station</a>
 <button on:click={deleteStation}>Delete station</button>
 
 <style>

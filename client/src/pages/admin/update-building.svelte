@@ -11,6 +11,7 @@
 
     export let scoped;
     const oldBuildingName = scoped.buildingName;
+    console.log(scoped);
 
     let newBuildingName = oldBuildingName;
     let description;

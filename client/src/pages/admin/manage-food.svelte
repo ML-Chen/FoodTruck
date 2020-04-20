@@ -1,4 +1,5 @@
 <!-- Screen 4: Admin Manage Building & Station -->
+<!-- TODO: doesn't work -->
 
 <script>
     import { onMount } from 'svelte';
@@ -17,6 +18,8 @@
     let errorMsg;
     let errorMsg2;
     let foodNameFilter;
+    let sortedBy = 'name'; // choices: ['name', 'menuCount', 'purchaseCount']
+    let sortDirection = 'ASC'; // choices: ['ASC', 'DESC']
     let selectedFoodName;
 
     onMount(fetchFoods);
@@ -24,7 +27,7 @@
     async function fetchFoods() {
         try {
             const json = (await axios.get('http://localhost:4000/ad_filter_food', {
-                params: { foodName: foodNameFilter }
+                params: { foodName: foodNameFilter, sortedBy, sortDirection }
             })).data;
             if (json.error) {
                 errorMsg = json.error

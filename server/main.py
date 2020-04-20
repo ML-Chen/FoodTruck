@@ -103,8 +103,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         try:
             a = parser.parse_args()
         except Exception as e:
-            # print(request.__dict__)
-            print(request.__dict__._cached_json)
+            print(request.__dict__)
             print(repr(e))
             return {'error': 'Bad request. Expected request arguments: ' + str(parser.args)}, 400
         print('Request: ' + repr(a))
@@ -300,8 +299,8 @@ ad_update_station = db_api('ad_update_station', ['POST'], [
 # Response: 
 ad_filter_food = db_api('ad_filter_food', ['GET'], [
     ('foodName', {'type': str}),
-    ('sortedBy', {'type': float, 'required': True, 'choices': ('name', 'menuCount', 'purchaseCount')}),
-    ('sortDirection', {'type': float, 'default': 'ASC', 'choices': ('ASC', 'DESC')})
+    ('sortedBy', {'type': str, 'required': True, 'choices': ('name', 'menuCount', 'purchaseCount')}),
+    ('sortDirection', {'type': str, 'default': 'ASC', 'choices': ('ASC', 'DESC')})
 ], get_result=2)
 
 # Query #15: ad_delete_food [Screen #9 Admin Manage Food]

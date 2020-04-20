@@ -4,7 +4,7 @@
     userType.useLocalStorage();
 </script>
 
-{#if $userType && $userType.includes('manager')}
+{#if $userType && $userType.includes('Manager')}
 <slot>
   <!-- pages in this folder and subfolders
    will be rendered here -->
