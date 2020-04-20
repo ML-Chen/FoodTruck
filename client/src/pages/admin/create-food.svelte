@@ -1,11 +1,32 @@
 <!-- Screen 10: Create Food -->
-
-import { url, goto } from '@sveltech/routify';
+<script>
+    import { url, goto } from '@sveltech/routify';
     import { token, userType } from '../_store.js';
     import axios from 'axios';
 
     token.useLocalStorage();
     userType.useLocalStorage();
+
+    let FoodName;
+    let errorMsg;
+
+    async function createBuilding() {
+        if (!FoodName) {
+            errorMsg = 'Food name must not be blank';
+        } else {
+            try {
+                const json = (await axios.post('http://localhost:4000/ad_create_food', { FoodName, token: $token })).data;
+                    if (json.error) {
+                        errorMsg = json.error;
+                    } else {
+                    }
+            } catch (error) {
+                console.log(error);
+                errorMsg = 'Maybe the server is down?'
+            }
+        }
+    }
+</script>
 
     </script>
 
