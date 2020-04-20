@@ -1,11 +1,12 @@
 <!-- Screen 1: Login -->
 
 <script>
-    import { token, userType } from './_store.js';
+    import { token, userType, storeUsername } from './_store.js';
     import { url, goto } from '@sveltech/routify';
 
     token.useLocalStorage();
     userType.useLocalStorage();
+    storeUsername.useLocalStorage();
 
     let username;
     let password;
@@ -35,6 +36,7 @@
                 } else {
                     token.set(json.token);
                     userType.set(json.userType);
+                    storeUsername.set(json.username);
                     $goto('../home')
                 }
             } catch (error) {

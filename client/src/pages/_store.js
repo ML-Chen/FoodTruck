@@ -21,5 +21,6 @@ function persistentWritable(key, startValue) {
 
 export const token = persistentWritable('token', '');
 export const userType = persistentWritable('userType', '');
+export const storeUsername = persistentWritable('storeUsername', '');
 
 // TODO: use cookies instead of storing token in localStorage

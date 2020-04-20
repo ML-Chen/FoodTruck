@@ -23,7 +23,7 @@ try:
         host='127.0.0.1',
         database='cs4400spring2020',
         user='root',
-        password="ENTERMYSQLPASSWORD"
+        password="mkyaw6@gatech.edu"
     )
     cursor = connection.cursor(buffered=True)
 except mysql.connector.Error as error:
@@ -98,8 +98,10 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
             if restrict_by_username:
                 assert tokens[token].username in (a['username'], a['customerUsername'], a['managerUsername'])
             if restrict_by_food_truck:
-                cursor.execute("SELECT foodTruckName FROM FoodTruck WHERE managerUsername = %s", (a['managerUsername']))
-                assert a['foodTruckName'] in cursor.fetchall()
+                cursor.execute("SELECT foodTruckName FROM FoodTruck WHERE managerUsername = '{}' ".format(a['managerUsername']))
+                print("errr")
+                print(cursor.fetchall())
+                assert not a['foodTruckName'] or a['foodTruckName'] in cursor.fetchall()
         except AssertionError as e:
             print(repr(e))
             return {'error': "Your user type can't access this page: " + repr(e)}, 403
@@ -114,6 +116,8 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 # The next two lines are from https://stackoverflow.com/a/17534004/5139284 by juandesant, CC-BY-SA 4.0
                 fields = map(lambda x: x[0], cursor.description)
                 result = [dict(zip(fields, row)) for row in cursor.fetchall()]
+                print(result)
+                print(procedure + '_result')
                 if len(result) == 1 and get_result == 1:
                     result = result[0]
                 # Create and send a token upon successful login
@@ -284,7 +288,7 @@ mn_filter_foodTruck = db_api('mn_filter_foodTruck', ['GET'], [
     ('minStaffCount', {'type': int}),
     ('maxStaffCount', {'type': int}),
     ('hasRemainingCapacity', {'type': bool, 'required': True})
-], get_result=2, restrict_by_username=True, restrict_by_food_truck=True)
+], get_result=2, restrict_by_username=False, restrict_by_food_truck=True)
 
 # Query #18: mn_delete_foodTruck [Screen #11 Manager Manage Food Truck]
 # Response :

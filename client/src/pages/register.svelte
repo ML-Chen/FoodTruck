@@ -1,5 +1,6 @@
 <!-- Screen 2: Register -->
 <script>
+    import { url, goto } from '@sveltech/routify';
     let username;
     let email;
     let firstName;
@@ -34,6 +35,7 @@
                 errorMsg = json.error;
             } else {
                 console.log("Success");
+                $goto('../login')
             }
         }
     }
@@ -70,7 +72,7 @@
     <input type="radio" id="manager" name="type" value="Manager" bind:group={type}>
     <label for="staff">Staff</label>
     <input type="radio" id="staff" name="type" value="Staff" bind:group={type}>
-    <button type="button">Back</button>
+    <a href={$url('../index')}>Back</a>
     <button type="submit">Register</button>
     {#if errorMsg}
         <p class="error">{errorMsg}</p>
