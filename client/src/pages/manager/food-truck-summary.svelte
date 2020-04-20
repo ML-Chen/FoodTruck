@@ -5,6 +5,7 @@
     import { token, userType, storeUsername } from '../_store.js';
     import { url, goto } from '@sveltech/routify';
     import axios from 'axios';
+    import { TableSort } from 'svelte-tablesort';
 
     token.useLocalStorage();
     userType.useLocalStorage();
@@ -92,9 +93,10 @@
             {/each}
         {/if}
     </select>
-
-    <label for="station-name">date:</label>
+    <br />
+    Date:
     <input type="date" id="min-date" name="min-date" bind:value={minDate} aria-label="minimum date" />
+    &ndash;
     <input type="date" id="max-date" name="max-date" bind:value={maxDate} aria-label="maximum date" />
 
     <br>
@@ -103,6 +105,8 @@
         <p class="error">{errorMsg}</p>
     {/if}
 </form>
+
+<!-- TODO: make columns sortable with https://github.com/mattiash/svelte-tablesort -->
 
 <table>
     <thead>
