@@ -13,6 +13,8 @@ import re
 from secrets import token_hex
 import datetime
 import os
+import decimal
+import flask.json
 
 # Load environment variables from `.env`
 with open('.env', 'r') as f:
@@ -24,9 +26,18 @@ with open('.env', 'r') as f:
 os.environ.update(env_vars)
 
 app = Flask(__name__)
+
 cors = CORS(app)  # allow CORS on all routes
 app.config['JSON_SORT_KEYS'] = False
 api = Api(app)
+# Fix decimal to string issue
+class MyJSONEncoder(flask.json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, decimal.Decimal):
+            # Convert decimal instances to strings.
+            return str(obj)
+        return super(MyJSONEncoder, self).default(obj)
+app.json_encoder = MyJSONEncoder
 try:
     # Check MySQL Workbench > Database > Connect to Database > Test Connection for the host name, etc.
     connection = mysql.connector.connect(
@@ -96,7 +107,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 del a['token']  # don't send token to database stored procedures
             else:
                 token = request.cookies.get('token')
-
+        
         try:
             if procedure.startswith('cus_'):
                 assert 'Customer' in tokens[token].user_type
@@ -106,7 +117,9 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 assert 'Manager' in tokens[token].user_type
             
             if restrict_by_username:
-                assert tokens[token].username in (a['username'], a['customerUsername'], a['managerUsername'])
+                print(tokens[token].username)
+                print(a['managerUsername'])
+                assert tokens[token].username == a['username'] or  tokens[token].username == a['customerUsername'] or tokens[token].username == a['managerUsername']
             if restrict_by_food_truck:
                 cursor.execute("SELECT foodTruckName FROM FoodTruck WHERE managerUsername = '{}' ".format(a['managerUsername']))
                 print("errr")
@@ -114,9 +127,11 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 assert not a['foodTruckName'] or a['foodTruckName'] in cursor.fetchall()
         except AssertionError as e:
             print(repr(e))
+            print('Your user type')
             return {'error': "Your user type can't access this page: " + repr(e)}, 403
         except KeyError as e:
             print(repr(e))
+            print('Your token doesn''t match a logged in user:')
             return {'error': "Your token doesn't match a logged in user: " + repr(e)}, 403
 
         try:
@@ -374,7 +389,7 @@ mn_update_foodTruck_MenuItem = db_api('mn_update_foodTruck_MenuItem', ['POST'], 
 # Response:
 mn_get_station = db_api('mn_get_station', ['GET'], [
     ('managerUsername', {'type': str, 'required': True}),
-], get_result=2, restrict_by_username=True)
+], get_result=2, restrict_by_username=False)
 
 # Query #24: mn_filter_summary [Screen #14 Manager Food Truck Summary]
 # Response:
@@ -384,9 +399,9 @@ mn_filter_summary = db_api('mn_filter_summary', ['GET'], [
     ('stationName', {'type': str}),
     ('minDate', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date()}),
     ('maxDate', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date()}),
-    ('sortedBy', {'type': float, 'choices': ('foodTruckName', 'totalOrder', 'totalRevenue', 'totalCustomer')}),
-    ('sortDirection', {'type': float, 'default': 'ASC', 'choices': ('ASC', 'DESC')})
-], get_result=2, restrict_by_username=True)
+    ('sortedBy', {'type': str, 'choices': ('foodTruckName', 'totalOrder', 'totalRevenue', 'totalCustomer')}),
+    ('sortDirection', {'type': str, 'default': 'ASC', 'choices': ('ASC', 'DESC')})
+], get_result=2, restrict_by_username=False)
 # no need to do restrict_by_food_truck=True because the query already does a join with the manager's username
 
 # Query #25: mn_summary_detail [Screen #15 Manager Summary Detail]
