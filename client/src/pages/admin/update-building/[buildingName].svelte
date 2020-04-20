@@ -19,12 +19,16 @@
     let tagsRemoved = [];
     let errorMsg;
 
-    onMount(fetchBuilding);
+    onMount(async () => {
+        await fetchBuilding();
+        await fetchTags();
+        console.log(tags);
+    });
 
     async function fetchBuilding() {
         try {
             const json = (await axios.get('http://localhost:4000/ad_view_building_general', {
-                params: { buildingName: oldBuildingName }
+                params: { buildingName: oldBuildingName, token: $token }
             })).data;
             if (json.error) {
                 errorMsg = json.error
@@ -32,7 +36,6 @@
                 newBuildingName = json.buildingName;
                 description = json.description;
                 errorMsg = null;
-                errorMsg2 = null;
             }
         } catch (error) {
             console.log(error);
@@ -41,11 +44,13 @@
     }
     async function fetchTags() {
         try {
-            const json = (await axios.get('http://localhost:4000/ad_view_building_tags'), {
-                params: { buildingName: oldBuildingName }
-            })
+            const json = (await axios.get('http://localhost:4000/ad_view_building_tags', {
+                params: { buildingName: oldBuildingName, token: $token }
+            })).data;
             if (json.error) {
                 errorMsg = json.error;
+            } else {
+                tags = json.map(obj => obj.tag);
             }
         } catch (error) {
             console.log(error);
@@ -72,7 +77,7 @@
     }
 </script>
 
-<svelte:head>Update Building</svelte:head>
+<svelte:head><title>Update Building</title></svelte:head>
 
 <h1>Update Building</h1>
 
@@ -105,7 +110,7 @@
     <p class="errorMsg">{errorMsg}</p>
 {/if}
 
-<a href={$url('../../home')}>Back</a>
+<a href={$url('../../manage-building-station')}>Back</a>
 
 <style>
     .errorMsg {

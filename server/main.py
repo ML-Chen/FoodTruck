@@ -16,6 +16,7 @@ import datetime
 import os
 import decimal
 import flask.json
+import pprint
 
 # Load environment variables from `.env`
 with open('.env', 'r') as f:
@@ -69,7 +70,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
     Parameters:
     - procedure: name of the MySQL stored procedure which we will call.
         - The URL for the API endpoint is just '/' plus the name of the procedure (e.g., '/login').
-        - Access to the API will be restricted to certain user types if `procedure` begins with 'ad_', 'mn_', or 'cus_'. In this case, either a 'token' cookie or a `token` request parameter is expected (or both, the `token` request parameter taking precedence).
+        - Access to the API will be restricted to certain user types if `procedure` begins with 'ad_', 'mn_', or 'cus_'. In this case, either a 'token' cookie or a `token` request parameter is expected (or both, the `token` request parameter taking precedence). Well actually the cookie thing doesn't work so you should use a token request parameter.
         - A procedure named 'login' will create a token for the user and set a cookie for that, and also return that in the response.
     - http_methods: HTTP methods, such as ['GET'] (if the operation is just fetching data and doesn't modify the database), or ['POST']
     - inputs: request parameters, which will be passed into the stored procedure. These arguments should be in the same order as the SQL stored procedure, but can be called anything you like.
@@ -103,7 +104,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         try:
             a = parser.parse_args()
         except Exception as e:
-            print(request.__dict__)
+            print(request.query_string)
             print(repr(e))
             return {'error': 'Bad request. Expected request arguments: ' + str(parser.args)}, 400
         print('Request: ' + repr(a))
@@ -161,7 +162,8 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                     tokens[new_token] = Auth(a['username'], result['userType'])
                     result['token'] = new_token
                     response = jsonify(result)
-                    response.set_cookie('token', new_token)
+                    response.set_cookie('token', value=new_token, domain='127.0.0.1')
+                    print(repr(response))
                     with open('tokens.txt', 'w+') as f:
                         f.write(str(tokens))
                 else:
