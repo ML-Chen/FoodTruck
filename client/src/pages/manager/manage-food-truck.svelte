@@ -11,13 +11,13 @@
     storeUsername.useLocalStorage();
 
     // Data fetched from the database
-    let foodTrucks;
+    let foodTrucks = [];
 
     // Form values
     console.log($storeUsername)
     let managerUsername = $storeUsername
-    let foodTruckName;
-    let stationName;
+    let foodTruckName = null;
+    let stationName = null;
     let minStaffCount;
     let maxStaffCount;
     let hasRemainingCapacity = false;
@@ -51,7 +51,7 @@
         console.log(selectedFoodTruck)
         try {
             const response = await axios.post('http://localhost:4000/mn_delete_foodTruck', {
-                foodTruckName: selectedFoodTruck.foodTruckName, token: $token
+                foodTruckName: selectedFoodTruck, token: $token
             });
             await fetchFoodTrucks();
             errorMsg = null;
@@ -66,6 +66,9 @@
         }
     }
 
+    $: console.log('foodtruckname ' + JSON.stringify(foodTruckName))
+    $: console.log('foodtrucks ' + JSON.stringify(foodTrucks))
+
 </script>
 
 <svelte:head>
@@ -78,18 +81,16 @@
 <form on:submit|preventDefault={fetchFoodTrucks}>
     <label for="username">Food Truck name:</label>
     <select id="foodTruck-name" name="station-name" bind:value={foodTruckName}>
-        {#if foodTrucks}
-            {#each foodTrucks.map(foodTruck => foodTruck.foodTruckName) as fName}
-                <option value={fName}>{fName}</option>
-            {/each}
-        {/if}
+        {#each [null].concat(foodTrucks.map(foodTruck => foodTruck.foodTruckName)) as fName}
+            <option value={fName} selected={fName === foodTruckName}>{fName || ''}</option>
+        {/each}
     </select>
 
     <label for="station-name">Station name:</label>
     <select id="foodTruck-name" name="station-name" bind:value={stationName}>
         {#if foodTrucks}
-            {#each Array.from(new Set(foodTrucks.map(foodTruck => foodTruck.stationName))) as sName}
-                <option value={sName}>{sName}</option>
+            {#each [null].concat(Array.from(new Set(foodTrucks.map(foodTruck => foodTruck.stationName)))) as sName}
+                <option value={sName} selected={sName === stationName}>{sName || ''}</option>
             {/each}
         {/if}
     </select>

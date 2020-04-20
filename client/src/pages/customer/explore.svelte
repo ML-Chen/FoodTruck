@@ -14,8 +14,8 @@
     let buildings;
 
     // Form values
-    let buildingName;
-    let stationName;
+    let buildingName = null;
+    let stationName = null;
     let buildingTag;
     let foodTruckName;
     let foodName;
@@ -72,11 +72,10 @@
 
 <form on:submit|preventDefault={fetchBuildings}>
     <label for="username">Building Name:</label>
-    <!-- TODO selecting a building and pressing filter, the dropdown looks like the null value is selected, but actually the selected thing is still what was previously selected -->
     <select id="building-name" name="station-name" bind:value={buildingName}>
         {#if buildings}
             {#each [null].concat(buildings.map(building => building.buildingName)) as bName}
-                <option value={bName}>{bName || ''}</option>
+                <option value={bName} selected={bName === buildingName}>{bName || ''}</option>
             {/each}
         {/if}
     </select>
@@ -85,7 +84,7 @@
     <select id="building-name" name="station-name" bind:value={stationName}>
         {#if buildings}
             {#each [null].concat(Array.from(new Set(buildings.map(building => building.stationName)))) as sName}
-                <option value={sName}>{sName || ''}</option>
+                <option value={sName} selected={sName === stationName}>{sName || ''}</option>
             {/each}
         {/if}
     </select>
