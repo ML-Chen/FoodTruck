@@ -122,13 +122,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 assert 'Manager' in tokens[token].user_type
             
             if restrict_by_username:
-<<<<<<< HEAD
-                print(tokens[token].username)
-                print(a['managerUsername'])
-                assert tokens[token].username == a['username'] or  tokens[token].username == a['customerUsername'] or tokens[token].username == a['managerUsername']
-=======
                 assert tokens[token].username in (a.get('username', ''), a.get('customerUsername', ''), a.get('managerUsername', ''))
->>>>>>> 4c9568c59ea88b401adeccf5b8889da0c3b8436c
             if restrict_by_food_truck:
                 cursor.execute("SELECT foodTruckName FROM FoodTruck WHERE managerUsername = '{}' ".format(a['managerUsername']))
                 print("errr")
