@@ -2,12 +2,13 @@
 
 <script>
     import { onMount } from 'svelte';
-    import { token, userType } from '../_store.js';
+    import { token, userType, storeUsername } from '../_store.js';
     import { url, goto } from '@sveltech/routify';
     import axios from 'axios';
 
     token.useLocalStorage();
     userType.useLocalStorage();
+    storeUsername.useLocalStorage();
     
      // Data fetched from the database
     let buildings;
@@ -48,7 +49,7 @@
         console.log(selectedBuilding)
         try {
             const response = await axios.post('http://localhost:4000/cus_select_location', {
-                customerName: 'TODO', // TODO
+                customerName: $storeUsername,
                 stationName: selectedBuilding.stationName, token: $token
             });
             await fetchBuildings();
