@@ -1,5 +1,4 @@
 <!-- Screen #12 Manager Create Food Truck -->
-<!-- Screen 5: Create foodTruck -->
 
 <script>
     import { url, goto } from '@sveltech/routify';
