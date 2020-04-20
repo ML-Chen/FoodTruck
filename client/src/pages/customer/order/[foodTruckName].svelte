@@ -41,14 +41,6 @@
             errorMsg = error.response.data.error;
         }
     }
-    
-    <select multiple bind:value={foodNames}>
-	{#each foodNames as foodName}
-		<option value={foodName}>
-			{foodName}
-		</option>
-	{/each}
-    </select>
   
 </script>
   
@@ -83,7 +75,7 @@
                 <tr>
                     <td>
                         <label>
-                            <input type=checkbox bind:group={foodNames} value={foodName}>
+                            <select multiple type=checkbox bind:value={foodName}>
                             {foodName}
                         </label>
                         {foodTruck.foodName}
