@@ -12,6 +12,16 @@ from mysql.connector import Error
 import re
 from secrets import token_hex
 import datetime
+import os
+
+# Load environment variables from `.env`
+with open('.env', 'r') as f:
+    env_vars = dict(
+        tuple(line.split('='))
+        for line in f.readlines()
+        if not line.startswith('#')
+    )
+os.environ.update(env_vars)
 
 app = Flask(__name__)
 cors = CORS(app)  # allow CORS on all routes
@@ -20,10 +30,10 @@ api = Api(app)
 try:
     # Check MySQL Workbench > Database > Connect to Database > Test Connection for the host name, etc.
     connection = mysql.connector.connect(
-        host='127.0.0.1',
-        database='cs4400spring2020',
-        user='root',
-        password="ENTERMYSQLPASSWORD"
+        host=os.environ['host'],
+        database=os.environ['database'],
+        user=os.environ['user'],
+        password=os.environ['password']
     )
     cursor = connection.cursor(buffered=True)
 except mysql.connector.Error as error:

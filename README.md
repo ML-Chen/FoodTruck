@@ -53,17 +53,7 @@ Next, we need to install the project dependencies, which are listed in `requirem
 
 ### Set your database password
 
-See `main.py` (excerpted below) for the database name and password that the Flask server expects.
-
-```
-# Check MySQL Workbench > Database > Connect to Database > Test Connection for the host name, etc.
-connection = mysql.connector.connect(
-    host='127.0.0.1',
-    database='cs4400spring2020',
-    user='root',
-    password='E55yT^$f&n4Nc&5k'
-)
-```
+Change `.env` to your match your datbase address, password, etc.
 
 ### Start the server
 
@@ -79,7 +69,7 @@ To test the backend, you can use the application [Postman](https://www.postman.c
 
 ## Getting started: client
 
-Install [Node.js](https://nodejs.org/en/).
+Install [Node.js](https://nodejs.org/en/) and [Git](https://git-scm.com/downloads).
 
 Now, in a separate terminal in the /client folder (`cd client`), run:
 
