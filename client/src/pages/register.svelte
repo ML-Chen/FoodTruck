@@ -1,6 +1,11 @@
 <!-- Screen 2: Register -->
 <script>
+<<<<<<< HEAD
     import { url, goto } from '@sveltech/routify';
+=======
+    import { url } from '@sveltech/routify';
+
+>>>>>>> 93c223b64825aeb1be7fcd6a8a4b3fc3351b65b1
     let username;
     let email;
     let firstName;
@@ -63,18 +68,27 @@
     <label for="confirmPassword">Confirm Password</label>
     <input type="password" id="confirmPassword" name="confirmPassword" bind:value={confirmPassword} />
     <label for="balance">Balance</label>
-    <input type="text" id="balance" name="balance" bind:value={balance} />
-    <label for="notEmployee">Not Employee</label>
+    <input type="number" id="balance" name="balance" bind:value={balance} />
+
     <input type="radio" id="notEmployee" name="type" value=undefined bind:group={type}>
-    <label for="admin">Admin</label>
+    <label for="notEmployee">Not Employee</label>
+
     <input type="radio" id="admin" name="type" value="Admin" bind:group={type}>
-    <label for="manager">Manager</label>
+    <label for="admin">Admin</label>
+
     <input type="radio" id="manager" name="type" value="Manager" bind:group={type}>
-    <label for="staff">Staff</label>
+    <label for="manager">Manager</label>
+
     <input type="radio" id="staff" name="type" value="Staff" bind:group={type}>
+<<<<<<< HEAD
     <a href={$url('../index')}>Back</a>
+=======
+    <label for="staff">Staff</label>
+    <br />
+>>>>>>> 93c223b64825aeb1be7fcd6a8a4b3fc3351b65b1
     <button type="submit">Register</button>
     {#if errorMsg}
         <p class="error">{errorMsg}</p>
     {/if}
 </form>
+<a href={$url('../')}>Back</a>

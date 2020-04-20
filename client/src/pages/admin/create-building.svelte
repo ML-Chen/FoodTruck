@@ -15,20 +15,26 @@
     let errorMsg;
 
     async function createBuilding() {
-        try {
-            const json = (await axios.post('http://localhost:4000/ad_create_building', { buildingName, description, token: $token })).data;
-                if (json.error) {
-                    errorMsg = json.error;
-                } else {
-                    for (let tag of tags) {
-                        axios.post('http://localhost:4000/ad_add_building_tag', { buildingName, tag, token: $token })
+        if (!buildingName) {
+            errorMsg = 'Building name must not be blank';
+        } else if (!description) {
+            errorMsg = 'Description must not be blank';
+        } else {
+            try {
+                const json = (await axios.post('http://localhost:4000/ad_create_building', { buildingName, description, token: $token })).data;
+                    if (json.error) {
+                        errorMsg = json.error;
+                    } else {
+                        for (let tag of tags) {
+                            axios.post('http://localhost:4000/ad_add_building_tag', { buildingName, tag, token: $token })
+                        }
+                        buildingName = description = wipTag = errorMsg = '';
+                        tags = [];
                     }
-                    buildingName = description = wipTag = errorMsg = '';
-                    tags = [];
-                }
-        } catch (error) {
-            console.log(error);
-            errorMsg = 'Maybe the server is down?'
+            } catch (error) {
+                console.log(error);
+                errorMsg = 'Maybe the server is down?'
+            }
         }
     }
 </script>
