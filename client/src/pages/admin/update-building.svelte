@@ -13,7 +13,7 @@
     let tags = [];
     let wipTag;
     let errorMsg;
-
+    onMount(updateBuilding)
     async function updateBuilding() {
         try {
             const json = (await axios.post('http://localhost:4000/ad_update_building', { buildingName, description, token: $token })).data;
@@ -21,7 +21,7 @@
                     errorMsg = json.error;
                 } else {
                     for (let tag of tags) {
-                        axios.post('http://localhost:4000/ad_add_building_tag', { buildingName, tag, token: $token })
+                        axios.post('http://localhost:4000/ad_update_building_tag', { buildingName, tag, token: $token })
                     }
                     buildingName = description = wipTag = errorMsg = '';
                     tags = [];
