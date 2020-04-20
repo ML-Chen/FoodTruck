@@ -27,6 +27,9 @@
     <a href={$url('../admin/manage-building-station')}>Manage buildings and stations</a>
     <a href={$url('../admin/manage-food')}>Manage food</a>
 {/if}
+{#if !$userType.includes('Customer') && !$userType.includes('Manager') && !$userType.includes('Admin')}
+    <p>You’re doing great! There’s nothing you need to do.</p>
+{/if}
 
 <style>
 a {

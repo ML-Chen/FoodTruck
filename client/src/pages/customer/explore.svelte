@@ -72,6 +72,7 @@
 
 <form on:submit|preventDefault={fetchBuildings}>
     <label for="username">Building Name:</label>
+    <!-- TODO selecting a building and pressing filter, the dropdown looks like the null value is selected, but actually the selected thing is still what was previously selected -->
     <select id="building-name" name="station-name" bind:value={buildingName}>
         {#if buildings}
             {#each [null].concat(buildings.map(building => building.buildingName)) as bName}

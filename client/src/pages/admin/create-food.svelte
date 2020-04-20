@@ -16,11 +16,11 @@
         } else {
             try {
                 const json = (await axios.post('http://localhost:4000/ad_create_food', { foodName, token: $token })).data;
-                    if (json.error) {
-                        errorMsg = json.error;
-                    } else {
-                        foodName = errorMsg = '';
-                    }
+                if (json.error) {
+                    errorMsg = json.error;
+                } else {
+                    foodName = errorMsg = '';
+                }
             } catch (error) {
                 console.log(error);
                 errorMsg = 'Maybe the server is down?'
@@ -40,7 +40,6 @@
     <label for="foodName">Name</label>
     <input type="text" id="foodName" name="foodName" bind:value={foodName} />
 
-    
     <button type="submit">Create</button>
 </form>
 
