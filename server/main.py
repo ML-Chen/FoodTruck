@@ -87,6 +87,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         try:
             a = parser.parse_args()
         except Exception as e:
+            print(request.__dict__)
             print(repr(e))
             return {'error': 'Bad request. Expected request arguments: ' + str(parser.args)}, 400
         print('Request: ' + repr(a))
@@ -175,7 +176,7 @@ register = db_api('register', ['POST'], [
     ('lastName', {'type': str, 'required': True}),
     ('password', {'type': str, 'required': True}),
     ('balance', {'type': float}),
-    ('type', {'type': str, 'required': True, 'choices': ('Admin', 'Manager', 'Staff')}),
+    ('type', {'type': str, 'choices': ('Admin', 'Manager', 'Staff')}),
 ])
 
 # Query #3: ad_filter_building_station [Screen #4 Admin Manage Building & Station]
