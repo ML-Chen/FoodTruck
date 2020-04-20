@@ -37,7 +37,7 @@
 
 <h1>Create Food</h1>
 
-<form on:submit|preventDefault={createBuilding}>
+<form on:submit|preventDefault={createFood}>
     <label for="FoodName">Name</label>
     <input type="text" id="FoodName" name="FoodName" bind:value={FoodName} />
 
