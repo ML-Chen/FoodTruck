@@ -10,29 +10,17 @@
     storeUsername.useLocalStorage();
     // Data fetched from the database
     let date;
-    let orderID;
-    let orderTotal;
-    let foodNames;
-    let foodQuantity;
+    let orders = [];
     // Form values
     let errorMsg;
-    let errorMsg2;
-    /** @type {{foodTruckName: int, customerUsername: string, foodNames: string}} */
-    let selectedOrder = {orderID: null, customerUsername: null, foodNames: null};
     onMount(async () => {
         await fetchOrders();
     });
     async function fetchOrders() {
         try {
-            const json = (await axios.get('http://localhost:4000/cus_order', {
+            const orders = (await axios.get('http://localhost:4000/cus_order_history', {
                 params: { customerUsername: $storeUsername, token: $token }
             })).data;
-            if (json.error) {
-                errorMsg = json.error
-            } else {
-                /** @type {[{orderID: int, customerUsername: string, foodNames: string}]} */
-                order = json.filter(order => Object.keys(order).length !== 0);
-            }
             errorMsg = null;
         } catch (error) {
             console.log(error.response.data);
@@ -61,26 +49,19 @@
         </tr>
     </thead>
     <tbody>
-        {#if orders}
-            {#each orders as order}
-                <tr>
-                    <td>
-                        <label>
-                            <input type="radio" bind:value={{ Date: order.orderDate }}/>
-                            {order.Date}
-                        </label>
-                    </td>
-                    <td>{order.orderID}</td>
-                    <td>{order.orderTotal}</td>
-                    <td>{order.foods}</td>
-                    <td>{order.foodQuantity}</td>
-                </tr>
-            {/each}
-        {/if}
+        {#each orders as order}
+            <tr>
+                <td>{order.date}</td>
+                <td>{order.orderID}</td>
+                <td>{order.orderTotal}</td>
+                <td>{order.foods}</td>
+                <td>{order.foodQuantity}</td>
+            </tr>
+        {/each}
     </tbody>
 </table>
-{#if errorMsg2}
-    <p class="error">{errorMsg2}</p>
+{#if errorMsg}
+    <p class="error">{errorMsg}</p>
 {/if}
 
 <a href={$url('../../home')}>Back</a>
