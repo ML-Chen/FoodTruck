@@ -30,17 +30,10 @@ api = Api(app)
 try:
     # Check MySQL Workbench > Database > Connect to Database > Test Connection for the host name, etc.
     connection = mysql.connector.connect(
-<<<<<<< HEAD
-        host='127.0.0.1',
-        database='cs4400spring2020',
-        user='root',
-        password="mkyaw6@gatech.edu"
-=======
         host=os.environ['host'],
         database=os.environ['database'],
         user=os.environ['user'],
         password=os.environ['password']
->>>>>>> 93c223b64825aeb1be7fcd6a8a4b3fc3351b65b1
     )
     cursor = connection.cursor(buffered=True)
 except mysql.connector.Error as error:
