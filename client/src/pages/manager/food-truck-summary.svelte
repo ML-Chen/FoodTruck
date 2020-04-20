@@ -3,7 +3,7 @@
 <script>
     import { onMount } from 'svelte';
     import { token, userType, storeUsername } from '../_store.js';
-    import { url, goto } from '@sveltech/routify';
+    import { Router, url, goto } from '@sveltech/routify';
     import axios from 'axios';
 
     token.useLocalStorage();
@@ -113,15 +113,17 @@
     <tbody>
         {#if foodTrucks}
             {#each foodTrucks as foodTruck}
-                <td>
-                    <label>
-                        <input type="radio" bind:group={selectedFoodTruck} value={{ foodTruckName: foodTruck.foodTruckName, stationName: foodTruck.stationName }}/>
-                    </label>
-                    {foodTruck.foodTruckName}
-                </td>
-                <td>{foodTruck.totalOrder}</td>
-                <td>{foodTruck.totalRevenue}</td>
-                <td>{foodTruck.totalCustomer}</td>
+                <tr>
+                    <td>
+                        <label>
+                            <input type="radio" bind:group={selectedFoodTruck} value={{ foodTruckName: foodTruck.foodTruckName, stationName: foodTruck.stationName }}/>
+                        </label>
+                        {foodTruck.foodTruckName}
+                    </td>
+                    <td>{foodTruck.totalOrder}</td>
+                    <td>{foodTruck.totalRevenue}</td>
+                    <td>{foodTruck.totalCustomer}</td>
+                </tr>
             {/each}
         {/if}
     </tbody>
@@ -132,7 +134,6 @@
 
 <a href={$url('../../home')}>Back</a>
 <a href={$url('../summary-detail')} scoped={{selectedFoodTruck}}>Detail</a>
-
 <style>
     .error {
         color: red;

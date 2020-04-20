@@ -142,7 +142,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
             if get_result:
                 cursor.execute(f"SELECT * FROM {procedure + '_result'};")
                 # The next two lines are from https://stackoverflow.com/a/17534004/5139284 by juandesant, CC-BY-SA 4.0
-                fields = map(lambda x: x[0], cursor.description)
+                fields = [col[0] for col in cursor.description]
                 result = [dict(zip(fields, row)) for row in cursor.fetchall()]
                 print(result)
                 print(procedure + '_result')
@@ -412,7 +412,7 @@ mn_filter_summary = db_api('mn_filter_summary', ['GET'], [
 
 # Query #25: mn_summary_detail [Screen #15 Manager Summary Detail]
 # Response: [{ date: string, customerName: string, totalPurchase: decimal, orderCount: int, foodNames: string }]
-mn_summary_detail = db_api('mn_summary_detail', ['POST'], [
+mn_summary_detail = db_api('mn_summary_detail', ['GET'], [
     ('managerUsername', {'type': str, 'required': True}),
     ('foodTruckName', {'type': str, 'required': True})
 ], get_result=2, restrict_by_username=True)

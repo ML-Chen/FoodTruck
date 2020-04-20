@@ -90,14 +90,16 @@
     <tbody>
         {#if foodTrucks}
             {#each foodTrucks as foodTruck}
-                <td>
-                    <label>
-                        <input type="radio" value={foodTruck} bind:group={selectedTruck} />
-                    </label>
-                    {foodTruck.foodTruckName}
-                </td>
-                <td>{foodTruck.managerName}</td>
-                <td>{foodTruck.foodNames}</td>
+                <tr>
+                    <td>
+                        <label>
+                            <input type="radio" value={foodTruck} bind:group={selectedTruck} />
+                        </label>
+                        {foodTruck.foodTruckName}
+                    </td>
+                    <td>{foodTruck.managerName}</td>
+                    <td>{foodTruck.foodNames}</td>
+                </tr>
             {/each}
         {/if}
     </tbody>

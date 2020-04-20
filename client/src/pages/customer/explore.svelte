@@ -117,15 +117,17 @@
     <tbody>
         {#if buildings}
             {#each buildings as building}
-                <td>
-                    <label>
-                        <input type="radio" bind:group={selectedBuilding} value={{ buildingName: building.buildingName, stationName: building.stationName }}/>
-                    </label>
-                    {building.stationName}
-                </td>
-                <td>{building.buildingName}</td>
-                <td>{building.foodTruckNames}</td>
-                <td>{building.foodNames}</td>
+                <tr>
+                    <td>
+                        <label>
+                            <input type="radio" bind:group={selectedBuilding} value={{ buildingName: building.buildingName, stationName: building.stationName }}/>
+                        </label>
+                        {building.stationName}
+                    </td>
+                    <td>{building.buildingName}</td>
+                    <td>{building.foodTruckNames}</td>
+                    <td>{building.foodNames}</td>
+                </tr>
             {/each}
         {/if}
     </tbody>

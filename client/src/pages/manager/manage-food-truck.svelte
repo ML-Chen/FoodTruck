@@ -119,16 +119,18 @@
     <tbody>
         {#if foodTrucks}
             {#each foodTrucks as foodTruck}
-                <td>
-                    <label>
-                        <input type="radio" bind:group={selectedFoodTruck} value={{ foodTruckName: foodTruck.foodTruckName, stationName: foodTruck.stationName }}/>
-                    </label>
-                    {foodTruck.foodTruckName}
-                </td>
-                <td>{foodTruck.stationName}</td>
-                <td>{foodTruck.remainingCapacity}</td>
-                <td>{foodTruck.staffCount}</td>
-                <td>{foodTruck.menuItemCount}</td>
+                <tr>
+                    <td>
+                        <label>
+                            <input type="radio" bind:group={selectedFoodTruck} value={{ foodTruckName: foodTruck.foodTruckName, stationName: foodTruck.stationName }}/>
+                        </label>
+                        {foodTruck.foodTruckName}
+                    </td>
+                    <td>{foodTruck.stationName}</td>
+                    <td>{foodTruck.remainingCapacity}</td>
+                    <td>{foodTruck.staffCount}</td>
+                    <td>{foodTruck.menuItemCount}</td>
+                </tr>
             {/each}
         {/if}
     </tbody>
