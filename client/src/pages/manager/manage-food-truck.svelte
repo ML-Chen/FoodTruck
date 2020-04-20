@@ -108,10 +108,10 @@
 <table>
     <thead>
         <tr>
-            <td>foodTruck</td>
-            <td>Station</td>
+            <td>Food Truck Name</td>
+            <td>Station Name</td>
             <td>Remaining Capacity</td>
-            <td>Staffs</td>
+            <td>Staff(s)</td>
             <td>#Menu Item</td>
         </tr>
     </thead>
@@ -140,9 +140,9 @@
 
 <a href={$url('../../home')}>Back</a>
 
-<a href={$url('../create-food-truck')}>Create foodTruck</a>
-<a href={$url(`../update-food-truck/${selectedFoodTruck}`)}>Update foodTruck</a>
-<button on:click={deleteFoodTruck}>Delete Food Truck</button>
+<a href={$url('../create-food-truck')}>Create</a>
+<a href={$url(`../update-food-truck/${selectedFoodTruck}`)}>Update</a>
+<button on:click={deleteFoodTruck}>Delete</button>
 
 <style>
     .error {
