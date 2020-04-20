@@ -27,7 +27,7 @@
         } else if (!type && (!balance || balance <= 0)) {
             errorMsg = "If you're not an employee, you must have a positive balance"
         } else {
-            const response = await axios.post('http://127.0.0.1:4000/register', { username, email, firstName, lastName, password, balance, type });
+            const response = await axios.post('http://127.0.0.1:4000/register', { username, email, firstName, lastName, password, balance, type: email ? type : null });
             const json = response.data;
             if (json === []) {
                 errorMsg = 'Error';
@@ -66,17 +66,19 @@
     <input type="number" id="balance" name="balance" bind:value={balance} />
     <br />
 
-    <input type="radio" id="notEmployee" name="type" value={undefined} bind:group={type}>
-    <label for="notEmployee" class="radio">Not Employee</label>
+    {#if email}
+        <input type="radio" id="notEmployee" name="type" value={undefined} bind:group={type}>
+        <label for="notEmployee" class="radio">Not Employee</label>
 
-    <input type="radio" id="admin" name="type" value="Admin" bind:group={type}>
-    <label for="admin" class="radio">Admin</label>
+        <input type="radio" id="admin" name="type" value="Admin" bind:group={type}>
+        <label for="admin" class="radio">Admin</label>
 
-    <input type="radio" id="manager" name="type" value="Manager" bind:group={type}>
-    <label for="manager" class="radio">Manager</label>
+        <input type="radio" id="manager" name="type" value="Manager" bind:group={type}>
+        <label for="manager" class="radio">Manager</label>
 
-    <input type="radio" id="staff" name="type" value="Staff" bind:group={type}>
-    <label for="staff" class="radio">Staff</label>
+        <input type="radio" id="staff" name="type" value="Staff" bind:group={type}>
+        <label for="staff" class="radio">Staff</label>
+    {/if}
     
     <br />
 
