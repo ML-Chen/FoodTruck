@@ -43,8 +43,8 @@
             errorMsg = null;
             errorMsg2 = null;
         } catch (error) {
-            console.log(error);
-            errorMsg = 'Network error. Maybe the server is down?';
+            console.log(error.response.data)
+            errorMsg = error.response.data.error;
         }
     }
 
@@ -58,7 +58,7 @@
             errorMsg = null;
             errorMsg2 = null;
         } catch (error) {
-            console.log(error);
+            console.log(error.response.data);
             if (error.response.data.error.includes('IntegrityError')) {
                 errorMsg2 = "Can't delete Food Truck because something depends on it"
             } else {

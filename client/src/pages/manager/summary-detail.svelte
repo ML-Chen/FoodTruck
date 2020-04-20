@@ -40,8 +40,8 @@
             errorMsg = null;
             errorMsg2 = null;
         } catch (error) {
-            console.log(error);
-            errorMsg = 'Network error. Maybe the server is down?';
+            console.log(error.response.data);
+            errorMsg = error.response.data.error;
         }
     }
 

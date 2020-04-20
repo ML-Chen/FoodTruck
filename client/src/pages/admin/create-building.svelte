@@ -32,8 +32,8 @@
                         tags = [];
                     }
             } catch (error) {
-                console.log(error);
-                errorMsg = 'Maybe the server is down?'
+                console.log(error.response.data)
+                errorMsg = error.response.data.error;
             }
         }
     }

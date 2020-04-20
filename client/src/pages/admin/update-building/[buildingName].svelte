@@ -53,8 +53,8 @@
                 tags = json.map(obj => obj.tag);
             }
         } catch (error) {
-            console.log(error);
-            errorMsg = error;
+            console.log(error.response.data);
+            errorMsg = error.response.data.error;
         }
     }
     async function updateBuilding() {
@@ -71,8 +71,8 @@
                     }
                 }
         } catch (error) {
-            console.log(error);
-            errorMsg = 'Maybe the server is down?'
+            console.log(error.response.data);
+            errorMsg = error.response.data.error;
         }
     }
 </script>

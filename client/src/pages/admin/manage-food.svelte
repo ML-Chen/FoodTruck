@@ -1,5 +1,4 @@
 <!-- Screen 4: Admin Manage Building & Station -->
-<!-- TODO: doesn't work -->
 
 <script>
     import { onMount } from 'svelte';
@@ -27,7 +26,7 @@
     async function fetchFoods() {
         try {
             const json = (await axios.get('http://localhost:4000/ad_filter_food', {
-                params: { foodName: foodNameFilter, sortedBy, sortDirection }
+                params: { foodName: foodNameFilter, sortedBy, sortDirection, token: $token }
             })).data;
             if (json.error) {
                 errorMsg = json.error
@@ -35,24 +34,25 @@
                 foods = json.filter(food => Object.keys(food).length !== 0);
             }
             errorMsg = null;
-            errorMsg2 = null;
         } catch (error) {
-            console.log(error);
-            errorMsg = 'Network error. Maybe the server is down?';
+            errorMsg = error.response.data.error;
         }
     }
 
     async function deleteFood() {
         try {
-            const json = (await axios.post('http://localhost:4000/ad_delete_food', {foodName: selectedFoodName})).data;
+            const json = (await axios.post('http://localhost:4000/ad_delete_food', {foodName: selectedFoodName, token: $token})).data;
             if (json.error) {
                 errorMsg = json.error;
             } else {
                 await fetchFoods();
             }
         } catch (error) {
-            console.log(error);
-            errorMsg = 'Network error. Maybe the server is down?';
+            if (error.response.data.error.includes('IntegrityError')) {
+                errorMsg = "This food can't be deleted because something depends on it";
+            } else {
+                errorMsg = error.response.data.error;
+            }
         }
     }
 
@@ -70,11 +70,21 @@
     <label for="food-name">Name</label>
     <input type="text" id="food-name" name="food-name" bind:value={foodNameFilter} />
 
+    <label for="sort-by">Sort by:</label>
+    <select id="sort-by" bind:value={sortedBy}>
+        <option value="name">Name</option>
+        <option value="menuCount">Menu count</option>
+        <option value="purchaseCount">Purchase count</option>
+    </select>
+
+    <label for="sort-dir">Sort by:</label>
+    <select id="sort-dir" bind:value={sortDirection}>
+        <option value="ASC">Ascending</option>
+        <option value="DESC">Descending</option>
+    </select>
+
     <br>
     <button type="submit">Filter</button>
-    {#if errorMsg}
-        <p class="error">{errorMsg}</p>
-    {/if}
 </form>
 
 <form on:submit|preventDefault={deleteFood}>
@@ -89,20 +99,22 @@
         <tbody>
             {#if foods}
                 {#each foods as food}
-                    <td>
-                        <label>
-                            <input type="radio" bind:group={selectedFoodName} value={food.foodName}/>
-                        </label>
-                        {food.foodName}
-                    </td>
-                    <td>{food.menuCount}</td>
-                    <td>{food.purchaseCount}</td>
+                    <tr>
+                        <td>
+                            <label>
+                                <input type="radio" bind:group={selectedFoodName} value={food.foodName}/>
+                                {food.foodName}
+                            </label>
+                        </td>
+                        <td>{food.menuCount}</td>
+                        <td>{food.purchaseCount}</td>
+                    </tr>
                 {/each}
             {/if}
         </tbody>
     </table>
-    {#if errorMsg2}
-        <p class="error">{errorMsg2}</p>
+    {#if errorMsg}
+        <p class="error">{errorMsg}</p>
     {/if}
 
     <a href={$url('../create-food')}>Create food</a>
