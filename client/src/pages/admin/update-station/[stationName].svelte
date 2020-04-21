@@ -11,6 +11,7 @@
     const oldStationName = decodeURIComponent(stationName);
     let newStationName = oldStationName;
     let capacity;
+    let selectedBuildingName;
     let oldBuildingName = decodeURIComponent(buildingName);
     let newBuildingName = oldBuildingname;
     let errorMsg;
@@ -77,10 +78,10 @@
     <textarea id="capacity" name="capacity" bind:value={capacity} />
 
     <label for="building">Building Name:</label>
-    <select id="building-name" name="station-name" bind:value={buildingName}>
+    <select id="building-name" name="station-name" bind:value={selectedBuildingName}>
         {#if buildings}
             {#each [null].concat(buildings.map(building => building.buildingName)) as bName}
-                <option value={bName} selected={bName === buildingName}>{bName || ''}</option>
+                <option value={bName} selected={bName === selctedBuildingName}>{bName || ''}</option>
             {/each}
         {/if}
     </select>
