@@ -38,6 +38,8 @@
                     stations = stationsJson.filter(station => Object.keys(station).length !== 0);
                     staffs = staffsJson.filter(staff => Object.keys(staff).length !== 0);
                     foods = foodsJson.filter(food => Object.keys(food).length !== 0);
+                    selectedStation = stations.length > 0 ? stations[0].stationName : null;
+                    wipFoods = stations.length > 0 ? foods[0].foodName : null;
                     console.log(stations)
                     console.log(staffs)
                     console.log(foods)
@@ -73,7 +75,7 @@
                     
             } catch (error) {
                 console.log(error);
-                errorMsg = error.response;
+                errorMsg = error.response.data.error;
             }
         }
     }
@@ -106,7 +108,7 @@
 
 
    
-    <label for="selectedFoods">Menu Item</label>
+    <label for="selectedFoods">Menu Item (name and price)</label>
         {#each selectedFoods as selectedFood, index (selectedFood)}
             <button type="button" on:click={() => { 
                 selectedFoods = selectedFoods.filter((_, i) => i !== index)
@@ -133,11 +135,19 @@
 			</option>
 		{/each}
 	</select>
-    <input type="number" bind:value={wipPrices} /><br />
+    <input type="number" min="0" step="1" bind:value={wipPrices} /><br />
     <button type="submit">Create</button>
-    <p>{errorMsg}</p>
+    {#if errorMsg}
+        <p class="error">{errorMsg}</p>
+    {/if}
     <h1>{selectedStaffs}</h1>
     <h1>{selectedStation}</h1>
 </form>
 
 <a href={$url('../../home')}>Back</a>
+
+<style>
+    .error {
+        color: red;
+    }
+</style>
