@@ -113,6 +113,7 @@
 
     <label for="station-name">Station capacity:</label>
     <input type="number" id="min-capacity" name="min-capacity" bind:value={minCapacity} aria-label="minimum station capacity" />
+    –
     <input type="number" id="max-capacity" name="max-capacity" bind:value={maxCapacity} aria-label="maximum station capacity" />
 
     <br>

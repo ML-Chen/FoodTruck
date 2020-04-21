@@ -310,7 +310,7 @@ DROP PROCEDURE IF EXISTS ad_view_building;
 DELIMITER //
 CREATE PROCEDURE ad_view_building_general(IN i_buildingName VARCHAR(55))
 BEGIN
-   DROP TABLE IF EXISTS ad_view_building_result;
+   DROP TABLE IF EXISTS ad_view_building_general_result;
    CREATE TABLE ad_view_building_general_result(buildingName varchar(55),
 `description` text);
    INSERT INTO ad_view_building_general_result
@@ -324,7 +324,7 @@ DROP PROCEDURE IF EXISTS ad_view_building_tags;
 DELIMITER //
 CREATE PROCEDURE ad_view_building_tags(IN i_buildingName VARCHAR(55))
 BEGIN
-   DROP TABLE IF EXISTS ad_view_building_result;
+   DROP TABLE IF EXISTS ad_view_building_tags_result;
    CREATE TABLE ad_view_building_tags_result(tag VARCHAR(55));
    INSERT INTO ad_view_building_tags_result
    SELECT tag

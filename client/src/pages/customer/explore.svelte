@@ -28,14 +28,12 @@
 
     async function fetchBuildings() {
       try {
-            const json = (await axios.get('http://localhost:4000/cus_filter_explore', {
+            buildings = (await axios.get('http://localhost:4000/cus_filter_explore', {
                 params: { buildingName, stationName, buildingTag, foodTruckName, foodName, token: $token }
             })).data;
-            if (json.error) {
-                errorMsg = json.error
-            } else {
-                /** @type {[{stationName: string, buildingName: string, foodTruckNames: string, foodNames: string}]} */
-                buildings = json.filter(building => Object.keys(building).length !== 0);
+            if (buildings.length === 0) {
+                buildingName = null;
+                stationName = null;
             }
             errorMsg = null;
             errorMsg2 = null;
@@ -120,8 +118,8 @@
                     <td>
                         <label>
                             <input type="radio" bind:group={selectedBuilding} value={{ buildingName: building.buildingName, stationName: building.stationName }}/>
+                            {building.stationName}
                         </label>
-                        {building.stationName}
                     </td>
                     <td>{building.buildingName}</td>
                     <td>{building.foodTruckNames}</td>
