@@ -18,7 +18,7 @@
     });
     async function fetchOrders() {
         try {
-            const orders = (await axios.get('http://localhost:4000/cus_order_history', {
+            orders = (await axios.get('http://localhost:4000/cus_order_history', {
                 params: { customerUsername: $storeUsername, token: $token }
             })).data;
             errorMsg = null;
@@ -54,7 +54,7 @@
                 <td>{order.date}</td>
                 <td>{order.orderID}</td>
                 <td>{order.orderTotal}</td>
-                <td>{order.foods}</td>
+                <td>{order.foodNames}</td>
                 <td>{order.foodQuantity}</td>
             </tr>
         {/each}
