@@ -380,19 +380,19 @@ mn_create_foodTruck_add_MenuItem = db_api('mn_create_foodTruck_add_MenuItem', ['
 mn_view_foodTruck_available_staff = db_api('mn_view_foodTruck_available_staff', ['GET'], [
     ('managerUsername', {'type': str, 'required': True}),
     ('foodTruckName', {'type': str, 'required': True})
-], get_result=2, restrict_by_food_truck=True, restrict_by_username=True)
+], get_result=2, restrict_by_food_truck=False, restrict_by_username=False)
 
 # Query #20b: mn_view_foodTruck_staff [Screen #13 Manager Update Food Truck]
 # Response: [{assignedStaff: string}]
 mn_view_foodTruck_staff = db_api('mn_view_foodTruck_staff', ['GET'], [
     ('foodTruckName', {'type': str, 'required': True})
- ], get_result=2, restrict_by_food_truck=True)
+ ], get_result=2, restrict_by_food_truck=False)
 
 # Query #21: mn_view_foodTruck_menu [Screen #13 Manager Update Food Truck]
 # Response: 
 mn_view_foodTruck_menu = db_api('mn_view_foodTruck_menu', ['GET'], [
     ('foodTruckName', {'type': str, 'required': True})
- ], get_result=2, restrict_by_food_truck=True)
+ ], get_result=2, restrict_by_food_truck=False)
 
 # Query #22a: mn_update_foodTruck_station [Screen #13 Manager Update Food Truck]
 # Response:
