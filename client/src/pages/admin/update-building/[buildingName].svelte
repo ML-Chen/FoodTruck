@@ -44,14 +44,9 @@
     }
     async function fetchTags() {
         try {
-            const json = (await axios.get('http://localhost:4000/ad_view_building_tags', {
+            tags = (await axios.get('http://localhost:4000/ad_view_building_tags', {
                 params: { buildingName: oldBuildingName, token: $token }
-            })).data;
-            if (json.error) {
-                errorMsg = json.error;
-            } else {
-                tags = json.map(obj => obj.tag);
-            }
+            })).data.map(obj => obj.tag);
         } catch (error) {
             console.log(error.response.data);
             errorMsg = error.response.data.error;
@@ -60,16 +55,18 @@
     async function updateBuilding() {
         try {
             const json = (await axios.post('http://localhost:4000/ad_update_building', { oldBuildingName, newBuildingName, description, token: $token })).data;
-                if (json.error) {
-                    errorMsg = json.error;
-                } else {
-                    for (let tag of tagsAdded) {
-                        await axios.post('http://localhost:4000/ad_add_building_tag', { buildingName, tag, token: $token })
-                    }
-                    for (let tag of tagsRemoved) {
-                        await axios.post('http://localhost:4000/ad_remove_building_tag', { buildingName, tag, token: $token })
-                    }
+            if (json.error) {
+                errorMsg = json.error;
+            } else {
+                for (let tag of tagsAdded) {
+                    await axios.post('http://localhost:4000/ad_add_building_tag', { buildingName: newBuildingName, tag, token: $token })
                 }
+                for (let tag of tagsRemoved) {
+                    await axios.post('http://localhost:4000/ad_remove_building_tag', { buildingName: newBuildingName, tag, token: $token })
+                }
+            }
+            errorMsg = null;
+            $goto(`../${newBuildingName}`)
         } catch (error) {
             console.log(error.response.data);
             errorMsg = error.response.data.error;
@@ -95,8 +92,11 @@
                 tagsRemoved = tagsRemoved.concat(tag)
             }} aria-label="Remove tag {tag}">−</button>{tag}<br />
         {/each}
+
     <button type="button" on:click={() => {
-        if (wipTag) {
+        if (tags.includes(wipTag)) {
+            errorMsg = "Can't have duplicate tags"
+        } else if (wipTag) {
             tags = tags.concat(wipTag);
             tagsAdded = tagsAdded.concat(wipTag);
             wipTag='';

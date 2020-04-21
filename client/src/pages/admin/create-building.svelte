@@ -54,7 +54,14 @@
         {#each tags as tag, index (tag)}
             <button type="button" on:click={() => { tags = tags.filter((_, i) => i !== index) }} aria-label="Remove tag {tag}">−</button>{tag}<br />
         {/each}
-    <button type="button" on:click={() => { if (wipTag) { tags = tags.concat(wipTag); wipTag=''; }}} aria-label="Add tag {wipTag}">+</button>
+    <button type="button" on:click={() => {
+        if (tags.includes(wipTag)) {
+            errorMsg = "Can't have duplicate tags"
+        } if (wipTag) {
+            tags = tags.concat(wipTag);
+            wipTag='';
+        }
+    }} aria-label="Add tag {wipTag}">+</button>
     <input type="text" bind:value={wipTag} /><br />
     <button type="submit">Create</button>
 </form>
