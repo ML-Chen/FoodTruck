@@ -479,11 +479,11 @@ cus_current_information_foodTruck = db_api('cus_current_information_foodTruck', 
 ], get_result=2, restrict_by_username=True)
 
 # Query #30: cus_order [Screen #18 Customer Order]
-# Response: []
+# Response: { orderID: int }, the order ID of the newly created order
 cus_order = db_api('cus_order', ['POST'], [
     ('date', {'type': date, 'required': True}),
     ('customerUsername', {'type': str, 'required': True})
-], restrict_by_username=True)
+], restrict_by_username=True, get_result=1)
 
 # Query #31: cus_add_item_to_order [Screen #18 Customer Order]
 # Response: []

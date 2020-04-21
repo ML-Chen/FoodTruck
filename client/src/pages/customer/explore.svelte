@@ -52,7 +52,6 @@
                 customerUsername: $storeUsername,
                 stationName: selectedBuilding.stationName, token: $token
             });
-            await fetchBuildings();
             errorMsg = null;
             errorMsg2 = null;
         } catch (error) {

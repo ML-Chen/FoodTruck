@@ -18,7 +18,6 @@
     let foods = [];
     /** @type {[{foodTruckName: string, stationName: string, foodName: string, price: decimal}]} */
     let selected = [];
-    let orderID;
     let date;
 
     // Form values
@@ -43,11 +42,14 @@
             errorMsg = "You haven't selected any food to order"
         } else if (selected.some(food => !food.purchaseQuantity)) {
             errorMsg = "You can't select a zero quantity of something"
+        } else if (!date) {
+            errorMsg = "Please select an order date"
         } else {
             try {
-                const json = (await axios.get('http://localhost:4000/cus_order'), {
-                // TODO
-                })
+                const orderID = (await axios.post('http://localhost:4000/cus_order', { date, customerUsername: $storeUsername, token: $token })).data;
+                for (const { foodName, purchaseQuantity } of selected) {
+                    axios.post('http://localhost:4000/cus_add_item_to_order', { foodTruckName, foodName, purchaseQuantity, orderID, token: $token });
+                }
             } catch (error) {
                 console.log(error.response.data);
                 errorMsg = error.response.data.error;

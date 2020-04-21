@@ -818,7 +818,11 @@ CREATE PROCEDURE cus_order(IN i_date DATE, i_customerUsername VARCHAR(55))
 BEGIN
    -- place your code/solution here
 INSERT INTO Orders
-	VALUES (null, i_date, i_customerUsername);
+    VALUES (null, i_date, i_customerUsername);
+-- alert: modification to the Phase 3 specification
+DROP TABLE IF EXISTS cus_order_result;
+CREATE TABLE cus_order_result(orderID int);
+INSERT INTO cus_order_result SELECT MAX(OrderID) FROM Orders WHERE customerUsername = i_customerUsername;
 END //
 DELIMITER ;  
 -- Query #31: cus_add_item_to_order [Screen #18 Customer Order]
