@@ -27,15 +27,10 @@
     });
     async function fetchTrucks() {
         try {
-            const json = (await axios.get('http://localhost:4000/cus_current_information_foodTruck', {
-                params: { customerUsername: $storeUsername, token: $token }
+            /** @type {[{foodTruckName: string, stationName: string, foodName: string, price: decimal}]} */
+            const foods = (await axios.get('http://localhost:4000/mn_view_foodTruck_menu', {
+                params: { foodTruckName, token: $token }
             })).data;
-            if (json.error) {
-                errorMsg = json.error
-            } else {
-                /** @type {[{foodTruckName: string, customerUsername: string, foodNames: string}]} */
-                foodTrucks = json.filter(foodTruck => Object.keys(foodTruck).length !== 0);
-            }
             errorMsg = null;
         } catch (error) {
             console.log(error.response.data);
@@ -99,7 +94,7 @@
  
 <input type="Date" id="Date" name="Date" bind:value={date} aria-label="Date" />
 
-<a href={$url('../../home')}>Back</a>
+<a href={$url('../../current-info')}>Back</a>
 <button type="button" on:click={placeOrder}>Submit</button>
 <style>
     .error {

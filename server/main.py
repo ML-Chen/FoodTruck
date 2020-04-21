@@ -65,7 +65,7 @@ except IOError as e:
     tokens = {}
 
 def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict[str, Any]]], get_result: int = 0,
-           restrict_by_username: bool = False, restrict_by_food_truck: bool = False, restrict_by_order: bool = False, helper: bool = False) -> Callable[[None], Response]:
+           restrict_by_username: bool = False, restrict_by_food_truck: bool = False, restrict_by_order: bool = False, access: List[str] = None, helper: bool = False) -> Callable[[None], Response]:
     """
     Parameters:
     - procedure: name of the MySQL stored procedure which we will call.
@@ -83,6 +83,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         2: the procedure is expected to create a list of results
     - restrict_by_username: restrict access to this API endpoint to people whose token corresponds to a user with a 'username', 'customerUsername', or 'managerUsername' field in inputs.
     - restrict_by_food_truck: restrict access to this API endpoint to people whose token corresponds to a user with a username 'managerUsername' in inputs that manages the food truck with the 'food_truck_name' in inputs.
+    - access: types of users that are allowed to access this endpoint. Overrides automatically inferring it from the procedure name. If falsy, then this parameter is ignored.
 
     Returns a function that works as a Flask API endpoint.
 
@@ -97,7 +98,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         parser = reqparse.RequestParser()
         for arg_name, arg_params in inputs:
             parser.add_argument(arg_name, **arg_params)
-        restricted = restrict_by_username or restrict_by_food_truck or restrict_by_order or procedure.startswith('cus_') or procedure.startswith('mn_') or procedure.startswith('ad_')
+        restricted = restrict_by_username or restrict_by_food_truck or restrict_by_order or procedure.startswith('cus_') or procedure.startswith('mn_') or procedure.startswith('ad_') or access
         if restricted:
             parser.add_argument('token', type=str)
         try:
@@ -133,12 +134,15 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 token = request.cookies.get('token')
         
         try:
-            if procedure.startswith('cus_'):
-                assert 'Customer' in tokens[token].user_type
-            elif procedure.startswith('ad_'):
-                assert 'Admin' in tokens[token].user_type
-            elif procedure.startswith('mn_'):
-                assert 'Manager' in tokens[token].user_type
+            if access:
+                assert any(allowed_user_type in tokens[token]for allowed_user_type in access)
+            else:
+                if procedure.startswith('cus_'):
+                    assert 'Customer' in tokens[token].user_type
+                elif procedure.startswith('ad_'):
+                    assert 'Admin' in tokens[token].user_type
+                elif procedure.startswith('mn_'):
+                    assert 'Manager' in tokens[token].user_type
         except AssertionError as e:
             print('Your user type' + repr(e))
             return {'error': "Your user type can't access this page: " + repr(e)}, 403
@@ -388,11 +392,11 @@ mn_view_foodTruck_staff = db_api('mn_view_foodTruck_staff', ['GET'], [
     ('foodTruckName', {'type': str, 'required': True})
  ], get_result=2, restrict_by_food_truck=False)
 
-# Query #21: mn_view_foodTruck_menu [Screen #13 Manager Update Food Truck]
+# Query #21: mn_view_foodTruck_menu [Screen #13 Manager Update Food Truck] and [Screen #18 Customer Order]
 # Response: 
 mn_view_foodTruck_menu = db_api('mn_view_foodTruck_menu', ['GET'], [
     ('foodTruckName', {'type': str, 'required': True})
- ], get_result=2, restrict_by_food_truck=False)
+ ], get_result=2, access=['Customer', 'Manager'])
 
 # Query #22a: mn_update_foodTruck_station [Screen #13 Manager Update Food Truck]
 # Response:
