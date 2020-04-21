@@ -18,7 +18,7 @@
     });
     async function fetchOrders() {
         try {
-            const orders = (await axios.get('http://localhost:4000/cus_order', {
+            const orders = (await axios.get('http://localhost:4000/cus_order_history', {
                 params: { customerUsername: $storeUsername, token: $token }
             })).data;
             errorMsg = null;
