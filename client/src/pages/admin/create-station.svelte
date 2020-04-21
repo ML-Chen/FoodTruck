@@ -10,6 +10,11 @@
     let capacity;
     let buildingName;
     let errorMsg;
+    
+    onMount(async () => {
+        await fetchBuilding();
+    });
+    
     async function createStation() {
         if (!stationName) {
             errorMsg = 'Station name must not be blank';
@@ -25,6 +30,22 @@
                 console.log(error.response.data)
                 errorMsg = error.response.data.error;
             }
+        }
+    }
+    async function fetchBuilding() {
+        try {
+            const json = (await axios.get('http://localhost:4000/ad_view_building_general', {
+                params: { buildingName: buildingName, token: $token }
+            })).data;
+            if (json.error) {
+                errorMsg = json.error
+            } else {
+                buildingName = json.buildingName;
+                errorMsg = null;
+            }
+        } catch (error) {
+            console.log(error);
+            errorMsg = error;
         }
     }
 </script>
