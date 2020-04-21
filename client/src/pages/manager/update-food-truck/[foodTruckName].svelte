@@ -22,13 +22,14 @@
     let availableStaffs = [];
     let foods = [];
     let menuItems = [];
-    let selectedStaffs;   
+    let selectedStaffs = [];   
 
     //params
     let wipFoods;
     let wipPrices;
     let errorMsg;
     let managerUsername = $storeUsername
+    let newSelectedStaffs = [];
 
     onMount(async () => {
         await fetchAvailableStaffs();
@@ -155,13 +156,23 @@
     </select>
     <label for="selectedStaffs">Assign Staffs:</label>
  
-    <select multiple bind:value={selectedStaffs}>
-        {#each availableStaffs as staff}
-            <option value={staff.staffUsername}>
-                {staff.staffName}
+    <select multiple bind:value={newSelectedStaffs}>
+        {#each selectedStaffs as selectedStaff}
+            <option value={selectedStaff}>
+                {selectedStaff}
             </option>
         {/each}
+        
+        {#each availableStaffs as staff}
+            <option value={staff.staffUsername}>
+                {staff}
+            </option>
+            <script>console.log(staff)</script>
+        {/each}
+        
+        
     </select>
+    <p>{selectedStaffs}</p>
 
 
    
@@ -193,8 +204,8 @@
     <input type="number" bind:value={wipPrices} /><br />
     <button type="submit">Create</button>
     <p>{errorMsg}</p>
-    <h1>{selectedStaffs}</h1>
-    <h1>{selectedStation}</h1> -->
+    <h1>{newSelectedStaffs}</h1>
+    <h1>{selectedStation}</h1>
 </form>
 
 <a href={$url('../../home')}>Back</a>

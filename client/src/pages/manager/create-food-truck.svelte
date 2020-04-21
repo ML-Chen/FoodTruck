@@ -79,9 +79,9 @@
     }
 </script>
 
-<svelte:head>Create Food Truck</svelte:head>
+<svelte:head>Update Food Truck</svelte:head>
 
-<h1>Create Food Truck</h1>
+<h1>Update Food Truck</h1>
 
 <form on:submit|preventDefault={createfoodTruck}>
     <label for="foodTruckName">Name</label>
