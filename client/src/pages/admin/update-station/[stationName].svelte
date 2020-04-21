@@ -9,26 +9,29 @@
     userType.useLocalStorage();
     export let stationName;
     stationName = decodeURIComponent(stationName);
+    let currentBuildingName; // the building the station is currently at
     let selectedBuildingName;
-    let buildingNames = [];
+    let buildingNames = []; // available buildings
     let capacity;
     let errorMsg;
 
     onMount(async () => {
         await fetchStation();
-        await fetchBuilding();
+        await fetchBuildings();
     });
     async function fetchStation() {
         try {
             const json = (await axios.get('http://localhost:4000/ad_view_station', {
-                params: { stationName: oldStationName, token: $token }
+                params: { stationName, token: $token }
             })).data;
-            newStationName = json.stationName;
+            console.log(json);
             capacity = json.capacity;
+            currentBuildingName = json.buildingName;
+            selectedBuildingName = currentBuildingName;
             errorMsg = null;
         } catch (error) {
-            console.log(error);
-            errorMsg = error;
+            console.log(error.response.data);
+            errorMsg = error.response.data.error;
         }
     }
     async function fetchBuildings() {
@@ -45,10 +48,7 @@
     }
     async function updateStation() {
         try {
-            const json = (await axios.post('http://localhost:4000/ad_update_station', { oldStationName, newStationName, capacity, token: $token })).data;
-                if (json.error) {
-                    errorMsg = json.error;
-                }
+            const json = (await axios.post('http://localhost:4000/ad_update_station', { stationName, capacity, buildingName: selectedBuildingName, token: $token })).data;
         } catch (error) {
             console.log(error.response.data);
             errorMsg = error.response.data.error;
@@ -62,14 +62,14 @@
 
 <form on:submit|preventDefault={updateStation}>
     <label for="stationName">Name</label>
-    <input type="text" id="stationName" name="stationName" disabled />
+    <input type="text" id="stationName" name="stationName" value={stationName} disabled />
 
     <label for="capacity">Capacity</label>
-    <textarea id="capacity" name="capacity" bind:value={capacity} />
+    <input type="number" id="capacity" name="capacity" bind:value={capacity} />
 
     <label for="building">Building Name:</label>
     <select id="building-name" name="station-name" bind:value={selectedBuildingName}>
-        {#each [null].concat(buildingNames) as bName}
+        {#each [currentBuildingName].concat(buildingNames) as bName}
             <option value={bName} selected={bName === selectedBuildingName}>{bName || ''}</option>
         {/each}
     </select>

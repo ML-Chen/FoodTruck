@@ -103,7 +103,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         try:
             a = parser.parse_args()
         except Exception as e:
-            print(request.query_string)
+            print(request.values)
             print(repr(e))
             return {'error': 'Bad request. Expected request arguments: ' + str(parser.args)}, 400
         print('Request: ' + repr(a))
@@ -305,7 +305,7 @@ ad_create_station = db_api('ad_create_station', ['POST'], [
 # Rresponse:
 ad_view_station = db_api('ad_view_station', ['GET'], [
     ('stationName', {'type': str, 'required': True})
-], get_result=2)
+], get_result=1)
 
 # Query #13: ad_update_station [Screen #8 Admin Update Station]
 # Response:
