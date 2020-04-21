@@ -14,18 +14,24 @@
     foodTruckName = decodeURIComponent(foodTruckName);
 
     // Data fetched from the database
-    /** @type {[{foodTruckName: string, stationName: string, foodName: string, price: decimal}]} */
-    let foods = [];
-    /** @type {[{foodTruckName: string, stationName: string, foodName: string, price: decimal}]} */
-    let selected = [];
+    let foods = []; // [{foodTruckName: string, stationName: string, foodName: string, price: decimal}]
+    let selectedFoodNames = []; // string[], list of food names
     let date;
+
+    let balance;
+    let orderTotal = (0).toFixed(2);
+
+    function calculateOrderTotal() {
+        orderTotal = foods.reduce((currentVal, food) => !food.purchaseQuantity || !selectedFoodNames.includes(food.foodName) ? currentVal : currentVal + food.price * food.purchaseQuantity, 0).toFixed(2);
+    }
 
     // Form values
     let errorMsg;
     onMount(async () => {
-        await fetchTrucks();
+        await fetchFoods();
+        await fetchBalance();
     });
-    async function fetchTrucks() {
+    async function fetchFoods() {
         try {
             /** @type {[{foodTruckName: string, stationName: string, foodName: string, price: decimal}]} */
             foods = (await axios.get('http://localhost:4000/mn_view_foodTruck_menu', {
@@ -37,8 +43,23 @@
             errorMsg = error.response.data.error;
         }
     }
+    async function fetchBalance() {
+        try {
+            balance = (await axios.get('http://localhost:4000/cus_current_information_basic', {
+                params: { customerUsername: $storeUsername, token: $token }
+            })).data.balance;
+        } catch (error) {
+            console.log(error.response.data);
+            errorMsg = error.response.data.error;
+        }
+    }
     async function placeOrder() {
-        if (!selected.some(food => food)) {
+        const selected = foods.filter(food => selectedFoodNames.includes(food.foodName));
+        console.log(selected);
+        if (orderTotal && orderTotal - balance >= 0) {
+            // orderTotal > balance was erroneously returning true for some reason
+            errorMsg = 'Your order total is greater than your balance';
+        } else if (!selected.some(food => food)) {
             errorMsg = "You haven't selected any food to order"
         } else if (selected.some(food => !food.purchaseQuantity)) {
             errorMsg = "You can't select a zero quantity of something"
@@ -52,6 +73,8 @@
                     console.log({ foodTruckName, foodName, purchaseQuantity, orderID, token: $token })
                     await axios.post('http://localhost:4000/cus_add_item_to_order', { foodTruckName, foodName, purchaseQuantity, orderID, token: $token });
                 }
+                await fetchBalance();
+                errorMsg = null;
             } catch (error) {
                 console.log(error.response.data);
                 errorMsg = error.response.data.error;
@@ -69,6 +92,8 @@
 
 <p>Food Truck: {foodTruckName}</p>
 
+<p>Balance: {balance}</p>
+
 <table>
     <thead>
         <tr>
@@ -79,24 +104,25 @@
         </tr>
     </thead>
     <tbody>
-        <!-- TODO -->
         {#each foods as food}
             <tr>
-                <td><input type="checkbox" value={food} bind:group={selected} /></td>
+                <td><input type="checkbox" value={food.foodName} bind:group={selectedFoodNames} on:change={calculateOrderTotal} /></td>
                 <td>{food.foodName}</td>
                 <td>{food.price}</td>
-                <td><input type="number" min="0" step="1" pattern="\d+" id="purchaseQuantity" name="purchaseQuantity" bind:value={food.purchaseQuantity} /></td>
+                <td><input type="number" min="0" step="1" pattern="\d+" id="purchaseQuantity" name="purchaseQuantity" bind:value={food.purchaseQuantity} on:input={calculateOrderTotal} /></td>
             </tr>
         {/each}
     </tbody>
 </table>
-{#if errorMsg}
-    <p class="error">{errorMsg}</p>
-{/if}
 
 <label for="Date">Order date</label>
 <input type="Date" id="Date" name="Date" bind:value={date} aria-label="Date" />
 
+<p>Order total: {orderTotal}</p>
+
+{#if errorMsg}
+    <p class="error">{errorMsg}</p>
+{/if}
 
 <a href={$url('../../current-info')}>Back</a>
 <button type="button" on:click={placeOrder}>Submit</button>
