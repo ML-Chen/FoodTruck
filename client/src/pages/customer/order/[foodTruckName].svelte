@@ -112,7 +112,8 @@
                 <td>{food.price}</td>
                 <td><input type="number" min="0" step="1" pattern="\d+" id="purchaseQuantity" name="purchaseQuantity" bind:value={food.purchaseQuantity} on:input={calculateOrderTotal} /></td>
             </tr>
-        {/each}
+            {/each}
+        {/if}        
     </tbody>
 </table>
 
