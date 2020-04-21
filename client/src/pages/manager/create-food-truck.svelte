@@ -69,14 +69,14 @@
                 }
                 for (let i = 0; i < selectedStaffs.length; i++) {
                     console.log(selectedStaffs[i]);
-                    axios.post('http://localhost:4000/mn_create_foodTruck_staff', { foodTruckName, staffName: selectedStaff[i], managerUsername: $storeUsername, token: $token })
+                    axios.post('http://localhost:4000/mn_create_foodTruck_add_staff', { foodTruckName, staffName: selectedStaffs[i], managerUsername: $storeUsername, token: $token })
                 }
-                foodTruckName = description = wipFood = errorMsg = '';
+                foodTruckName = wipFood = errorMsg = '';
                 selectedFoods = [];
                     
             } catch (error) {
                 console.log(error);
-                errorMsg = error.response.data.error;
+                errorMsg = error.response;
             }
         }
     }
@@ -146,6 +146,7 @@
     {/if}
 </form>
 
+<h3>{selectedStaffs}</h3>
 <a href={$url('../../home')}>Back</a>
 
 <style>
