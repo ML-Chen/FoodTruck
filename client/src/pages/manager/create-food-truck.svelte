@@ -12,17 +12,17 @@
 
 
     // Data fetched from the database
-    let stations = [];
-    let staffs = [];
-    let foods = [];
+    let stations = []; // string[]
+    let staffs = []; // [{staffUsername: string, staffName: string}]
+    let foods = []; // string[]
 
     let foodTruckName;
     let selectedStation;
     let selectedStaffs;
     let selectedFoods = [];
-    let prices = [];
-    let wipFoods;
-    let wipPrices;
+    let prices = []; // number[]
+    let wipFood; // string
+    let wipPrice;
     let errorMsg;
     let managerUsername = $storeUsername
 
@@ -35,16 +35,17 @@
                 if (stationsJson.error || staffsJson.error) {
                     errorMsg = stationsJson.error;
                 } else {
-                    stations = stationsJson.filter(station => Object.keys(station).length !== 0);
-                    staffs = staffsJson.filter(staff => Object.keys(staff).length !== 0);
-                    foods = foodsJson.filter(food => Object.keys(food).length !== 0);
-                    selectedStation = stations.length > 0 ? stations[0].stationName : null;
-                    wipFoods = stations.length > 0 ? foods[0].foodName : null;
+                    stations = stationsJson.map(station => station.stationName);
+                    staffs = staffsJson;
+                    foods = foodsJson.map(food => food.foodName);
+                    selectedStation = stations.length > 0 ? stations[0] : null;
+                    wipFood = stations.length > 0 ? foods[0] : null;
                     console.log(stations)
                     console.log(staffs)
                     console.log(foods)
                 }
             } catch (error) {
+                console.log(error);
                 console.log(error.response.data)
                 errorMsg = error.response.data.error;
             }
@@ -56,7 +57,7 @@
             errorMsg = 'Please select a station';
         } else if (!selectedStaffs) {
             errorMsg = 'Please assign at least one staff';
-        } else if (selectedFoods == []) {
+        } else if (selectedFoods.length === 0) {
             errorMsg = 'Please add at least one food'; 
         } else {
             try {
@@ -70,7 +71,7 @@
                     console.log(selectedStaffs[i]);
                     axios.post('http://localhost:4000/mn_create_foodTruck_staff', { foodTruckName, staffName: selectedStaff[i], managerUsername: $storeUsername, token: $token })
                 }
-                foodTruckName = description = wipFoods = errorMsg = '';
+                foodTruckName = description = wipFood = errorMsg = '';
                 selectedFoods = [];
                     
             } catch (error) {
@@ -91,7 +92,7 @@
 
     <select id="station-name" name="station-name" bind:value={selectedStation}>
         {#if stations}
-            {#each stations.map(station => station.stationName) as sName}
+            {#each stations as sName}
                 <option value={sName}>{sName}</option>
             {/each}
         {/if}
@@ -106,36 +107,39 @@
         {/each}
     </select>
 
-
-   
     <label for="selectedFoods">Menu Item (name and price)</label>
         {#each selectedFoods as selectedFood, index (selectedFood)}
             <button type="button" on:click={() => { 
                 selectedFoods = selectedFoods.filter((_, i) => i !== index)
                 prices = prices.filter((_, i) => i !== index)
+                foods = foods.concat(selectedFood)
                 }} 
                 aria-label="Remove Food {selectedFood}">−</button>Food: {selectedFood} Price: {prices[index]}<br />
         {/each}
     <button type="button" on:click={() => { 
-        if (wipFoods && wipPrices) {
-            if (wipFoods in selectedFoods) {
+        if (!wipPrice || wipPrice < 0) {
+            errorMsg = "Food must have a non-negative price";
+        } else if (wipFood && wipPrice) {
+            if (wipFood in selectedFoods) {
                 errorMsg = "Duplicate Food name"
             } else {
-                selectedFoods = selectedFoods.concat(wipFoods); 
-                prices = prices.concat(wipPrices);
-                wipFoods='';
-                wipPrices= 0;
-                } 
+                selectedFoods = selectedFoods.concat(wipFood); 
+                prices = prices.concat(wipPrice);
+                foods = foods.filter(food => food !== wipFood);
+                wipFood = foods[0];
+                wipPrice = null;
+                errorMsg = null;
             }
-        }} aria-label="Add Food {wipFoods}">+</button>
-    <select bind:value = {wipFoods}>
+        }
+        }} aria-label="Add Food {wipFood}">+</button>
+    <select bind:value = {wipFood}>
 		{#each foods as food}
-			<option value={food.foodName}>
-				{food.foodName}
+			<option value={food}>
+				{food}
 			</option>
 		{/each}
 	</select>
-    <input type="number" min="0" step="1" bind:value={wipPrices} /><br />
+    <input type="number" min="0" step="1" bind:value={wipPrice} /><br />
     <button type="submit">Create</button>
     {#if errorMsg}
         <p class="error">{errorMsg}</p>
