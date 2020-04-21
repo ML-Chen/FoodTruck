@@ -28,27 +28,27 @@
 
     onMount(callHelpers);
     async function callHelpers() {
-            try {
-                const stationsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Station'}})).data;
-                const staffsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Staff'}})).data;
-                const foodsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Food'}})).data;
-                if (stationsJson.error || staffsJson.error) {
-                    errorMsg = stationsJson.error;
-                } else {
-                    stations = stationsJson.map(station => station.stationName);
-                    staffs = staffsJson;
-                    foods = foodsJson.map(food => food.foodName);
-                    selectedStation = stations.length > 0 ? stations[0] : null;
-                    wipFood = stations.length > 0 ? foods[0] : null;
-                    console.log(stations)
-                    console.log(staffs)
-                    console.log(foods)
-                }
-            } catch (error) {
-                console.log(error);
-                console.log(error.response.data)
-                errorMsg = error.response.data.error;
+        try {
+            const stationsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Station'}})).data;
+            const staffsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Staff'}})).data;
+            const foodsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Food'}})).data;
+            if (stationsJson.error || staffsJson.error) {
+                errorMsg = stationsJson.error;
+            } else {
+                stations = stationsJson.map(station => station.stationName);
+                staffs = staffsJson;
+                foods = foodsJson.map(food => food.foodName);
+                selectedStation = stations.length > 0 ? stations[0] : null;
+                wipFood = stations.length > 0 ? foods[0] : null;
+                console.log(stations)
+                console.log(staffs)
+                console.log(foods)
             }
+        } catch (error) {
+            console.log(error);
+            console.log(error.response.data)
+            errorMsg = error.response.data.error;
+        }
     }
     async function createfoodTruck() {
         if (!foodTruckName) {
@@ -76,7 +76,7 @@
                     
             } catch (error) {
                 console.log(error);
-                errorMsg = error.response;
+                errorMsg = error.response.data.error;
             }
         }
     }
@@ -147,7 +147,7 @@
 </form>
 
 <h3>{selectedStaffs}</h3>
-<a href={$url('../../home')}>Back</a>
+<a href={$url('../manage-food-truck')}>Back</a>
 
 <style>
     .error {
