@@ -18,16 +18,15 @@
     let stations = []; // string[]
     let foods = []; // [[foodName: string, foodPrice: number]]
     let menuItems = [];
-    let staffs = []; // [{ staffUsername: string, staffName: string }], although this later changes to just the staffUsername
-    let availableStaffs = []; // used only to add values to staffs
-    let selectedStaffs = [];
+    let staffs = []; // [{ staffUsername: string, staffName: string }]
+    let availableStaffs = []; // a temporary variable used only to add values to staffs
+    let selectedStaffs = []; // fetched from database, later currently selected staffs
 
     //params
     let selectedStation // string
     let wipFood; // string
     let wipPrice; // number
     let errorMsg; // string[]
-    let newSelectedStaffs = [];
 
     onMount(async () => {
         await fetchAvailableStaffs();
@@ -104,14 +103,13 @@
                     console.log(menuItems[i]);
                     await axios.post('http://localhost:4000/mn_update_foodTruck_MenuItem', { foodTruckName, foodName: menuItems[i][0], price: menuItems[i][1], managerUsername, token: $token })
                 }
-                for (let i = 0; i < selectedStaffs.length; i++) {
-                    console.log(selectedStaffs[i]);
-                    await axios.post('http://localhost:4000/mn_update_foodTruck_staff', { foodTruckName, staffName: selectedStaffs[i], managerUsername, token: $token })
+                for (const selectedStaff of selectedStaffs) {
+                    await axios.post('http://localhost:4000/mn_update_foodTruck_staff', { foodTruckName, staffName: selectedStaff.staffUsername, managerUsername, token: $token })
                 }
                 const unselectedStaffs = staffs.filter(staff => !(staff in selectedStaffs));
-                // Blocked due to CORS for some reason
-                for (let i = 0; i < unselectedStaffs.length; i++) {
-                    await axios.post('http://localhost:4000/mn_update_foodTruck_remove_staff', { foodTruckName, staffName: unselectedStaffs[i], token: $token })
+                for (const unselectedStaff of unselectedStaffs) {
+                    console.log(unselectedStaff.staffUsername);
+                    await axios.post('http://localhost:4000/mn_update_foodTruck_remove_staff', { foodTruckName, staffName: unselectedStaff.staffUsername, token: $token })
                 }
                 $goto(`../${foodTruckName}`);
                     
@@ -140,7 +138,7 @@
  
     <select multiple bind:value={selectedStaffs}>
         {#each staffs as staff}
-            <option value={staff.staffUsername} selected="selected">
+            <option value={staff} selected="selected">
                 {staff.staffName}
             </option>
         {/each}
@@ -176,7 +174,6 @@
     {#if errorMsg}
         <p>{errorMsg}</p>
     {/if}
-    <h1>{newSelectedStaffs}</h1>
 </form>
 
 <a href={$url('../../manage-food-truck')}>Back</a>
