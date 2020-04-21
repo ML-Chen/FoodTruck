@@ -108,7 +108,7 @@ CREATE TABLE cs4400spring2020.BuildingTag (
 );
  
 CREATE TABLE cs4400spring2020.OrderDetail (
-	orderID INT(10) ZEROFILL NOT NULL,
+	orderID INT NOT NULL,
     foodTruckName VARCHAR(55) NOT NULL,
     foodName VARCHAR(55) NOT NULL,
     purchaseQuantity INT NOT NULL,
@@ -469,7 +469,7 @@ SELECT FoodTruck.foodTruckName, FoodTruck.stationName, remainingCapacity, staffs
     ((i_hasRemainingCapacity = TRUE AND remainingCapacity>0) OR (i_hasRemainingCapacity =
  FALSE)) AND
     ((i_minStaffCount is NULL AND i_maxStaffCount is NULL) OR (i_minStaffCount is
- NULL AND staffs <= i_maxStaffCount) OR (i_maxStaffCount is NULL AND i_minStaffCount <= staffs) OR (staffs BETWEEN i_minStaffCount AND i_maxStaffCount))
+ NULL AND staffs <= i_maxStaffCount) OR (i_maxStaffCount is NULL AND i_minStaffCount <= staffs) OR (staffs BETWEEN i_minStaffCount AND i_maxStaffCount));
 END //
 DELIMITER ;
 -- Query #18: mn_delete_foodTruck [Screen #11 Manager Manage Food Truck] COMPLETE
@@ -498,7 +498,7 @@ DELIMITER //
 CREATE PROCEDURE mn_create_foodTruck_add_staff(IN i_foodTruckName VARCHAR(50), IN
 i_staffName VARCHAR(50))
 BEGIN
-UPDATE STAFF(username, foodTruckName)
+UPDATE STAFF
    SET foodTruckName = i_foodTruckName
    WHERE username = i_staffName;
 END //

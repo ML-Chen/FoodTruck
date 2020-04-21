@@ -8,7 +8,7 @@ Contributors (and their primary Georgia Tech username):
 - Michael Chen (mchen419)
 - Min Htat Kyaw (mkyaw6)
 - Alexander Trotter (atrotter6)
-- Duncan Siebert (dsiebert3)
+- Duncan Siebert (dsiebert3) – opted to take the final exam
 
 ## Getting started: server
 
