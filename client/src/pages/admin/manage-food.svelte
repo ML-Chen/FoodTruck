@@ -94,7 +94,7 @@
 </form>
 
 {#if errorMsg}
-    <p style="error">{errorMsg}</p>
+    <p class="error">{errorMsg}</p>
 {/if}
 
 <a href={$url('../../home')}>Back</a>
