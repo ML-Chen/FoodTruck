@@ -29,15 +29,11 @@
 
     async function fetchFoodTrucks() {
         try {
-            const json = (await axios.get('http://localhost:4000/mn_filter_foodTruck', {
+            foodTrucks = (await axios.get('http://localhost:4000/mn_filter_foodTruck', {
                 params: { managerUsername, foodTruckName, stationName, minStaffCount, maxStaffCount, hasRemainingCapacity, token: $token }
             })).data;
-            console.log(json);
-            if (json.error) {
-                errorMsg = json.error
-            } else {
-                /** @type {[{foodTruckName: string, stationName: string, capacity: int, foodTruckNames: string}]} */
-                foodTrucks = json.filter(foodTruck => Object.keys(foodTruck).length !== 0);
+            if (foodTrucks.length == 0) {
+                foodTruckName = stationName = null;
             }
             errorMsg = null;
             errorMsg2 = null;
@@ -95,9 +91,17 @@
         {/if}
     </select>
 
-    <label for="station-name">Staff Count:</label>
-    <input type="number" id="min-capacity" name="min-capacity" bind:value={minStaffCount} aria-label="minimum staff count" />
-    <input type="number" id="max-capacity" name="max-capacity" bind:value={maxStaffCount} aria-label="maximum staff count" />
+    <label>
+        Staff Count:
+        <input type="number" id="min-capacity" name="min-capacity" bind:value={minStaffCount} aria-label="minimum staff count" />
+        –
+        <input type="number" id="max-capacity" name="max-capacity" bind:value={maxStaffCount} aria-label="maximum staff count" />
+    </label>
+
+    <label for="has-rem-capacity">
+        <input type="checkbox" id="has-rem-capacity" bind:checked={hasRemainingCapacity} />
+        Has remaining capacity
+    </label>
 
     <br>
     <button type="submit">Filter</button>
