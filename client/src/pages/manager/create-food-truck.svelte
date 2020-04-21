@@ -65,11 +65,11 @@
                 for (let i = 0; i < selectedFoods.length; i++) {
                     console.log(selectedFoods[i]);
                     console.log(prices[i]);
-                    axios.post('http://localhost:4000/mn_create_foodTruck_add_MenuItem', { foodTruckName, foodName: selectedFoods[i], price: prices[i], managerUsername: $storeUsername, token: $token })
+                    await axios.post('http://localhost:4000/mn_create_foodTruck_add_MenuItem', { foodTruckName, foodName: selectedFoods[i], price: prices[i], managerUsername: $storeUsername, token: $token })
                 }
                 for (let i = 0; i < selectedStaffs.length; i++) {
                     console.log(selectedStaffs[i]);
-                    axios.post('http://localhost:4000/mn_create_foodTruck_add_staff', { foodTruckName, staffName: selectedStaffs[i], managerUsername: $storeUsername, token: $token })
+                    await axios.post('http://localhost:4000/mn_create_foodTruck_add_staff', { foodTruckName, staffName: selectedStaffs[i], managerUsername: $storeUsername, token: $token })
                 }
                 foodTruckName = wipFood = errorMsg = '';
                 selectedFoods = [];
