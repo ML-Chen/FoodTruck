@@ -123,9 +123,9 @@
     }
 </script>
 
-<svelte:head>Create Food Truck</svelte:head>
+<svelte:head>Update Food Truck</svelte:head>
 
-<h1>Create Food Truck</h1>
+<h1>Update Food Truck</h1>
 
 <form on:submit|preventDefault={updatefoodTruck}>
     <label for="foodTruckName">Name</label>
@@ -174,7 +174,7 @@
     <input type="number" bind:value={wipPrice} /><br />
     <button type="submit">Update</button>
     {#if errorMsg}
-    <p>{errorMsg}</p>
+        <p>{errorMsg}</p>
     {/if}
     <h1>{newSelectedStaffs}</h1>
 </form>

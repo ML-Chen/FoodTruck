@@ -82,9 +82,9 @@
     }
 </script>
 
-<svelte:head>Update Food Truck</svelte:head>
+<svelte:head>Create Food Truck</svelte:head>
 
-<h1>Update Food Truck</h1>
+<h1>Create Food Truck</h1>
 
 <form on:submit|preventDefault={createfoodTruck}>
     <label for="foodTruckName">Name</label>
@@ -144,8 +144,6 @@
     {#if errorMsg}
         <p class="error">{errorMsg}</p>
     {/if}
-    <h1>{selectedStaffs}</h1>
-    <h1>{selectedStation}</h1>
 </form>
 
 <a href={$url('../../home')}>Back</a>
