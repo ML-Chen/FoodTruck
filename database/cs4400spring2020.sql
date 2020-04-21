@@ -645,7 +645,7 @@ as totalRevenue, COUNT(DISTINCT customerUsername) as totalCustomer
        INNER JOIN
        MenuItem ON (OrderDetail.foodName = MenuItem.foodName AND
 OrderDetail.foodTruckName = MenuItem.foodTruckName)
-       INNER JOIN
+       RIGHT OUTER JOIN
        FoodTruck ON OrderDetail.foodTruckName = FoodTruck.foodTruckName
        WHERE
        (i_managerUsername = FoodTruck.managerUsername) AND
