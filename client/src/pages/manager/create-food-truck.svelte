@@ -3,11 +3,13 @@
 <script>
     import { onMount } from 'svelte';
     import { url, goto } from '@sveltech/routify';
-    import { token, userType } from '../_store.js';
+    import { token, userType, storeUsername } from '../_store.js';
     import axios from 'axios';
 
     token.useLocalStorage();
     userType.useLocalStorage();
+    storeUsername.useLocalStorage();
+
 
     // Data fetched from the database
     let stations = [];
@@ -21,6 +23,7 @@
     let wipFoods;
     let wipPrices;
     let errorMsg;
+    let managerUsername = $storeUsername
 
     onMount(callHelpers);
     async function callHelpers() {
@@ -43,23 +46,26 @@
     async function createfoodTruck() {
         if (!foodTruckName) {
             errorMsg = 'foodTruck name must not be blank';
-        } else if (!description) {
-            errorMsg = 'Description must not be blank';
+        } else if (!selectedStation) {
+            errorMsg = 'Please select a station';
+        } else if (!selectedStaffs) {
+            errorMsg = 'Please assign at least one staff';
+        } else if (foods == []) {
+            errorMsg = 'Please add at least one food'; 
         } else {
             try {
-                const json = (await axios.post('http://localhost:4000/mn_create_foodTruck_add_station', { foodTruckName, stationName: selectedStation, token: $token })).data;
-                    if (json.error) {
-                        errorMsg = json.error;
-                    } else {
-                        for (let foodName of foods) {
-                            axios.post('http://localhost:4000/mn_create_foodTruck_add_MenuItem', { foodTruckName, foodName, price: -1, token: $token })
-                        }
-                        foodTruckName = description = wipFoods = errorMsg = '';
-                        foods = [];
-                    }
+                const json = (await axios.post('http://localhost:4000/mn_create_foodTruck_add_station', { foodTruckName, stationName: selectedStation, managerUsername: $storeUsername, token: $token })).data;    
+                for (let i = 0; i < foods.length; i++) {
+                    console.log(foods[i]);
+                    console.log(prices[i]);
+                    axios.post('http://localhost:4000/mn_create_foodTruck_add_MenuItem', { foodTruckName, foodName: foods[i], price: prices[i], managerUsername: $storeUsername, token: $token })
+                }
+                foodTruckName = description = wipFoods = errorMsg = '';
+                foods = [];
+                    
             } catch (error) {
-                console.log(error.response.data)
-                errorMsg = error.response.data.error;
+                console.log(error);
+                errorMsg = error.response;
             }
         }
     }
@@ -91,7 +97,7 @@
     </select>
 
 
-    <!-- TODO: add price -->
+   
     <label for="foods">Menu Item</label>
         {#each foods as food, index (food)}
             <button type="button" on:click={() => { 
@@ -102,15 +108,22 @@
         {/each}
     <button type="button" on:click={() => { 
         if (wipFoods && wipPrices) {
-            foods = foods.concat(wipFoods); 
-            prices = prices.concat(wipPrices);
-            wipFoods='';
-            wipPrices= 0; 
+            if (wipFoods in foods) {
+                errorMsg = "Duplicate Food name"
+            } else {
+                foods = foods.concat(wipFoods); 
+                prices = prices.concat(wipPrices);
+                wipFoods='';
+                wipPrices= 0;
+                } 
             }
         }} aria-label="Add Food {wipFoods}">+</button>
     <input type="text" bind:value={wipFoods} /><br />
     <input type="number" bind:value={wipPrices} /><br />
     <button type="submit">Create</button>
+    <p>{errorMsg}</p>
+    <h1>{selectedStaffs}</h1>
+    <h1>{selectedStation}</h1>
 </form>
 
 <a href={$url('../../home')}>Back</a>

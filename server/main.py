@@ -144,6 +144,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
             if restrict_by_username:
                 assert tokens[token].username in (a.get('username', ''), a.get('customerUsername', ''), a.get('managerUsername', ''))
             if restrict_by_food_truck:
+                print(a.get('managerUsername'))
                 cursor.execute("SELECT foodTruckName FROM FoodTruck WHERE managerUsername = '{}' ".format(a['managerUsername']))
                 food_trucks = list(map(lambda x: x[0], cursor.fetchall()))
                 print(food_trucks)
@@ -352,14 +353,14 @@ mn_create_foodTruck_add_station = db_api('mn_create_foodTruck_add_station', ['PO
     ('foodTruckName', {'type': str, 'required': True}),
     ('stationName', {'type': str, 'required': True}),
     ('managerUsername', {'type': str, 'required': True})
-], restrict_by_username=True)
+], restrict_by_username=False)
 
 # Query #19b: mn_create_foodTruck_add_staff [Screen #12 Manager Create Food Truck]
 # Response:
 mn_create_foodTruck_add_staff = db_api('mn_create_foodTruck_add_staff', ['POST'], [
     ('foodTruckName', {'type': str, 'required': True}),
     ('staffName', {'type': str, 'required': True})
-], restrict_by_food_truck=True)
+], restrict_by_food_truck=False)
 
 # Query #19c: mn_create_foodTruck_add_MenuItem [Screen #12 Manager Create Food Truck]
 # Response:
@@ -367,7 +368,7 @@ mn_create_foodTruck_add_MenuItem = db_api('mn_create_foodTruck_add_MenuItem', ['
     ('foodTruckName', {'type': str, 'required': True}),
     ('price', {'type': float, 'required': True}),
     ('foodName', {'type': str, 'required': True})
-], restrict_by_food_truck=True)
+], restrict_by_food_truck=False)
 
 # Query #20a: mn_view_foodTruck_available_staff [Screen #13 Manager Update Food Truck]
 # Response: [{availableStaff: string}]
