@@ -84,7 +84,7 @@
 
 <svelte:head>Update Food Truck</svelte:head>
 
-<h1>Update Food Truck</h1>
+<h1>Create Food Truck</h1>
 
 <form on:submit|preventDefault={createfoodTruck}>
     <label for="foodTruckName">Name</label>
@@ -93,7 +93,7 @@
     <select id="station-name" name="station-name" bind:value={selectedStation}>
         {#if stations}
             {#each stations as sName}
-                <option value={sName}>{sName}</option>
+                <option value={sName}>{sName || ''}</option>
             {/each}
         {/if}
     </select>
@@ -144,8 +144,6 @@
     {#if errorMsg}
         <p class="error">{errorMsg}</p>
     {/if}
-    <h1>{selectedStaffs}</h1>
-    <h1>{selectedStation}</h1>
 </form>
 
 <a href={$url('../../home')}>Back</a>
