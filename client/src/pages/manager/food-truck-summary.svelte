@@ -82,7 +82,7 @@
 <h1>Food Truck Summary</h1>
 
 <form on:submit|preventDefault={fetchFoodTrucks}>
-    <label for="food-truck-name">Food Truck name:</label>
+    <label for="food-truck-name">Food Truck Name (contain)</label>
     <input type="text" name="food-truck-name" bind:value={foodTruckName}>
 
     <label for="station-name">Station name:</label>
