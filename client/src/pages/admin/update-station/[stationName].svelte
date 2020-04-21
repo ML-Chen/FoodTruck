@@ -20,7 +20,7 @@
     });
     async function fetchStation() {
         try {
-            const json = (await axios.get('http://localhost:4000/ad_view_station_general', {
+            const json = (await axios.get('http://localhost:4000/ad_view_station', {
                 params: { stationName: oldStationName, token: $token }
             })).data;
             newStationName = json.stationName;
