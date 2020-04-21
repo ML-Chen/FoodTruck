@@ -209,6 +209,8 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
 
     return new_api
 
+date = str  # lambda d: datetime.strptime(d, '%Y-%m-%d').date()  # date input type
+
 # Query #1: login [Screen #1: Login]
 # Response: {username: str, userType: str} or [] if no user found
 login = db_api('login', ['POST'], [
@@ -432,10 +434,10 @@ mn_filter_summary = db_api('mn_filter_summary', ['GET'], [
     ('managerUsername', {'type': str, 'required': True}),
     ('foodTruckName', {'type': str}),
     ('stationName', {'type': str}),
-    ('minDate', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date()}),
-    ('maxDate', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date()}),
-    ('sortedBy', {'type': str, 'choices': ('foodTruckName', 'totalOrder', 'totalRevenue', 'totalCustomer')}),
-    ('sortDirection', {'type': str, 'default': 'ASC', 'choices': ('ASC', 'DESC')})
+    ('minDate', {'type': date}),
+    ('maxDate', {'type': date}),
+    ('sortedBy', {'type': str, 'default': 'totalRevenue', 'choices': ('foodTruckName', 'totalOrder', 'totalRevenue', 'totalCustomer')}),
+    ('sortDirection', {'type': str, 'default': 'DESC', 'choices': ('ASC', 'DESC')})
 ], get_result=2, restrict_by_username=False)
 # no need to do restrict_by_food_truck=True because the query already does a join with the manager's username
 
@@ -479,7 +481,7 @@ cus_current_information_foodTruck = db_api('cus_current_information_foodTruck', 
 # Query #30: cus_order [Screen #18 Customer Order]
 # Response: []
 cus_order = db_api('cus_order', ['POST'], [
-    ('date', {'type': lambda d: datetime.strptime(d, '%Y%m%d').date(), 'required': True}),
+    ('date', {'type': date, 'required': True}),
     ('customerUsername', {'type': str, 'required': True})
 ], restrict_by_username=True)
 

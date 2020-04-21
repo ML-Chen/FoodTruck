@@ -103,10 +103,6 @@
     </tr>
 </TableSort>
 
-{#if errorMsg}
-    <p class="error">{errorMsg}</p>
-{/if}
-
 <a href={$url('../../home')}>Back</a>
 <a href={$url(`../summary-detail/${selectedFoodTruck}`)}>Detail</a>
 <style>
