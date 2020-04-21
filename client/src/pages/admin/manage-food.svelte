@@ -12,14 +12,12 @@
 
     // Data fetched from the database
     /** @type {[{foodName: string, menuCount: number, purchaseCount: number, }]} */
-    
-     // Data fetched from the database
     let foods = [];
 
 
     // Form values (all strings)
     let errorMsg;
-    let foodNameFilter;
+    let foodNameFilter; // selected food name in the select bar above the filter button
     let sortedBy = 'name'; // choices: ['name', 'menuCount', 'purchaseCount']
     let sortDirection = 'ASC'; // choices: ['ASC', 'DESC']
     let selectedFoodName;
@@ -40,12 +38,14 @@
 
     async function deleteFood() {
         try {
-            const json = (await axios.post('http://localhost:4000/ad_delete_food', {foodName: selectedFoodName, token: $token})).data;
-            if (json.error) {
-                errorMsg = json.error;
-            } else {
-                await fetchFoods();
+            await axios.post('http://localhost:4000/ad_delete_food', {foodName: selectedFoodName, token: $token});
+            // await fetchFoods();
+            foods = foods.filter(food => food.foodName !== selectedFoodName);
+            if (foodNameFilter === selectedFoodName) {
+                foodNameFilter = null;
             }
+            selectedFoodName = null;
+            errorMsg = null;
         } catch (error) {
             if (error.response.data.error.includes('IntegrityError')) {
                 errorMsg = "This food can't be deleted because something depends on it";
@@ -67,7 +67,11 @@
 
 <form on:submit|preventDefault={fetchFoods}>
     <label for="food-name">Name</label>
-    <input type="text" id="food-name" name="food-name" bind:value={foodNameFilter} />
+    <select bind:value={foodNameFilter}>
+        {#each [null].concat(foods.map(food => food.foodName)) as foodName}
+            <option value={foodName} selected={foodName === foodNameFilter}>{foodName || ''}</option>
+        {/each}
+    </select>
     <br />
     <button type="submit">Filter</button>
 </form>
