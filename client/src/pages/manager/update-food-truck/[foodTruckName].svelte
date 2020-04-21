@@ -3,6 +3,7 @@
 <script>
     export let foodTruckName;
     const oldTruckName = decodeURIComponent(foodTruckName);
+    let selectedFoodTruck = oldTruckName;
     // TODO; see admin/update-building/[buildingName].svelte for a similar page
 
     import { onMount } from 'svelte';
@@ -15,12 +16,12 @@
     storeUsername.useLocalStorage();
 
 
+    let selectedStation
     // Data fetched from the database
     let stations = [];
     let availableStaffs = [];
     let foods = [];
     let menuItems = [];
-    let selectedStation;
     let selectedStaffs;   
 
     //params
@@ -93,7 +94,7 @@
             try {
                 const stationsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Station'}})).data;
                 const foodsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Food'}})).data;
-                if (stationsJson.error || staffsJson.error) {
+                if (stationsJson.error) {
                     errorMsg = stationsJson.error;
                 } else {
                     stations = stationsJson.filter(station => Object.keys(station).length !== 0);
@@ -113,18 +114,18 @@
             errorMsg = 'Please select a station';
         } else if (!selectedStaffs) {
             errorMsg = 'Please assign at least one staff';
-        } else if (selectedFoods == []) {
+        } else if (menuItems == []) {
             errorMsg = 'Please add at least one food'; 
         } else {
             try {
                 const json = (await axios.post('http://localhost:4000/mn_create_foodTruck_add_station', { foodTruckName, stationName: selectedStation, managerUsername: $storeUsername, token: $token })).data;    
-                for (let i = 0; i < selectedFoods.length; i++) {
-                    console.log(selectedFoods[i]);
+                for (let i = 0; i < menuItems.length; i++) {
+                    console.log(menuItems[i]);
                     console.log(prices[i]);
-                    axios.post('http://localhost:4000/mn_create_foodTruck_add_MenuItem', { foodTruckName, foodName: selectedFoods[i], price: prices[i], managerUsername: $storeUsername, token: $token })
+                    axios.post('http://localhost:4000/mn_create_foodTruck_add_MenuItem', { foodTruckName, foodName: menuItems[i], price: prices[i], managerUsername: $storeUsername, token: $token })
                 }
                 foodTruckName = description = wipFoods = errorMsg = '';
-                selectedFoods = [];
+                menuItems = [];
                     
             } catch (error) {
                 console.log(error);
@@ -138,7 +139,7 @@
 
 <h1>Create Food Truck</h1>
 
-<!-- <form on:submit|preventDefault={createfoodTruck}>
+<form on:submit|preventDefault={createfoodTruck}>
     <label for="foodTruckName">Name</label>
     <input type="text" id="foodTruckName" name="foodTruckName" bind:value={foodTruckName} />
 
@@ -152,7 +153,7 @@
     <label for="selectedStaffs">Assign Staffs:</label>
  
     <select multiple bind:value={selectedStaffs}>
-        {#each staffs as staff}
+        {#each availableStaffs as staff}
             <option value={staff.staffUsername}>
                 {staff.staffName}
             </option>
@@ -161,21 +162,19 @@
 
 
    
-    <label for="selectedFoods">Menu Item</label>
-        {#each selectedFoods as selectedFood, index (selectedFood)}
+    <label for="menuItems">Menu Item</label>
+        {#each menuItems as menuItem, index (menuItem)}
             <button type="button" on:click={() => { 
-                selectedFoods = selectedFoods.filter((_, i) => i !== index)
-                prices = prices.filter((_, i) => i !== index)
+                menuItems = menuItems.filter((_, i) => i !== index)
                 }} 
-                aria-label="Remove Food {selectedFood}">−</button>Food: {selectedFood} Price: {prices[index]}<br />
+                aria-label="Remove Food {menuItem[0]}">−</button>Food: {menuItem[0]} Price: {menuItem[1]}<br />
         {/each}
     <button type="button" on:click={() => { 
         if (wipFoods && wipPrices) {
-            if (wipFoods in selectedFoods) {
+            if (wipFoods in menuItems) {
                 errorMsg = "Duplicate Food name"
             } else {
-                selectedFoods = selectedFoods.concat(wipFoods); 
-                prices = prices.concat(wipPrices);
+                menuItems = menuItems.concat([wipFoods, wipPrices]); 
                 wipFoods='';
                 wipPrices= 0;
                 } 
@@ -193,6 +192,6 @@
     <p>{errorMsg}</p>
     <h1>{selectedStaffs}</h1>
     <h1>{selectedStation}</h1> -->
-<!-- </form> -->
+</form>
 
 <a href={$url('../../home')}>Back</a>
