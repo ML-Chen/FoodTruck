@@ -11,9 +11,6 @@
     userType.useLocalStorage();
     storeUsername.useLocalStorage();
 
-    // Tablesort
-    import {TableSort} from 'svelte-tablesort'
-
     // Data fetched from the database
     let foodTrucks;
     let stations;
