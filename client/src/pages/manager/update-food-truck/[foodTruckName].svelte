@@ -28,15 +28,17 @@
     let wipPrice; // number
     let errorMsg; // string[]
 
+    $: console.log(selectedStaffs);
+
     onMount(async () => {
         await fetchAvailableStaffs();
         await fetchSelectedStaffs();
         staffs = selectedStaffs.concat(availableStaffs);
         await fetchMenuItems();
         await callHelpers();
-        console.log(availableStaffs);
-        console.log(selectedStaffs);
-        console.log(menuItems);
+        // console.log(availableStaffs);
+        // console.log(selectedStaffs);
+        // console.log(menuItems);
     });
 
     async function fetchAvailableStaffs() {
@@ -138,7 +140,8 @@
  
     <select multiple bind:value={selectedStaffs}>
         {#each staffs as staff}
-            <option value={staff} selected="selected">
+            <!-- Super inefficient lmao -->
+            <option value={staff} selected={selectedStaffs.filter(selectedStaff => selectedStaff.staffUsername === staff.staffUsername).length > 0}>
                 {staff.staffName}
             </option>
         {/each}
