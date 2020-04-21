@@ -5,6 +5,7 @@
     import { token, userType } from '../_store.js';
     import { url, goto } from '@sveltech/routify';
     import axios from 'axios';
+    import { TableSort } from 'svelte-tablesort';
 
     token.useLocalStorage();
     userType.useLocalStorage();
@@ -12,6 +13,10 @@
     // Data fetched from the database
     /** @type {[{foodName: string, menuCount: number, purchaseCount: number, }]} */
     let foods;
+    
+     // Data fetched from the database
+    let foods = [];
+
 
     // Form values (all strings)
     let errorMsg;
@@ -25,16 +30,11 @@
 
     async function fetchFoods() {
         try {
-            const json = (await axios.get('http://localhost:4000/ad_filter_food', {
+            foods = (await axios.get('http://localhost:4000/ad_filter_food', {
                 params: { foodName: foodNameFilter, sortedBy, sortDirection, token: $token }
             })).data;
-            if (json.error) {
-                errorMsg = json.error
-            } else {
-                foods = json.filter(food => Object.keys(food).length !== 0);
-            }
-            errorMsg = null;
-        } catch (error) {
+            } catch (error) {
+            console.log(error.response.data)
             errorMsg = error.response.data.error;
         }
     }
@@ -88,7 +88,7 @@
 </form>
 
 <form on:submit|preventDefault={deleteFood}>
-    <table>
+<!--    <table>
         <thead>
             <tr>
                 <td>Name</td>
@@ -115,11 +115,27 @@
     </table>
     {#if errorMsg}
         <p class="error">{errorMsg}</p>
-    {/if}
+    {/if}  -->
+    
+    <TableSort items={foods}>
+    <tr slot="thead">
+        <th></th>
+        <th data-sort="name">Name</th>
+        <th data-sort="menuCount">Menu Count</th>
+        <th data-sort="purchaseCount">Purchase Count</th>
+    </tr>
+    <tr slot="tbody" let:item={food}>
+        <input type="radio" bind:group={selectedFoodName} value={food.foodName} />
+        <td>{food.name}</td>
+        <td>{food.menuCount}</td>
+        <td>{food.purchaseCount}</td>
+    </tr>
+</TableSort>
 
     <a href={$url('../create-food')}>Create food</a>
     <button type="submit" on:click={deleteFood}>Delete food</button>
 </form>
+
 
 <a href={$url('../../home')}>Back</a>
 
