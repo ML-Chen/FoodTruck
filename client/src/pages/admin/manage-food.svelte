@@ -12,7 +12,6 @@
 
     // Data fetched from the database
     /** @type {[{foodName: string, menuCount: number, purchaseCount: number, }]} */
-    let foods;
     
      // Data fetched from the database
     let foods = [];
