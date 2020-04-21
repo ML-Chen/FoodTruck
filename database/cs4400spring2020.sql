@@ -460,13 +460,13 @@ DROP TABLE IF EXISTS mn_filter_foodTruck_result;
     CREATE TABLE mn_filter_foodTruck_result(foodTruckName varchar(100),
 stationName varchar(100),
 remainingCapacity int, staffCount int, menuItemCount int)
-SELECT FoodTruck.foodTruckName, FoodTruck.stationName, remainingCapacity, staffs,  foods
+SELECT FoodTruck.foodTruckName, FoodTruck.stationName, remainingCapacity, staffs as staffCount, foods as menuItemCount
    FROM FoodTruck
    INNER JOIN (select (capacity - count(foodTruckName)) as remainingCapacity, Station.stationName from Station inner join FoodTruck on Station.stationName = FoodTruck.stationName group by Station.stationName) as capacityInfo
    ON FoodTruck.stationName = capacityInfo.stationName
-   INNER JOIN (select foodTruckName, count(username) as staffs from STAFF group by foodTruckName) as staffInfo
+   LEFT OUTER JOIN (select foodTruckName, count(username) as staffs from STAFF group by foodTruckName) as staffInfo
    ON FoodTruck.foodTruckName = staffInfo.foodTruckName
-   INNER JOIN (select count(foodName) as foods, foodTruckName from MenuItem group by foodTruckName) as foodInfo
+   LEFT OUTER JOIN (select count(foodName) as foods, foodTruckName from MenuItem group by foodTruckName) as foodInfo
    ON FoodTruck.foodTruckName = foodInfo.foodTruckName
    WHERE
    (i_managerUsername = managerUsername OR i_managerUsername is NULL OR i_managerUsername = '') and 
