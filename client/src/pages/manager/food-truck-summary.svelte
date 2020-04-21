@@ -12,40 +12,29 @@
     storeUsername.useLocalStorage();
 
     // Data fetched from the database
-    let foodTrucks;
-    let stations;
+    let foodTrucks = [];
+    let stations = [];
 
     // Form values
-    console.log($storeUsername)
     let managerUsername = $storeUsername
     let foodTruckName;
     let stationName;
     let minDate;
     let maxDate;
     let errorMsg;
-    let errorMsg2;
-    /** @type {{ foodTruckName: string, stationName: string }} */
-    let selectedFoodTruck = { foodTruckName: null, stationName: null }
+    let selectedFoodTruck; // name of selected food truck
 
     onMount(async () => {
         await fetchStations();
         await fetchFoodTrucks();
+        errorMsg = null;
     });
 
     async function fetchStations() {
         try {
-            const json = (await axios.get('http://localhost:4000/mn_get_station', {
-                params: { managerUsername, errorMsg, token: $token }
+            stations = (await axios.get('http://localhost:4000/mn_get_station', {
+                params: { managerUsername, token: $token }
             })).data;
-            console.log(json);
-            if (json.error) {
-                errorMsg = json.error
-            } else {
-                /** @type {[{foodTruckName: string, stationName: string, date: int, foodTruckNames: string}]} */
-                stations = json.filter(station => Object.keys(station).length !== 0);
-            }
-            errorMsg = null;
-            errorMsg2 = null;
         } catch (error) {
             console.log(error.response.data)
             errorMsg = error.response.data.error;
@@ -54,18 +43,9 @@
 
     async function fetchFoodTrucks() {
         try {
-            const json = (await axios.get('http://localhost:4000/mn_filter_summary', {
-                params: { managerUsername, foodTruckName, stationName, minDate, maxDate, errorMsg, selectedFoodTruck, token: $token }
+            foodTrucks = (await axios.get('http://localhost:4000/mn_filter_summary', {
+                params: { managerUsername, foodTruckName, stationName, minDate, maxDate, token: $token }
             })).data;
-            console.log(json);
-            if (json.error) {
-                errorMsg = json.error
-            } else {
-                /** @type {[{foodTruckName: string, stationName: string, date: int, foodTruckNames: string}]} */
-                foodTrucks = json.filter(foodTruck => Object.keys(foodTruck).length !== 0);
-            }
-            errorMsg = null;
-            errorMsg2 = null;
         } catch (error) {
             console.log(error.response.data)
             errorMsg = error.response.data.error;
@@ -106,44 +86,29 @@
     {/if}
 </form>
 
-<!-- TODO: make columns sortable with https://github.com/mattiash/svelte-tablesort -->
-
-<!-- <TableSort items={items}>
-	<tr slot="thead">
-		<th data-sort="title">Title</th>
-		<th data-sort="user">User</th>
-	</tr>
-	<tr slot="tbody" let:item={item}>
-		<td><a href="{item.url}">{item.title}</a></td>
-		<td>{item.user}</td>
-	</tr>
-    </TableSort>  -->
-
 <TableSort items={foodTrucks}>
     <tr slot="thead">
-        <th data-sort="food-truck">Food Truck</th>
-        <th data-sort="total-order">Total Order</th>
-        <th data-sort="total-revenue">Total Revenue</th>
-        <th data-sort="#customer"># Customer</th>
+        <th></th>
+        <th data-sort="foodTruckName">Food Truck</th>
+        <th data-sort="totalOrder">Total Order</th>
+        <th data-sort="totalRevenue">Total Revenue</th>
+        <th data-sort="totalCustomer"># Customer</th>
     </tr>
     <tr slot="tbody" let:item={foodTruck}>
-        <td>
-            <label>
-                <input type="radio" bind:group={selectedFoodTruck} value={{ foodTruckName: foodTruck.foodTruckName, stationName: foodTruck.stationName }} />
-                {foodTruck.foodTruckName}
-            </label>
-        </td>
-        <td><a href="{foodTruck.totalOrder}">{foodTruck.totalOrder}</a></td>
-        <td><a href="{foodTruck.totalRevenue}">{foodTruck.totalRevenue}</a></td>
-        <td><a href="{foodTruck.totalCustomer}">{foodTruck.totalCustomer}</a></td>
+        <input type="radio" bind:group={selectedFoodTruck} value={foodTruck.foodTruckName} />
+        <td>{foodTruck.foodTruckName}</td>
+        <td>{foodTruck.totalOrder}</td>
+        <td>{foodTruck.totalRevenue}</td>
+        <td>{foodTruck.totalCustomer}</td>
     </tr>
 </TableSort>
-{#if errorMsg2}
-    <p class="error">{errorMsg2}</p>
+
+{#if errorMsg}
+    <p class="error">{errorMsg}</p>
 {/if}
 
 <a href={$url('../../home')}>Back</a>
-<a href={$url(`../summary-detail/${selectedFoodTruck['foodTruckName']}`)}>Detail</a>
+<a href={$url(`../summary-detail/${selectedFoodTruck}`)}>Detail</a>
 <style>
     .error {
         color: red;
