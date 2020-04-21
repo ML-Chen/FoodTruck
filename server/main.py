@@ -403,14 +403,14 @@ mn_view_foodTruck_menu = db_api('mn_view_foodTruck_menu', ['GET'], [
 mn_update_foodTruck_station = db_api('mn_update_foodTruck_station', ['POST'], [
     ('foodTruckName', {'type': str, 'required': True}),
     ('stationName', {'type': str, 'required': True})
-], restrict_by_food_truck=True)
+], restrict_by_food_truck=False)
 
 # Query #22b: mn_update_foodTruck_staff [Screen #13 Manager Update Food Truck]
 # Response: []
 mn_update_foodTruck_staff = db_api('mn_update_foodTruck_staff', ['POST'], [
     ('foodTruckName', {'type': str, 'required': True}),
     ('staffUsername', {'type': str, 'required': True})
-], restrict_by_food_truck=True)
+], restrict_by_food_truck=False)
 
 # Query #22c: mn_update_foodTruck_MenuItem [Screen #13 Manager Update Food Truck]
 # Response: []

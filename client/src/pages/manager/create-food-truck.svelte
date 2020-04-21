@@ -64,6 +64,10 @@
                     console.log(prices[i]);
                     axios.post('http://localhost:4000/mn_create_foodTruck_add_MenuItem', { foodTruckName, foodName: selectedFoods[i], price: prices[i], managerUsername: $storeUsername, token: $token })
                 }
+                for (let i = 0; i < selectedStaffs.length; i++) {
+                    console.log(selectedStaffs[i]);
+                    axios.post('http://localhost:4000/mn_create_foodTruck_staff', { foodTruckName, staffName: selectedStaff[i], managerUsername: $storeUsername, token: $token })
+                }
                 foodTruckName = description = wipFoods = errorMsg = '';
                 selectedFoods = [];
                     

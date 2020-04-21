@@ -107,7 +107,7 @@
                 errorMsg = error;
             }
     }
-    async function createfoodTruck() {
+    async function updatefoodTruck() {
         if (!foodTruckName) {
             errorMsg = 'foodTruck name must not be blank';
         } else if (!selectedStation) {
@@ -118,11 +118,14 @@
             errorMsg = 'Please add at least one food'; 
         } else {
             try {
-                const json = (await axios.post('http://localhost:4000/mn_create_foodTruck_add_station', { foodTruckName, stationName: selectedStation, managerUsername: $storeUsername, token: $token })).data;    
+                const json = (await axios.post('http://localhost:4000/mn_update_foodTruck_station', { foodTruckName, stationName: selectedStation, managerUsername: $storeUsername, token: $token })).data;    
                 for (let i = 0; i < menuItems.length; i++) {
                     console.log(menuItems[i]);
-                    console.log(prices[i]);
-                    axios.post('http://localhost:4000/mn_create_foodTruck_add_MenuItem', { foodTruckName, foodName: menuItems[i], price: prices[i], managerUsername: $storeUsername, token: $token })
+                    axios.post('http://localhost:4000/mn_update_foodTruck_MenuItem', { foodTruckName, foodName: menuItems[i][0], price: menuItems[i][1], managerUsername: $storeUsername, token: $token })
+                }
+                for (let i = 0; i < selectedStaffs.length; i++) {
+                    console.log(selectedStaffs[i]);
+                    axios.post('http://localhost:4000/mn_update_foodTruck_staff', { foodTruckName, staffName: selectedStaff[i], managerUsername: $storeUsername, token: $token })
                 }
                 foodTruckName = description = wipFoods = errorMsg = '';
                 menuItems = [];
@@ -139,7 +142,7 @@
 
 <h1>Create Food Truck</h1>
 
-<form on:submit|preventDefault={createfoodTruck}>
+<form on:submit|preventDefault={updatefoodTruck}>
     <label for="foodTruckName">Name</label>
     <input type="text" id="foodTruckName" name="foodTruckName" bind:value={foodTruckName} />
 
