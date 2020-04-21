@@ -119,31 +119,25 @@
 	</tr>
     </TableSort>  -->
 
-<TableSort items={items}>
+<TableSort items={foodTrucks}>
     <tr slot="thead">
         <th data-sort="food-truck">Food Truck</th>
         <th data-sort="total-order">Total Order</th>
         <th data-sort="total-revenue">Total Revenue</th>
         <th data-sort="#customer"># Customer</th>
     </tr>
-    <tr slot="tbody">
-        {#if foodTrucks}
-            {#each foodTrucks as foodTruck}
-                <tr>
-                    <td>
-                        <label>
-                            <a href="input type="radio" bind:group={selectedFoodTruck} value={{ foodTruckName: foodTruck.foodTruckName, stationName: foodTruck.stationName }}"
-                               >{foodTruckName: foodTruck.foodTruckName}</a>
-                        </label>
-                    </td>
-                    <td><a href="{foodTruck.totalOrder}">{foodTruck.totalOrder}</a></td>
-                    <td><a href="{foodTruck.totalRevenue}">{foodTruck.totalRevenue}</a></td>
-                    <td><a href="{foodTruck.totalCustomer}">{foodTruck.totalCustomer}</a></td>
-                </tr>
-            {/each}
-        {/if}
+    <tr slot="tbody" let:item={foodTruck}>
+        <td>
+            <label>
+                <input type="radio" bind:group={selectedFoodTruck} value={{ foodTruckName: foodTruck.foodTruckName, stationName: foodTruck.stationName }} />
+                {foodTruck.foodTruckName}
+            </label>
+        </td>
+        <td><a href="{foodTruck.totalOrder}">{foodTruck.totalOrder}</a></td>
+        <td><a href="{foodTruck.totalRevenue}">{foodTruck.totalRevenue}</a></td>
+        <td><a href="{foodTruck.totalCustomer}">{foodTruck.totalCustomer}</a></td>
     </tr>
-</table>
+</TableSort>
 {#if errorMsg2}
     <p class="error">{errorMsg2}</p>
 {/if}
