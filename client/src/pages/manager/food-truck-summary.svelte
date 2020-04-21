@@ -11,6 +11,9 @@
     userType.useLocalStorage();
     storeUsername.useLocalStorage();
 
+    // Tablesort
+    import {TableSort} from 'svelte-tablesort'
+
     // Data fetched from the database
     let foodTrucks;
     let stations;
@@ -108,32 +111,41 @@
 
 <!-- TODO: make columns sortable with https://github.com/mattiash/svelte-tablesort -->
 
-<table>
-    <thead>
-        <tr>
-            <td>foodTruck</td>
-            <td>Total Order</td>
-            <td>Total Revenue</td>
-            <td># Customer</td>
-        </tr>
-    </thead>
-    <tbody>
+<!-- <TableSort items={items}>
+	<tr slot="thead">
+		<th data-sort="title">Title</th>
+		<th data-sort="user">User</th>
+	</tr>
+	<tr slot="tbody" let:item={item}>
+		<td><a href="{item.url}">{item.title}</a></td>
+		<td>{item.user}</td>
+	</tr>
+    </TableSort>  -->
+
+<TableSort items={items}>
+    <tr slot="thead">
+        <th data-sort="food-truck">Food Truck</th>
+        <th data-sort="total-order">Total Order</th>
+        <th data-sort="total-revenue">Total Revenue</th>
+        <th data-sort="#customer"># Customer</th>
+    </tr>
+    <tr slot="tbody">
         {#if foodTrucks}
             {#each foodTrucks as foodTruck}
                 <tr>
                     <td>
                         <label>
-                            <input type="radio" bind:group={selectedFoodTruck} value={{ foodTruckName: foodTruck.foodTruckName, stationName: foodTruck.stationName }}/>
-                            {foodTruck.foodTruckName}
+                            <a href="input type="radio" bind:group={selectedFoodTruck} value={{ foodTruckName: foodTruck.foodTruckName, stationName: foodTruck.stationName }}"
+                               >{foodTruckName: foodTruck.foodTruckName}</a>
                         </label>
                     </td>
-                    <td>{foodTruck.totalOrder}</td>
-                    <td>{foodTruck.totalRevenue}</td>
-                    <td>{foodTruck.totalCustomer}</td>
+                    <td><a href="{foodTruck.totalOrder}">{foodTruck.totalOrder}</a></td>
+                    <td><a href="{foodTruck.totalRevenue}">{foodTruck.totalRevenue}</a></td>
+                    <td><a href="{foodTruck.totalCustomer}">{foodTruck.totalCustomer}</a></td>
                 </tr>
             {/each}
         {/if}
-    </tbody>
+    </tr>
 </table>
 {#if errorMsg2}
     <p class="error">{errorMsg2}</p>
