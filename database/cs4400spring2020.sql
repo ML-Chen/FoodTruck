@@ -16,107 +16,107 @@ CREATE TABLE cs4400spring2020.`User`(
 );
  
 CREATE TABLE cs4400spring2020.Building (
-    buildingName VARCHAR(55) PRIMARY KEY,
+	buildingName VARCHAR(55) PRIMARY KEY,
     description TEXT NOT NULL
 );
  
 CREATE TABLE cs4400spring2020.Station (
-    stationName VARCHAR(55) PRIMARY KEY,
+	stationName VARCHAR(55) PRIMARY KEY,
     buildingName VARCHAR(55) NOT NULL UNIQUE,
     capacity INT NOT NULL,
     FOREIGN KEY (buildingName) REFERENCES Building (buildingName)
-        ON UPDATE CASCADE ON DELETE CASCADE
+		ON UPDATE CASCADE ON DELETE CASCADE
 );
  
 CREATE TABLE cs4400spring2020.Food (
-    foodName VARCHAR(55) PRIMARY KEY
+	foodName VARCHAR(55) PRIMARY KEY
 );
  
 CREATE TABLE cs4400spring2020.Customer (
-    username VARCHAR(55) PRIMARY KEY,
+	username VARCHAR(55) PRIMARY KEY,
     balance DECIMAL(6, 2) NOT NULL,
     stationName VARCHAR(55),
     FOREIGN KEY (stationName) REFERENCES Station (stationName)
-        ON DELETE SET NULL ON UPDATE RESTRICT,
-    FOREIGN KEY (username) REFERENCES `User` (username)
-        ON DELETE CASCADE ON UPDATE CASCADE
+		ON DELETE SET NULL ON UPDATE RESTRICT,
+	FOREIGN KEY (username) REFERENCES `User` (username)
+		ON DELETE CASCADE ON UPDATE CASCADE
 );
  
 CREATE TABLE cs4400spring2020.Employee (
-    username VARCHAR(55) PRIMARY KEY,
+	username VARCHAR(55) PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     FOREIGN KEY (username) REFERENCES `User` (username)
-        ON UPDATE CASCADE ON DELETE CASCADE
+		ON UPDATE CASCADE ON DELETE CASCADE
 );
  
 CREATE TABLE cs4400spring2020.Manager (
-    username VARCHAR(55) PRIMARY KEY,
+	username VARCHAR(55) PRIMARY KEY,
     FOREIGN KEY (username) REFERENCES Employee (username)
-        ON UPDATE CASCADE ON DELETE CASCADE
+		ON UPDATE CASCADE ON DELETE CASCADE
 );
  
 CREATE TABLE cs4400spring2020.FoodTruck (
-    foodTruckName VARCHAR(55) PRIMARY KEY,
+	foodTruckName VARCHAR(55) PRIMARY KEY,
     stationName VARCHAR(55) NOT NULL,
     managerUsername VARCHAR(55) NOT NULL,
     FOREIGN KEY (stationName) REFERENCES Station (stationName)
-        ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (managerUsername) REFERENCES Manager (username)
-        ON UPDATE CASCADE ON DELETE CASCADE
+		ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY (managerUsername) REFERENCES Manager (username)
+		ON UPDATE CASCADE ON DELETE CASCADE
 );
  
 CREATE TABLE cs4400spring2020.Staff (
-    username VARCHAR(55) PRIMARY KEY,
+	username VARCHAR(55) PRIMARY KEY,
     foodTruckName VARCHAR(55),
     FOREIGN KEY (username) REFERENCES Employee (username)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (foodTruckName) REFERENCES FoodTruck (foodTruckName)
-        ON DELETE SET NULL ON UPDATE CASCADE
+		ON DELETE CASCADE ON UPDATE CASCADE,
+	FOREIGN KEY (foodTruckName) REFERENCES FoodTruck (foodTruckName)
+		ON DELETE SET NULL ON UPDATE CASCADE
 );
  
 CREATE TABLE cs4400spring2020.`Admin` (
-    username VARCHAR(55) PRIMARY KEY,
+	username VARCHAR(55) PRIMARY KEY,
     FOREIGN KEY (username) REFERENCES Employee (username)
-        ON UPDATE CASCADE ON DELETE CASCADE
+		ON UPDATE CASCADE ON DELETE CASCADE
 );
  
 CREATE TABLE cs4400spring2020.Orders (
-    orderID INT AUTO_INCREMENT PRIMARY KEY,
+	orderID INT AUTO_INCREMENT PRIMARY KEY,
     date DATE NOT NULL,
     customerUsername VARCHAR(55) NOT NULL,
     FOREIGN KEY (customerUsername) REFERENCES Customer (username)
-        ON UPDATE CASCADE ON DELETE CASCADE
+		ON UPDATE CASCADE ON DELETE CASCADE
 );
  
 CREATE TABLE cs4400spring2020.MenuItem (
-    price DECIMAL(6,2) NOT NULL,
+	price DECIMAL(6,2) NOT NULL,
     foodTruckName VARCHAR(55) NOT NULL,
     foodName VARCHAR(55) NOT NULL,
     PRIMARY KEY (foodTruckName, foodName),
     FOREIGN KEY (foodName) REFERENCES Food (foodName)
-        ON UPDATE RESTRICT ON DELETE RESTRICT,
-    FOREIGN KEY (foodTruckName) REFERENCES FoodTruck (foodTruckName)
-        ON UPDATE RESTRICT ON DELETE RESTRICT
+		ON UPDATE RESTRICT ON DELETE RESTRICT,
+	FOREIGN KEY (foodTruckName) REFERENCES FoodTruck (foodTruckName)
+		ON UPDATE RESTRICT ON DELETE RESTRICT
 );
  
 CREATE TABLE cs4400spring2020.BuildingTag (
-    buildingName VARCHAR(55) NOT NULL,
+	buildingName VARCHAR(55) NOT NULL,
     tag VARCHAR(55) NOT NULL,
     PRIMARY KEY (buildingName, tag),
     FOREIGN KEY (buildingName) REFERENCES Building (buildingName)
-        ON UPDATE CASCADE ON DELETE CASCADE
+		ON UPDATE CASCADE ON DELETE CASCADE
 );
  
 CREATE TABLE cs4400spring2020.OrderDetail (
-    orderID INT NOT NULL,
+	orderID INT NOT NULL,
     foodTruckName VARCHAR(55) NOT NULL,
     foodName VARCHAR(55) NOT NULL,
     purchaseQuantity INT NOT NULL,
     PRIMARY KEY (orderID, foodTruckName, foodName),
     FOREIGN KEY (orderID) REFERENCES Orders (orderID)
-        ON UPDATE RESTRICT ON DELETE RESTRICT,
-    FOREIGN KEY (foodTruckName, foodName) REFERENCES MenuItem (foodTruckName, foodName)
-        ON UPDATE RESTRICT ON DELETE RESTRICT
+		ON UPDATE RESTRICT ON DELETE RESTRICT,
+	FOREIGN KEY (foodTruckName, foodName) REFERENCES MenuItem (foodTruckName, foodName)
+		ON UPDATE RESTRICT ON DELETE RESTRICT
 );
  
 INSERT INTO cs4400spring2020.Building(buildingName,description) VALUES ("Clough","Has starbucks; located near to transit hub"),("College of Computing","Famously called as CoC"),("CrossLand Tower","Library"),("KLAUS Adv Computing","Connected to CoC through binary bridge"),("Molecular Engineering","Hosts classes for molecular engineering"),("Skiles","Host classes for media and literature students"),("Students_Center","Host for student activities"),("TechTower","Most Iconic building"),("Weber Building","Classes mostly related to space technology");
@@ -211,21 +211,21 @@ IN i_email VARCHAR(50),
                IN i_type ENUM('Admin', 'Manager', 'Staff'))
 BEGIN
   IF char_length(i_password) >= 8 AND (i_balance IS NULL OR i_balance > 0.0) AND (((i_email is not null) and (i_type is not null)) OR (i_balance IS NOT NULL AND i_balance > 0)) THEN
-        INSERT INTO `User` (username, `password`, firstname, lastname) VALUES (i_username, md5(i_password), i_firstname, i_lastname);
-        IF i_balance > 0.0 THEN
-            INSERT INTO Customer (username, balance, stationName) VALUES (i_username, i_balance, NULL);
-        END IF;
-        IF i_type = 'Admin' and i_email is not null THEN
-            INSERT INTO Employee (username, email) VALUES (i_username, i_email);
-            INSERT INTO `Admin` (username) VALUES (i_username);
-        ELSEIF i_type = 'Manager'  and i_email is not null THEN
-            INSERT INTO Employee (username, email) VALUES (i_username, i_email);
-            INSERT INTO Manager (username) VALUES (i_username);
-        ELSEIF i_type = 'Staff'  and i_email is not null THEN
-            INSERT INTO Employee (username, email) VALUES (i_username, i_email);
-            INSERT INTO Staff (username, foodTruckName) VALUES (i_username, NULL);
-        END IF;
-    END IF;
+		INSERT INTO `User` (username, `password`, firstname, lastname) VALUES (i_username, md5(i_password), i_firstname, i_lastname);
+		IF i_balance > 0.0 THEN
+			INSERT INTO Customer (username, balance, stationName) VALUES (i_username, i_balance, NULL);
+		END IF;
+		IF i_type = 'Admin' and i_email is not null THEN
+			INSERT INTO Employee (username, email) VALUES (i_username, i_email);
+			INSERT INTO `Admin` (username) VALUES (i_username);
+		ELSEIF i_type = 'Manager'  and i_email is not null THEN
+			INSERT INTO Employee (username, email) VALUES (i_username, i_email);
+			INSERT INTO Manager (username) VALUES (i_username);
+		ELSEIF i_type = 'Staff'  and i_email is not null THEN
+			INSERT INTO Employee (username, email) VALUES (i_username, i_email);
+			INSERT INTO Staff (username, foodTruckName) VALUES (i_username, NULL);
+		END IF;
+	END IF;
  
  
 END //
@@ -523,7 +523,7 @@ CREATE PROCEDURE mn_view_foodTruck_available_staff(IN i_managerUsername VARCHAR(
 BEGIN
 DROP TABLE IF EXISTS mn_view_foodTruck_available_staff_result;
 CREATE TABLE mn_view_foodTruck_available_staff_result(availableStaff varchar(100))
-SELECT CONCAT(firstName,' ', lastName)
+SELECT CONCAT(firstName,' ', lastName) as staffName
 FROM Staff
 INNER JOIN USER
 ON STAFF.username = USER.username
@@ -541,14 +541,14 @@ CREATE PROCEDURE mn_view_foodTruck_staff(i_foodTruckName VARCHAR(50))
 BEGIN
    DROP TABLE IF EXISTS mn_view_foodTruck_staff_result;
    CREATE TABLE mn_view_foodTruck_staff_result(assignedStaff varchar(100))
-   SELECT CONCAT(firstName , ' ' , lastName)
+   SELECT Staff.username as staffUsername, CONCAT(firstName , ' ' , lastName) as assignedStaff
    FROM FoodTruck
    INNER JOIN STAFF
    ON FoodTruck.foodTruckName = STAFF.foodTruckName
    INNER JOIN USER
    ON STAFF.username = USER.username
    WHERE
-   (i_foodTruckName = foodTruckName);
+   (i_foodTruckName = FoodTruck.foodTruckName);
 END //
 DELIMITER ;
 -- Query #21: mn_view_foodTruck_menu [Screen #13 Manager Update Food Truck]  COMPLETE
@@ -559,6 +559,7 @@ BEGIN
 DROP TABLE IF EXISTS mn_view_foodTruck_menu_result;
     CREATE TABLE mn_view_foodTruck_menu_result(foodTruckName varchar(100),
 stationName varchar(100),          foodName varchar(100), price DECIMAL(6,2));
+	INSERT INTO mn_view_foodTruck_menu_result
     SELECT FoodTruck.foodTruckName, stationName, foodName, price
     FROM FoodTruck
     INNER JOIN MenuItem
@@ -767,19 +768,19 @@ CREATE PROCEDURE cus_current_information_basic(IN i_customerUsername VARCHAR(55)
 BEGIN
     DROP TABLE IF EXISTS cus_current_information_basic_result;
     CREATE TABLE cus_current_information_basic_result(stationName VARCHAR(100), buildingName VARCHAR(100), tags text, `description` text,
-        balance DECIMAL(6, 2));
+		balance DECIMAL(6, 2));
     INSERT INTO cus_current_information_basic_result
 SELECT stationName, customerInfo.buildingName, tags, `description`, balance from
-            (select Customer.username, Customer.stationName, Customer.balance, Station.buildingName 
-            from Customer inner join Station 
-            on Customer.stationName = Station.stationName) as customerInfo
-            inner join 
-            (select BuildingTag.buildingName, GROUP_CONCAT(BuildingTag.tag)as tags, Building.`description`
-            from BuildingTag inner join Building
-            on BuildingTag.buildingName = Building.buildingName
-            group by BuildingTag.buildingName) as buildingInfo
-            on customerInfo.buildingName = buildingInfo.buildingName
-        where username = i_customerUsername;
+			(select Customer.username, Customer.stationName, Customer.balance, Station.buildingName 
+			from Customer inner join Station 
+			on Customer.stationName = Station.stationName) as customerInfo
+			inner join 
+			(select BuildingTag.buildingName, GROUP_CONCAT(BuildingTag.tag)as tags, Building.`description`
+			from BuildingTag inner join Building
+			on BuildingTag.buildingName = Building.buildingName
+			group by BuildingTag.buildingName) as buildingInfo
+			on customerInfo.buildingName = buildingInfo.buildingName
+		where username = i_customerUsername;
 END //
 DELIMITER ;
  
@@ -795,18 +796,18 @@ varchar(100), managerName varchar(100), foodNames text);
    -- place your code/solution here
 INSERT INTO cus_current_information_foodTruck_result
     select foodTruckName, CONCAT(firstName,' ', lastName) as managerName, foods from
-    (select Customer.username, Customer.stationName, Customer.balance, Station.buildingName 
-        from Customer inner join Station 
-        on Customer.stationName = Station.stationName) as customerInfo
-    LEFT JOIN
-    (select stationName, foodTruck.foodTruckName, managerUsername, GROUP_CONCAT(foodName) as foods from
-    foodTruck left join MenuItem
-    on foodTruck.foodTruckName = MenuItem.foodTruckName
-    group by foodTruck.foodTruckName) as foodTruckInfo
-    on customerInfo.stationName = foodTruckInfo.stationName
+	(select Customer.username, Customer.stationName, Customer.balance, Station.buildingName 
+		from Customer inner join Station 
+		on Customer.stationName = Station.stationName) as customerInfo
+	LEFT JOIN
+	(select stationName, foodTruck.foodTruckName, managerUsername, GROUP_CONCAT(foodName) as foods from
+	foodTruck left join MenuItem
+	on foodTruck.foodTruckName = MenuItem.foodTruckName
+	group by foodTruck.foodTruckName) as foodTruckInfo
+	on customerInfo.stationName = foodTruckInfo.stationName
     LEFT JOIN
     `User` on `User`.username = foodTruckInfo.managerUsername
-    where customerInfo.username = i_customerUsername;
+	where customerInfo.username = i_customerUsername;
  
 END //
 DELIMITER ;   
@@ -817,7 +818,7 @@ CREATE PROCEDURE cus_order(IN i_date DATE, i_customerUsername VARCHAR(55))
 BEGIN
    -- place your code/solution here
 INSERT INTO Orders
-    VALUES (null, i_date, i_customerUsername);
+	VALUES (null, i_date, i_customerUsername);
 END //
 DELIMITER ;  
 -- Query #31: cus_add_item_to_order [Screen #18 Customer Order]
