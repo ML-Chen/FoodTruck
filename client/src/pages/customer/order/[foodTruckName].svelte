@@ -5,14 +5,16 @@
     import { token, userType, storeUsername } from '../../_store.js';
     import { url, goto } from '@sveltech/routify';
     import axios from 'axios';
+
     token.useLocalStorage();
     userType.useLocalStorage();
     storeUsername.useLocalStorage();
+
+    export let foodTruckName;
+    foodTruckName = decodeURIComponent(foodTruckName);
+
     // Data fetched from the database
-    let foodTrucks;
-    let foodTruckName;
-    let foodNames;
-    let foodName;
+    let foods = [];
     let price;
     let purchaseQuantity;
     let orderID;
@@ -20,9 +22,6 @@
 
     // Form values
     let errorMsg;
-    let errorMsg2;
-    /** @type {{foodTruckName: string, customerUsername: string, foodNames: string}} */
-    let selectedTruck = {foodTruckName: null, customerUsername: null, foodNames: null};
     onMount(async () => {
         await fetchTrucks();
     });
@@ -44,7 +43,14 @@
         }
     }
     async function placeOrder() {
-        // TODO
+        try {
+            const json = (await axios.get('http://localhost:4000/cus_order'), {
+            // TODO
+            })
+        } catch (error) {
+            console.log(error.response.data);
+            errorMsg = error.response.data.error;
+        }
     }
   
 </script>
@@ -72,25 +78,23 @@
         </tr>
     </thead>
     <tbody>
-        {#if foodTrucks}
-            {#each foodTrucks as foodTruck}
-                <tr>
-                    <td>
-                        <label>
-                            <select multiple type=checkbox bind:value={foodName}>
-                            {foodName}
-                        </label>
-                        {foodTruck.foodName}
-                    </td>
-                    <td>{foodTruck.price}</td>
-                    <td><input type="purchaseQuantity" id="purchaseQuantity" name="purchaseQuantity" bind:value={purchaseQuantity} aria-label="purchaseQuantity" /></td>
-                </tr>
-            {/each}
-        {/if}
+        <!-- TODO -->
+        {#each foods as food}
+            <tr>
+                <td>
+                    <label>
+                        <input type="checkbox" />
+                        {food.foodName}
+                    </label>
+                </td>
+                <td>{food.price}</td>
+                <td><input type="purchaseQuantity" id="purchaseQuantity" name="purchaseQuantity" bind:value={purchaseQuantity} aria-label="purchaseQuantity" /></td>
+            </tr>
+        {/each}
     </tbody>
 </table>
-{#if errorMsg2}
-    <p class="error">{errorMsg2}</p>
+{#if errorMsg}
+    <p class="error">{errorMsg}</p>
 {/if}
  
 <input type="Date" id="Date" name="Date" bind:value={date} aria-label="Date" />
