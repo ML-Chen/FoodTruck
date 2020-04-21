@@ -104,7 +104,7 @@
         </tr>
     </thead>
     <tbody>
-        {if foods}
+        {#if foods}
             {#each foods as food}
             <tr>
                 <td><input type="checkbox" value={food.foodName} bind:group={selectedFoodNames} on:change={calculateOrderTotal} /></td>
