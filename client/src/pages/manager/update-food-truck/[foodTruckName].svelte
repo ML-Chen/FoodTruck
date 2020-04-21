@@ -106,7 +106,7 @@
                 for (const selectedStaff of selectedStaffs) {
                     await axios.post('http://localhost:4000/mn_update_foodTruck_staff', { foodTruckName, staffName: selectedStaff.staffUsername, managerUsername, token: $token })
                 }
-                const unselectedStaffs = staffs.filter(staff => !(staff in selectedStaffs));
+                const unselectedStaffs = staffs.filter(staff => !selectedStaffs.includes(staff));
                 for (const unselectedStaff of unselectedStaffs) {
                     console.log(unselectedStaff.staffUsername);
                     await axios.post('http://localhost:4000/mn_update_foodTruck_remove_staff', { foodTruckName, staffName: unselectedStaff.staffUsername, token: $token })
