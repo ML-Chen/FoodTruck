@@ -62,9 +62,6 @@
         }
     }
 
-    $: console.log('foodtruckname ' + JSON.stringify(foodTruckName))
-    $: console.log('foodtrucks ' + JSON.stringify(foodTrucks))
-
 </script>
 
 <svelte:head>
@@ -75,15 +72,11 @@
 <h1>Manage Food Truck</h1>
 
 <form on:submit|preventDefault={fetchFoodTrucks}>
-    <label for="username">Food Truck Name (contain)</label>
-    <select id="foodTruck-name" name="station-name" bind:value={foodTruckName}>
-        {#each [null].concat(foodTrucks.map(foodTruck => foodTruck.foodTruckName)) as fName}
-            <option value={fName} selected={fName === foodTruckName}>{fName || ''}</option>
-        {/each}
-    </select>
+    <label for="food-truck-name">Food Truck Name (contain)</label>
+    <input type="text" name="food-truck-name" bind:value={foodTruckName} />
 
     <label for="station-name">Station name:</label>
-    <select id="foodTruck-name" name="station-name" bind:value={stationName}>
+    <select id="station-name" name="station-name" bind:value={stationName}>
         {#if foodTrucks}
             {#each [null].concat(Array.from(new Set(foodTrucks.map(foodTruck => foodTruck.stationName)))) as sName}
                 <option value={sName} selected={sName === stationName}>{sName || ''}</option>

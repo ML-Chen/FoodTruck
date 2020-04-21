@@ -92,21 +92,21 @@
     }
 
     async function callHelpers() {
-            try {
-                const stationsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Station'}})).data;
-                const foodsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Food'}})).data;
-                if (stationsJson.error) {
-                    errorMsg = stationsJson.error;
-                } else {
-                    stations = stationsJson.filter(station => Object.keys(station).length !== 0);
-                    foods = foodsJson.filter(food => Object.keys(food).length !== 0);
-                    console.log(stations)
-                    console.log(foods)
-                }
-            } catch (error) {
-                console.log(error)
-                errorMsg = error;
+        try {
+            const stationsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Station'}})).data;
+            const foodsJson = (await axios.get('http://localhost:4000/help_create_food_truck', { params: {queryType: 'Food'}})).data;
+            if (stationsJson.error) {
+                errorMsg = stationsJson.error;
+            } else {
+                stations = stationsJson.filter(station => Object.keys(station).length !== 0);
+                foods = foodsJson.filter(food => Object.keys(food).length !== 0);
+                console.log(stations)
+                console.log(foods)
             }
+        } catch (error) {
+            console.log(error)
+            errorMsg = error;
+        }
     }
     async function updatefoodTruck() {
         if (!foodTruckName) {
