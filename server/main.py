@@ -344,13 +344,13 @@ ad_create_food = db_api('ad_create_food', ['POST'], [
 # Query #17: mn_filter_foodTruck [Screen #11 Manager Manage Food Truck]
 # Response: 
 mn_filter_foodTruck = db_api('mn_filter_foodTruck', ['GET'], [
-    ('managerUsername', {'type': str, 'required': True}),
+    ('managerUsername', {'type': str}),
     ('foodTruckName', {'type': str}),
     ('stationName', {'type': str}),
     ('minStaffCount', {'type': int}),
     ('maxStaffCount', {'type': int}),
-    ('hasRemainingCapacity', {'type': boolean, 'required': True})
-], get_result=2, restrict_by_username=True)
+    ('hasRemainingCapacity', {'type': boolean, 'default': False})
+], get_result=2, access=['Customer', 'Manager'])
 
 # Query #18: mn_delete_foodTruck [Screen #11 Manager Manage Food Truck]
 # Response :

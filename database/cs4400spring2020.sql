@@ -108,7 +108,7 @@ CREATE TABLE cs4400spring2020.BuildingTag (
 );
  
 CREATE TABLE cs4400spring2020.OrderDetail (
-	orderID INT NOT NULL,
+	orderID INT(10) ZEROFILL NOT NULL,
     foodTruckName VARCHAR(55) NOT NULL,
     foodName VARCHAR(55) NOT NULL,
     purchaseQuantity INT NOT NULL,
@@ -453,10 +453,8 @@ BEGIN
 DROP TABLE IF EXISTS mn_filter_foodTruck_result;
     CREATE TABLE mn_filter_foodTruck_result(foodTruckName varchar(100),
 stationName varchar(100),
-remainingCapacity int, staffCount int, menuItemCount int);
-INSERT INTO mn_filter_foodTruck_result
-SELECT * FROM
-(SELECT FoodTruck.foodTruckName, FoodTruck.stationName, remainingCapacity, staffs,  foods
+remainingCapacity int, staffCount int, menuItemCount int)
+SELECT FoodTruck.foodTruckName, FoodTruck.stationName, remainingCapacity, staffs,  foods
    FROM FoodTruck
    INNER JOIN (select (capacity - count(foodTruckName)) as remainingCapacity, Station.stationName from Station inner join FoodTruck on Station.stationName = FoodTruck.stationName group by Station.stationName) as capacityInfo
    ON FoodTruck.stationName = capacityInfo.stationName
@@ -465,14 +463,13 @@ SELECT * FROM
    INNER JOIN (select count(foodName) as foods, foodTruckName from MenuItem group by foodTruckName) as foodInfo
    ON FoodTruck.foodTruckName = foodInfo.foodTruckName
    WHERE
-   (i_managerUsername = managerUsername) and 
-(FoodTruck.foodTruckName LIKE CONCAT("%",i_foodTruckName,"%") OR i_foodTruckName is NULL) and
+   (i_managerUsername = managerUsername OR i_managerUsername is NULL OR i_managerUsername = '') and 
+(FoodTruck.foodTruckName LIKE CONCAT("%",i_foodTruckName,"%") OR i_foodTruckName is NULL OR i_foodTruckName = '') and
     (i_stationName = FoodTruck.stationName OR i_stationName is NULL) AND
     ((i_hasRemainingCapacity = TRUE AND remainingCapacity>0) OR (i_hasRemainingCapacity =
  FALSE)) AND
     ((i_minStaffCount is NULL AND i_maxStaffCount is NULL) OR (i_minStaffCount is
- NULL AND staffs <= i_maxStaffCount) OR (i_maxStaffCount is NULL AND i_minStaffCount <= staffs) OR (staffs BETWEEN i_minStaffCount AND i_maxStaffCount)))
-AS hex;
+ NULL AND staffs <= i_maxStaffCount) OR (i_maxStaffCount is NULL AND i_minStaffCount <= staffs) OR (staffs BETWEEN i_minStaffCount AND i_maxStaffCount))
 END //
 DELIMITER ;
 -- Query #18: mn_delete_foodTruck [Screen #11 Manager Manage Food Truck] COMPLETE
@@ -501,8 +498,9 @@ DELIMITER //
 CREATE PROCEDURE mn_create_foodTruck_add_staff(IN i_foodTruckName VARCHAR(50), IN
 i_staffName VARCHAR(50))
 BEGIN
-INSERT INTO STAFF(username, foodTruckName)
-VALUES (i_staffName, i_foodTruckName);
+UPDATE STAFF(username, foodTruckName)
+   SET foodTruckName = i_foodTruckName
+   WHERE username = i_staffName;
 END //
 DELIMITER ;
 -- Query #19c: mn_create_foodTruck_add_MenuItem [Screen #12 Manager Create Food Truck] COMPLETE
@@ -588,7 +586,7 @@ i_staffName VARCHAR(50))
 BEGIN
    UPDATE STAFF
    SET foodTruckName = i_foodTruckName
-   WHERE staffName = i_staffName;
+   WHERE username = i_staffName;
 END //
 DELIMITER ;
 -- Query #22c: mn_update_foodTruck_MenuItem [Screen #13 Manager Update Food Truck]
