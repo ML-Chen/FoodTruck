@@ -49,11 +49,11 @@
 </script>
 
 <svelte:head>
-    <title>Food Truck Summary</title>
+    <title>Summary Detail</title>
 </svelte:head>
 
 
-<h1>Food Truck Detail</h1>
+<h1>Summary Detail</h1>
 <h3>Food Truck Name: {foodTruckName}</h3>
 
 <table>
