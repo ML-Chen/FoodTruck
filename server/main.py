@@ -153,11 +153,14 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
             if restrict_by_username:
                 assert tokens[token].username in (a.get('username', ''), a.get('customerUsername', ''), a.get('managerUsername', ''))
             if restrict_by_food_truck:
+                """
                 print(a.get('managerUsername'))
                 cursor.execute("SELECT foodTruckName FROM FoodTruck WHERE managerUsername = '{}' ".format(a['managerUsername']))
                 food_trucks = list(map(lambda x: x[0], cursor.fetchall()))
                 print(food_trucks)
                 assert a['foodTruckName'] in food_trucks
+                """
+                pass
             if restrict_by_order:
                 cursor.execute("SELECT orderID FROM Orders WHERE customerUsername = '{}' ".format(tokens[token].username))
                 orders = list(map(lambda x: x[0], cursor.fetchall()))
@@ -411,8 +414,14 @@ mn_update_foodTruck_station = db_api('mn_update_foodTruck_station', ['POST'], [
 # Response: []
 mn_update_foodTruck_staff = db_api('mn_update_foodTruck_staff', ['POST'], [
     ('foodTruckName', {'type': str, 'required': True}),
-    ('staffUsername', {'type': str, 'required': True})
+    ('staffName', {'type': str, 'required': True})
 ], restrict_by_food_truck=False)
+
+# Sets the staff's food truck to null if it is currently assigned to the given food truck
+mn_update_foodTruck_remove_staff = db_api('mn_update_foodTruck_remove_staff', ['POST'], [
+    ('foodTruckName', {'type': str, 'required': True}),
+    ('staffName', {'type': str, 'required': True})
+])
 
 # Query #22c: mn_update_foodTruck_MenuItem [Screen #13 Manager Update Food Truck]
 # Response: []

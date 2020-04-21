@@ -509,6 +509,19 @@ UPDATE STAFF
    WHERE username = i_staffName;
 END //
 DELIMITER ;
+
+-- NEW PROCEDURE
+DROP PROCEDURE IF EXISTS mn_update_foodTruck_remove_staff;
+DELIMITER //
+CREATE PROCEDURE mn_update_foodTruck_remove_staff(IN i_foodTruckName VARCHAR(50), IN
+i_staffName VARCHAR(50))
+BEGIN
+UPDATE STAFF
+   SET foodTruckName = NULL
+   WHERE username = i_staffName
+   AND foodTruckName = i_foodTruckName;
+END //
+DELIMITER ;
 -- Query #19c: mn_create_foodTruck_add_MenuItem [Screen #12 Manager Create Food Truck] COMPLETE
 DROP PROCEDURE IF EXISTS mn_create_foodTruck_add_MenuItem;
 DELIMITER //
@@ -526,8 +539,8 @@ DELIMITER //
 CREATE PROCEDURE mn_view_foodTruck_available_staff(IN i_managerUsername VARCHAR(50), IN i_foodTruckName VARCHAR(50))
 BEGIN
 DROP TABLE IF EXISTS mn_view_foodTruck_available_staff_result;
-CREATE TABLE mn_view_foodTruck_available_staff_result(availableStaff varchar(100))
-SELECT CONCAT(firstName,' ', lastName) as staffName
+CREATE TABLE mn_view_foodTruck_available_staff_result(staffUsername varchar(55), staffName varchar(100))
+SELECT Staff.username as staffUsername, CONCAT(firstName,' ', lastName) as staffName
 FROM Staff
 INNER JOIN USER
 ON STAFF.username = USER.username
