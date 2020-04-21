@@ -43,6 +43,9 @@
             errorMsg = error.response.data.error;
         }
     }
+    async function placeOrder() {
+        // TODO
+    }
   
 </script>
   
@@ -90,7 +93,7 @@
     <p class="error">{errorMsg2}</p>
 {/if}
  
- <input type="Date" id="Date" name="Date" bind:value={date} aria-label="Date" />
+<input type="Date" id="Date" name="Date" bind:value={date} aria-label="Date" />
 
 <a href={$url('../../home')}>Back</a>
 <button type="button" on:click={placeOrder}>Submit</button>

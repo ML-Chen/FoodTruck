@@ -8,13 +8,12 @@
     token.useLocalStorage();
     userType.useLocalStorage();
     export let stationName;
-    const oldStationName = decodeURIComponent(stationName);
-    let newStationName = oldStationName;
-    let capacity;
+    stationName = decodeURIComponent(stationName);
     let selectedBuildingName;
-    let oldBuildingName = decodeURIComponent(buildingName);
-    let newBuildingName = oldBuildingname;
+    let buildingNames = [];
+    let capacity;
     let errorMsg;
+
     onMount(async () => {
         await fetchStation();
         await fetchBuilding();
@@ -24,33 +23,24 @@
             const json = (await axios.get('http://localhost:4000/ad_view_station_general', {
                 params: { stationName: oldStationName, token: $token }
             })).data;
-            if (json.error) {
-                errorMsg = json.error
-            } else {
-                newStationName = json.stationName;
-                capacity = json.capacity;
-                errorMsg = null;
-            }
+            newStationName = json.stationName;
+            capacity = json.capacity;
+            errorMsg = null;
         } catch (error) {
             console.log(error);
             errorMsg = error;
         }
     }
-    async function fetchBuilding() {
+    async function fetchBuildings() {
         try {
-            const json = (await axios.get('http://localhost:4000/ad_view_station_building', {
-                params: { buildingName: oldBuildingName, token: $token }
+            const json = (await axios.get('http://localhost:4000/ad_get_available_building', {
+                params: { token: $token }
             })).data;
-            if (json.error) {
-                errorMsg = json.error
-            } else {
-                newBuildingName = json.buildingName;
-                capacity = json.capacity;
-                errorMsg = null;
-            }
+            buildingNames = json.map(building => building.buildingName);
+            errorMsg = null;
         } catch (error) {
-            console.log(error);
-            errorMsg = error;
+            console.log(error.response.data);
+            errorMsg = error.response.data.error;
         }
     }
     async function updateStation() {
@@ -72,18 +62,16 @@
 
 <form on:submit|preventDefault={updateStation}>
     <label for="stationName">Name</label>
-    <input type="text" id="stationName" name="stationName" bind:value={newStationName} />
+    <input type="text" id="stationName" name="stationName" disabled />
 
     <label for="capacity">Capacity</label>
     <textarea id="capacity" name="capacity" bind:value={capacity} />
 
     <label for="building">Building Name:</label>
     <select id="building-name" name="station-name" bind:value={selectedBuildingName}>
-        {#if buildings}
-            {#each [null].concat(buildings.map(building => building.buildingName)) as bName}
-                <option value={bName} selected={bName === selctedBuildingName}>{bName || ''}</option>
-            {/each}
-        {/if}
+        {#each [null].concat(buildingNames) as bName}
+            <option value={bName} selected={bName === selectedBuildingName}>{bName || ''}</option>
+        {/each}
     </select>
   
     <button type="submit">Update</button>

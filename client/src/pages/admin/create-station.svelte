@@ -3,17 +3,18 @@
 <script>
     import { url, goto } from '@sveltech/routify';
     import { token, userType } from '../_store.js';
+    import { onMount } from 'svelte';
     import axios from 'axios';
     token.useLocalStorage();
     userType.useLocalStorage();
     let stationName;
     let capacity;
-    let buildingNames;
+    let buildingNames = [];
     let selectedBuildingName;
     let errorMsg;
     
     onMount(async () => {
-        await fetchBuilding();
+        await fetchBuildings();
     });
     
     async function createStation() {
@@ -33,16 +34,16 @@
             }
         }
     }
-    async function fetchBuilding() {
+    async function fetchBuildings() {
         try {
-            const json = (await axios.get('http://localhost:4000/ad_view_building_general', {
-                params: { buildingName: buildingName, token: $token }
+            const json = (await axios.get('http://localhost:4000/ad_get_available_building', {
+                params: { token: $token }
             })).data;
             buildingNames = json.map(building => building.buildingName);
             errorMsg = null;
         } catch (error) {
-            console.log(error);
-            errorMsg = error;
+            console.log(error.response.data);
+            errorMsg = error.response.data.error;
         }
     }
 </script>
@@ -60,11 +61,9 @@
 
     <label for="building">Sponsor Building</label>
     <select id="building-name" name="building-name" bind:value={selectedBuildingName}>
-        {#if buildingNames}
-            {#each [null].concat(buildingNames) as bName}
-                <option value={bName} selected={bName === selectedBuildingName}>{bName || ''}</option>
-            {/each}
-        {/if}
+        {#each [null].concat(buildingNames) as bName}
+            <option value={bName} selected={bName === selectedBuildingName}>{bName || ''}</option>
+        {/each}
     <button type="submit">Create</button>
 </form>
   
