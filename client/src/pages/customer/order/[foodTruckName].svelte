@@ -14,9 +14,10 @@
     foodTruckName = decodeURIComponent(foodTruckName);
 
     // Data fetched from the database
+    /** @type {[{foodTruckName: string, stationName: string, foodName: string, price: decimal}]} */
     let foods = [];
-    let price;
-    let purchaseQuantity;
+    /** @type {[{foodTruckName: string, stationName: string, foodName: string, price: decimal}]} */
+    let selected = [];
     let orderID;
     let date;
 
@@ -28,7 +29,7 @@
     async function fetchTrucks() {
         try {
             /** @type {[{foodTruckName: string, stationName: string, foodName: string, price: decimal}]} */
-            const foods = (await axios.get('http://localhost:4000/mn_view_foodTruck_menu', {
+            foods = (await axios.get('http://localhost:4000/mn_view_foodTruck_menu', {
                 params: { foodTruckName, token: $token }
             })).data;
             errorMsg = null;
@@ -38,13 +39,19 @@
         }
     }
     async function placeOrder() {
-        try {
-            const json = (await axios.get('http://localhost:4000/cus_order'), {
-            // TODO
-            })
-        } catch (error) {
-            console.log(error.response.data);
-            errorMsg = error.response.data.error;
+        if (!selected.some(food => food)) {
+            errorMsg = "You haven't selected any food to order"
+        } else if (selected.some(food => !food.purchaseQuantity)) {
+            errorMsg = "You can't select a zero quantity of something"
+        } else {
+            try {
+                const json = (await axios.get('http://localhost:4000/cus_order'), {
+                // TODO
+                })
+            } catch (error) {
+                console.log(error.response.data);
+                errorMsg = error.response.data.error;
+            }
         }
     }
   
@@ -53,7 +60,6 @@
 <svelte:head>
     <title>Order</title>
 </svelte:head>
-
 
 <h1>Order</h1>
 
@@ -67,6 +73,7 @@
 <table>
     <thead>
         <tr>
+            <td></td>
             <td>Food</td>
             <td>Price</td>
             <td>Purchase Quantity</td>
@@ -76,14 +83,10 @@
         <!-- TODO -->
         {#each foods as food}
             <tr>
-                <td>
-                    <label>
-                        <input type="checkbox" />
-                        {food.foodName}
-                    </label>
-                </td>
+                <td><input type="checkbox" value={food} bind:group={selected} /></td>
+                <td>{food.foodName}</td>
                 <td>{food.price}</td>
-                <td><input type="purchaseQuantity" id="purchaseQuantity" name="purchaseQuantity" bind:value={purchaseQuantity} aria-label="purchaseQuantity" /></td>
+                <td><input type="number" min="0" step="1" pattern="\d+" id="purchaseQuantity" name="purchaseQuantity" bind:value={food.purchaseQuantity} /></td>
             </tr>
         {/each}
     </tbody>
@@ -91,8 +94,10 @@
 {#if errorMsg}
     <p class="error">{errorMsg}</p>
 {/if}
- 
+
+<label for="Date">Order date</label>
 <input type="Date" id="Date" name="Date" bind:value={date} aria-label="Date" />
+
 
 <a href={$url('../../current-info')}>Back</a>
 <button type="button" on:click={placeOrder}>Submit</button>
