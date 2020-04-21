@@ -216,14 +216,20 @@ BEGIN
 			INSERT INTO Customer (username, balance, stationName) VALUES (i_username, i_balance, NULL);
 		END IF;
 		IF i_type = 'Admin' and i_email is not null THEN
-			INSERT INTO Employee (username, email) VALUES (i_username, i_email);
-			INSERT INTO `Admin` (username) VALUES (i_username);
+			IF i_email LIKE '_%@_%._%' THEN													       
+				INSERT INTO Employee (username, email) VALUES (i_username, i_email);
+				INSERT INTO `Admin` (username) VALUES (i_username);
+			END IF;
 		ELSEIF i_type = 'Manager'  and i_email is not null THEN
-			INSERT INTO Employee (username, email) VALUES (i_username, i_email);
-			INSERT INTO Manager (username) VALUES (i_username);
+			IF i_email LIKE '_%@_%._%' THEN
+				INSERT INTO Employee (username, email) VALUES (i_username, i_email);
+				INSERT INTO Manager (username) VALUES (i_username);
+			END IF;
 		ELSEIF i_type = 'Staff'  and i_email is not null THEN
-			INSERT INTO Employee (username, email) VALUES (i_username, i_email);
-			INSERT INTO Staff (username, foodTruckName) VALUES (i_username, NULL);
+			IF i_email LIKE '_%@_%._%' THEN
+				INSERT INTO Employee (username, email) VALUES (i_username, i_email);
+				INSERT INTO Staff (username, foodTruckName) VALUES (i_username, NULL);
+			END IF;
 		END IF;
 	END IF;
  
