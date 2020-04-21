@@ -2,7 +2,7 @@
 
 <script>
     import { onMount } from 'svelte';
-    import { token, userType, storeUsername } from '../_store.js';
+    import { token, userType, storeUsername } from '../../_store.js';
     import { url, goto } from '@sveltech/routify';
     import axios from 'axios';
     token.useLocalStorage();
@@ -10,13 +10,14 @@
     storeUsername.useLocalStorage();
     // Data fetched from the database
     let foodTrucks;
-    let foofTruckName
+    let foodTruckName;
     let foodNames;
     let foodName;
     let price;
     let purchaseQuantity;
     let orderID;
     let date;
+
     // Form values
     let errorMsg;
     let errorMsg2;

@@ -114,12 +114,17 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
                 cursor.execute('select distinct(capacityInfo.stationName) as stationName FROM FoodTruck INNER JOIN (select (capacity - count(foodTruckName)) as remainingCapacity, Station.stationName from Station inner join FoodTruck on Station.stationName = FoodTruck.stationName group by Station.stationName) as capacityInfo ON FoodTruck.stationName = capacityInfo.stationName where remainingCapacity>0;')
             elif a['queryType'] == 'Staff':
                 cursor.execute('select Staff.username as staffUsername, CONCAT(firstName," ", lastName) as staffName from Staff left join `user` on Staff.username = `user`.username')
+            elif a['queryType'] == 'Food':
+                cursor.execute('SELECT foodName from Food')
             fields = [col[0] for col in cursor.description]
             result = [dict(zip(fields, row)) for row in cursor.fetchall()]
             result = list(filter(lambda x: x != {}, result))
             print(result)
             response = jsonify(result)
             return response
+
+
+
         if restricted:
             if 'token' in a and a.token is not None:
                 token = a.token
@@ -490,9 +495,9 @@ cus_order_history = db_api('cus_order_history', ['GET'], [
 ], get_result=2, restrict_by_username=True)
 
 # Helper Query #1: help_create_food_truck [Screen #12 Create Food Truck]
-# Response: [{'stationName': string}] or [{'staffName': string}]
+# Response: [{'stationName': string}] or [{'staffName': string}] or [{'foodName': string}]
 help_create_food_truck = db_api('help_create_food_truck', ['GET'], 
-[('queryType',{'type': str, 'required': True, 'choices': ('Station', 'Staff')})], helper=True)
+[('queryType',{'type': str, 'required': True, 'choices': ('Station', 'Staff', 'Food')})], helper=True)
 def close_connection() -> None:
     connection.close()
     print('MySQL connection closed')
