@@ -82,7 +82,7 @@
     }
 </script>
 
-<svelte:head>Update Food Truck</svelte:head>
+<svelte:head>Create Food Truck</svelte:head>
 
 <h1>Create Food Truck</h1>
 
