@@ -75,7 +75,7 @@
 <h1>Manage Food Truck</h1>
 
 <form on:submit|preventDefault={fetchFoodTrucks}>
-    <label for="username">Food Truck name:</label>
+    <label for="username">Food Truck Name (contain)</label>
     <select id="foodTruck-name" name="station-name" bind:value={foodTruckName}>
         {#each [null].concat(foodTrucks.map(foodTruck => foodTruck.foodTruckName)) as fName}
             <option value={fName} selected={fName === foodTruckName}>{fName || ''}</option>
