@@ -199,7 +199,7 @@
 		{/each}
 	</select>
     <input type="number" bind:value={wipPrices} /><br />
-    <button type="submit">Create</button>
+    <button type="submit">Update</button>
     <p>{errorMsg}</p>
 </form>
 
