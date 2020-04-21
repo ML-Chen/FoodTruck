@@ -46,9 +46,11 @@
             errorMsg = "Please select an order date"
         } else {
             try {
-                const orderID = (await axios.post('http://localhost:4000/cus_order', { date, customerUsername: $storeUsername, token: $token })).data;
+                const orderID = (await axios.post('http://localhost:4000/cus_order', { date, customerUsername: $storeUsername, token: $token })).data.orderID;
+                console.log(selected);
                 for (const { foodName, purchaseQuantity } of selected) {
-                    axios.post('http://localhost:4000/cus_add_item_to_order', { foodTruckName, foodName, purchaseQuantity, orderID, token: $token });
+                    console.log({ foodTruckName, foodName, purchaseQuantity, orderID, token: $token })
+                    await axios.post('http://localhost:4000/cus_add_item_to_order', { foodTruckName, foodName, purchaseQuantity, orderID, token: $token });
                 }
             } catch (error) {
                 console.log(error.response.data);
@@ -66,11 +68,6 @@
 <h1>Order</h1>
 
 <p>Food Truck: {foodTruckName}</p>
-
-    <br>
-    {#if errorMsg}
-        <p class="error">{errorMsg}</p>
-    {/if}
 
 <table>
     <thead>
