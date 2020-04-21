@@ -135,7 +135,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         
         try:
             if access:
-                assert any(allowed_user_type in tokens[token]for allowed_user_type in access)
+                assert any(allowed_user_type in tokens[token].user_type for allowed_user_type in access)
             else:
                 if procedure.startswith('cus_'):
                     assert 'Customer' in tokens[token].user_type
