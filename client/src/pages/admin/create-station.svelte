@@ -64,6 +64,7 @@
         {#each [null].concat(buildingNames) as bName}
             <option value={bName} selected={bName === selectedBuildingName}>{bName || ''}</option>
         {/each}
+    </select>
     <button type="submit">Create</button>
 </form>
   
