@@ -66,7 +66,7 @@
             if (json.error) {
                 errorMsg = json.error
             } else {
-                selectedStaffs = json.map(obj => obj.assignedStaff);
+                selectedStaffs = json.filter(staff => Object.keys(staff).length !== 0);
                 errorMsg = null;
             }
         } catch (error) {
@@ -158,23 +158,20 @@
  
     <select multiple bind:value={newSelectedStaffs}>
         {#each selectedStaffs as selectedStaff}
-            <option value={selectedStaff}>
-                {selectedStaff}
+            <option value={selectedStaff.staffUsername} selected="selected">
+                {selectedStaff.staffName}
             </option>
         {/each}
         
         {#each availableStaffs as staff}
             <option value={staff.staffUsername}>
-                {staff}
+                {staff.staffName}
             </option>
             <script>console.log(staff)</script>
         {/each}
         
         
     </select>
-    <p>{selectedStaffs}</p>
-
-
    
     <label for="menuItems">Menu Item</label>
         {#each menuItems as menuItem, index (menuItem)}
@@ -205,7 +202,6 @@
     <button type="submit">Create</button>
     <p>{errorMsg}</p>
     <h1>{newSelectedStaffs}</h1>
-    <h1>{selectedStation}</h1>
 </form>
 
 <a href={$url('../../home')}>Back</a>

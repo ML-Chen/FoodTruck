@@ -540,8 +540,8 @@ DELIMITER //
 CREATE PROCEDURE mn_view_foodTruck_staff(i_foodTruckName VARCHAR(50))
 BEGIN
    DROP TABLE IF EXISTS mn_view_foodTruck_staff_result;
-   CREATE TABLE mn_view_foodTruck_staff_result(staffUsername varchar(55), assignedStaff varchar(100))
-   SELECT Staff.username as staffUsername, CONCAT(firstName , ' ' , lastName) as assignedStaff
+   CREATE TABLE mn_view_foodTruck_staff_result(staffUsername varchar(55), staffName varchar(100))
+   SELECT Staff.username as staffUsername, CONCAT(firstName , ' ' , lastName) as staffName
    FROM FoodTruck
    INNER JOIN STAFF
    ON FoodTruck.foodTruckName = STAFF.foodTruckName
