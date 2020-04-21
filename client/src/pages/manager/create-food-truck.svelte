@@ -93,7 +93,7 @@
     <select id="station-name" name="station-name" bind:value={selectedStation}>
         {#if stations}
             {#each stations as sName}
-                <option value={sName}>{sName || ''}</option>
+                <option value={sName}>{sName}</option>
             {/each}
         {/if}
     </select>
