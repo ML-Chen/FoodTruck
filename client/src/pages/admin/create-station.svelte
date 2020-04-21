@@ -22,12 +22,12 @@
             errorMsg = 'Station name must not be blank';
         } else if (!capacity) {
             errorMsg = 'Capacity must not be blank';
+        } else if (!selectedBuildingName) {
+            errorMsg = 'You must select a building';
         } else {
             try {
-                const json = (await axios.post('http://localhost:4000/ad_create_station', { stationName, buildingName: selectedBuildingName, capacity, token: $token })).data;
-                    if (json.error) {
-                        errorMsg = json.error;
-                    }
+                await axios.post('http://localhost:4000/ad_create_station', { stationName, buildingName: selectedBuildingName, capacity, token: $token });
+                errorMsg = null;
             } catch (error) {
                 console.log(error.response.data)
                 errorMsg = error.response.data.error;
@@ -56,8 +56,8 @@
     <label for="stationName">Name</label>
     <input type="text" id="stationName" name="stationName" bind:value={stationName} />
 
-    <label for="capacity">Description</label>
-    <textarea id="capacity" name="capacity" bind:value={capacity} />
+    <label for="capacity">Capacity</label>
+    <input type="number" min="1" step="1" id="capacity" name="capacity" bind:value={capacity} />
 
     <label for="building">Sponsor Building</label>
     <select id="building-name" name="building-name" bind:value={selectedBuildingName}>
@@ -65,7 +65,18 @@
             <option value={bName} selected={bName === selectedBuildingName}>{bName || ''}</option>
         {/each}
     </select>
+    <br />
     <button type="submit">Create</button>
 </form>
+
+{#if errorMsg}
+    <p class="error">{errorMsg}</p>
+{/if}
   
-<a href={$url('../../home')}>Back</a>
+<a href={$url('../manage-building-station')}>Back</a>
+
+<style>
+    .error {
+        color: red;
+    }
+</style>
