@@ -24,8 +24,6 @@
             errorMsg = 'Balance must be a positive number'
         } else if (!type && (!balance || balance <= 0)) {
             errorMsg = "If you're not an employee, you must have a positive balance"
-        } else if (!(/\b[A-z0-9._%+-]+@[A-z0-9.-]+\.[A-z]{2,}\b/.test(email))) {
-            errorMsg = "Email must be in ____@__.___ format"
         } else {
             const response = await axios.post('http://127.0.0.1:4000/register', { username, email, firstName, lastName, password, balance, type: email ? type : null });
             const json = response.data;
@@ -53,7 +51,7 @@
     <label for="username">Username</label>
     <input type="text" id="username" name="username" bind:value={username} />
     <label for="email">Email</label>
-    <input type="text" id="email" name="email" bind:value={email} />
+    <input type="email" id="email" name="email" bind:value={email} />
     <label for="firstName">First Name</label>
     <input type="text" id="firstName" name="firstName" bind:value={firstName} />
     <label for="lastName">Last Name</label>
