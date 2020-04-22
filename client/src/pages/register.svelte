@@ -3,7 +3,7 @@
     import { url, goto } from '@sveltech/routify';
     import axios from 'axios';
     let username;
-    let email;
+    let email = null;
     let firstName;
     let lastName;
     let password;
@@ -25,15 +25,14 @@
         } else if (!type && (!balance || balance <= 0)) {
             errorMsg = "If you're not an employee, you must have a positive balance"
         } else {
-            const response = await axios.post('http://127.0.0.1:4000/register', { username, email, firstName, lastName, password, balance, type: email ? type : null });
-            const json = response.data;
-            if (json === []) {
-                errorMsg = 'Error';
-            } else if (json.error) {
-                errorMsg = json.error;
-            } else {
-                console.log("Success");
-                $goto('../login')
+            try {
+                console.log({ username, email, firstName, lastName, password, balance, type: (email ? type : null) })
+                const _type = email ? type: null;
+                await axios.post('http://127.0.0.1:4000/register', { username, email, firstName, lastName, password, balance, type: _type });
+                $goto('../login');
+            } catch (error) {
+                console.log(error.response);
+                errorMsg = error.response.data.error;
             }
         }
     }
