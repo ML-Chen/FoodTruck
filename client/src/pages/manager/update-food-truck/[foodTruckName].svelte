@@ -70,7 +70,7 @@
         try {
             menuItems = (await axios.get('http://localhost:4000/mn_view_foodTruck_menu', {
                 params: {foodTruckName , token: $token }
-            })).data.map(obj => [obj.foodName, obj.price]);
+            })).data.map(obj => [obj.foodName, Number(obj.price)]);
             errorMsg = null;
         } catch (error) {
             console.log(error);
