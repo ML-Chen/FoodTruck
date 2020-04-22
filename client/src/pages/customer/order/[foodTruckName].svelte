@@ -107,12 +107,8 @@
         {#if foods}
             {#each foods as food}
             <tr>
-                <td>
-                    <label>
-                        <input type="checkbox" value={food.foodName} bind:group={selectedFoodNames} on:change={calculateOrderTotal} />
-                        {food.foodName}
-                    </label>    
-                </td>
+                <td><input id="food-checkbox" type="checkbox" value={food.foodName} bind:group={selectedFoodNames} on:change={calculateOrderTotal} /></td>
+                <td><label for="food-checkbox">{food.foodName}</label></td>
                 <td>{food.price}</td>
                 <td><input type="number" min="0" step="1" pattern="\d+" id="purchaseQuantity" name="purchaseQuantity" bind:value={food.purchaseQuantity} on:input={calculateOrderTotal} /></td>
             </tr>
