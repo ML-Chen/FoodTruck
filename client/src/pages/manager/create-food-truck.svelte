@@ -73,7 +73,7 @@
                 }
                 foodTruckName = wipFood = errorMsg = '';
                 selectedFoods = [];
-                    
+                $goto('../manage-food-truck')
             } catch (error) {
                 console.log(error);
                 errorMsg = error.response.data.error;

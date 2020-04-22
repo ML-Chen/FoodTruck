@@ -52,6 +52,7 @@
             });
             errorMsg = null;
             errorMsg2 = null;
+            $goto('../current-info');
         } catch (error) {
             console.log(error.response.data)
             errorMsg = error.response.data.error;
