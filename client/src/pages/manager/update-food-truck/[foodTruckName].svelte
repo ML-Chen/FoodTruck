@@ -17,6 +17,7 @@
     // Data fetched from the database
     let stations = []; // string[]
     let foods = []; // [[foodName: string, foodPrice: number]]
+    let newMenuItems = [];
     let menuItems = []; // [[foodName: string, foodPrice: number]]
     let staffs = []; // [{ staffUsername: string, staffName: string }]
     let availableStaffs = []; // string[], list of usernames, a temporary variable used only to add values to staffs
@@ -102,10 +103,9 @@
         } else {
             try {
                 const json = (await axios.post('http://localhost:4000/mn_update_foodTruck_station', { foodTruckName, stationName: selectedStation, managerUsername, token: $token })).data;
-                // TODO: This just sets the prices of existing items. Enable adding and removing menu items.
                 for (let i = 0; i < menuItems.length; i++) {
                     console.log(menuItems[i]);
-                    await axios.post('http://localhost:4000/mn_update_foodTruck_MenuItem', { foodTruckName, foodName: menuItems[i][0], price: menuItems[i][1], managerUsername, token: $token })
+                    await axios.post('http://localhost:4000/mn_update_foodTruck_MenuItem', { foodTruckName, foodName: newMenuItems[i][0], price: newMenuItems[i][1], managerUsername, token: $token })
                 }
                 for (const selectedStaff of selectedStaffs) {
                     await axios.post('http://localhost:4000/mn_update_foodTruck_staff', { foodTruckName, staffName: selectedStaff, managerUsername, token: $token })
@@ -150,10 +150,7 @@
    
     <label for="menuItems">Menu Item</label>
         {#each menuItems as menuItem, index (menuItem)}
-            <button type="button" on:click={() => { 
-                menuItems = menuItems.filter((_, i) => i !== index)
-                }} 
-                aria-label="Remove Food {menuItem[0]}">−</button>Food: {menuItem[0]} Price: {menuItem[1]}<br />
+            Food: {menuItem[0]} Price: {menuItem[1]}<br /> <br/>
         {/each}
     <button type="button" on:click={() => { 
         if (wipFood && wipPrice) {
@@ -161,6 +158,7 @@
                 errorMsg = "Duplicate Food name"
             } else {
                 menuItems = menuItems.concat([[wipFood, wipPrice]]); 
+                newMenuItems = newMenuItems.concat([[wipFood, wipPrice]]); 
                 wipFood = '';
                 wipPrice = 0;
                 }
