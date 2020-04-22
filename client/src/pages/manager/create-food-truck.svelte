@@ -146,7 +146,6 @@
     {/if}
 </form>
 
-<h3>{selectedStaffs}</h3>
 <a href={$url('../manage-food-truck')}>Back</a>
 
 <style>
