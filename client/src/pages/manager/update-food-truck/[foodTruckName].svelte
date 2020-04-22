@@ -29,7 +29,6 @@
     let wipPrice; // number
     let errorMsg; // string[]
 
-    $: console.log(selectedStaffs);
 
     onMount(async () => {
         await fetchAvailableStaffs();
@@ -39,9 +38,7 @@
         availableStaffs = availableStaffs.map(staff => staff.staffUsername)
         await fetchMenuItems();
         await callHelpers();
-        // console.log(availableStaffs);
-        // console.log(selectedStaffs);
-        // console.log(menuItems);
+        
     });
 
     async function fetchAvailableStaffs() {
@@ -103,19 +100,21 @@
         } else {
             try {
                 const json = (await axios.post('http://localhost:4000/mn_update_foodTruck_station', { foodTruckName, stationName: selectedStation, managerUsername, token: $token })).data;
-                for (let i = 0; i < menuItems.length; i++) {
-                    console.log(menuItems[i]);
-                    await axios.post('http://localhost:4000/mn_update_foodTruck_MenuItem', { foodTruckName, foodName: newMenuItems[i][0], price: newMenuItems[i][1], managerUsername, token: $token })
-                }
-                for (const selectedStaff of selectedStaffs) {
+                for (let selectedStaff of selectedStaffs) {
                     await axios.post('http://localhost:4000/mn_update_foodTruck_staff', { foodTruckName, staffName: selectedStaff, managerUsername, token: $token })
                 }
+                
                 const unselectedStaffs = staffs.map(staff => staff.staffUsername).filter(staffUsername => !selectedStaffs.includes(staffUsername));
+                // console.log(unselectedStaffs);
                 for (const unselectedStaff of unselectedStaffs) {
                     console.log(unselectedStaff.staffUsername);
                     await axios.post('http://localhost:4000/mn_update_foodTruck_remove_staff', { foodTruckName, staffName: unselectedStaff, token: $token })
                 }
-                $goto(`../${foodTruckName}`);
+                for (let i = 0; i < menuItems.length; i++) {
+                    await axios.post('http://localhost:4000/mn_update_foodTruck_MenuItem', { foodTruckName, foodName: newMenuItems[i][0], price: newMenuItems[i][1], managerUsername, token: $token })
+                }
+               
+                $goto(`../manage-food-truck`);
                     
             } catch (error) {
                 console.log(error);
@@ -177,5 +176,7 @@
         <p>{errorMsg}</p>
     {/if}
 </form>
+
+<h1>{selectedStaffs}</h1>
 
 <a href={$url('../../manage-food-truck')}>Back</a>
