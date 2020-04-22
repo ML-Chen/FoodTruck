@@ -17,7 +17,7 @@
     // Data fetched from the database
     let stations = []; // string[]
     let foods = []; // [[foodName: string, foodPrice: number]]
-    let menuItems = [];
+    let menuItems = []; // [[foodName: string, foodPrice: number]]
     let staffs = []; // [{ staffUsername: string, staffName: string }]
     let availableStaffs = []; // string[], list of usernames, a temporary variable used only to add values to staffs
     let selectedStaffs = []; // string[], list of usernames, fetched from database, later currently selected staffs
@@ -157,7 +157,7 @@
         {/each}
     <button type="button" on:click={() => { 
         if (wipFood && wipPrice) {
-            if (wipFood in menuItems) {
+            if (menuItems.map(item => item[0]).includes(wipFood)) {
                 errorMsg = "Duplicate Food name"
             } else {
                 menuItems = menuItems.concat([[wipFood, wipPrice]]); 

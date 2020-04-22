@@ -120,7 +120,7 @@
         if (!wipPrice || wipPrice < 0) {
             errorMsg = "Food must have a non-negative price";
         } else if (wipFood && wipPrice) {
-            if (wipFood in selectedFoods) {
+            if (selectedFoods.includes(wipFood)) {
                 errorMsg = "Duplicate Food name"
             } else {
                 selectedFoods = selectedFoods.concat(wipFood); 
