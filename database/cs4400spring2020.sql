@@ -460,13 +460,13 @@ DROP TABLE IF EXISTS mn_filter_foodTruck_result;
     CREATE TABLE mn_filter_foodTruck_result(foodTruckName varchar(100),
 stationName varchar(100),
 remainingCapacity int, staffCount int, menuItemCount int)
-SELECT FoodTruck.foodTruckName, FoodTruck.stationName, remainingCapacity, staffs,  foods
+SELECT FoodTruck.foodTruckName, FoodTruck.stationName, remainingCapacity, staffs as staffCount, foods as menuItemCount
    FROM FoodTruck
    INNER JOIN (select (capacity - count(foodTruckName)) as remainingCapacity, Station.stationName from Station inner join FoodTruck on Station.stationName = FoodTruck.stationName group by Station.stationName) as capacityInfo
    ON FoodTruck.stationName = capacityInfo.stationName
-   INNER JOIN (select foodTruckName, count(username) as staffs from STAFF group by foodTruckName) as staffInfo
+   LEFT OUTER JOIN (select foodTruckName, count(username) as staffs from STAFF group by foodTruckName) as staffInfo
    ON FoodTruck.foodTruckName = staffInfo.foodTruckName
-   INNER JOIN (select count(foodName) as foods, foodTruckName from MenuItem group by foodTruckName) as foodInfo
+   LEFT OUTER JOIN (select count(foodName) as foods, foodTruckName from MenuItem group by foodTruckName) as foodInfo
    ON FoodTruck.foodTruckName = foodInfo.foodTruckName
    WHERE
    (i_managerUsername = managerUsername OR i_managerUsername is NULL OR i_managerUsername = '') and 
@@ -509,6 +509,19 @@ UPDATE STAFF
    WHERE username = i_staffName;
 END //
 DELIMITER ;
+
+-- NEW PROCEDURE
+DROP PROCEDURE IF EXISTS mn_update_foodTruck_remove_staff;
+DELIMITER //
+CREATE PROCEDURE mn_update_foodTruck_remove_staff(IN i_foodTruckName VARCHAR(50), IN
+i_staffName VARCHAR(50))
+BEGIN
+UPDATE STAFF
+   SET foodTruckName = NULL
+   WHERE username = i_staffName
+   AND foodTruckName = i_foodTruckName;
+END //
+DELIMITER ;
 -- Query #19c: mn_create_foodTruck_add_MenuItem [Screen #12 Manager Create Food Truck] COMPLETE
 DROP PROCEDURE IF EXISTS mn_create_foodTruck_add_MenuItem;
 DELIMITER //
@@ -526,8 +539,8 @@ DELIMITER //
 CREATE PROCEDURE mn_view_foodTruck_available_staff(IN i_managerUsername VARCHAR(50), IN i_foodTruckName VARCHAR(50))
 BEGIN
 DROP TABLE IF EXISTS mn_view_foodTruck_available_staff_result;
-CREATE TABLE mn_view_foodTruck_available_staff_result(availableStaff varchar(100))
-SELECT CONCAT(firstName,' ', lastName) as staffName
+CREATE TABLE mn_view_foodTruck_available_staff_result(staffUsername varchar(55), staffName varchar(100))
+SELECT Staff.username as staffUsername, CONCAT(firstName,' ', lastName) as staffName
 FROM Staff
 INNER JOIN USER
 ON STAFF.username = USER.username
@@ -602,8 +615,9 @@ DELIMITER //
 CREATE PROCEDURE mn_update_foodTruck_MenuItem(IN i_foodTruckName VARCHAR(50), IN
 i_price DECIMAL(6,2), IN i_foodName VARCHAR(50))
 BEGIN
-   INSERT INTO MenuItem
-   VALUES (i_price, i_foodTruckName, i_foodName);
+   UPDATE MenuItem
+   SET price = i_price
+   WHERE foodTruckName = i_foodTruckName AND foodName = i_foodName;
 END //
 DELIMITER ;
 -- Query #23: mn_get_station [Screen #14 Manager Food Truck Summary]
