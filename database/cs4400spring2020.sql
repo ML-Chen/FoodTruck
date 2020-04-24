@@ -746,11 +746,11 @@ varchar(100),
 GROUP_CONCAT(DISTINCT(FoodTruck.foodTruckName) SEPARATOR ',') AS foodTruckNames,
 GROUP_CONCAT(DISTINCT(MenuItem.foodName) SEPARATOR ',') AS foodNames
        FROM Station
-       INNER JOIN
+       LEFT OUTER JOIN
        FoodTruck ON Station.stationName = FoodTruck.stationName
-       INNER JOIN 
+       LEFT OUTER JOIN
        MenuItem  ON FoodTruck.foodTruckName = MenuItem.foodTruckName
-       INNER JOIN
+       LEFT OUTER JOIN
        BuildingTag ON Station.buildingName  = BuildingTag.buildingName
        WHERE
        (i_buildingName is NULL OR i_buildingName = Station.buildingName) AND

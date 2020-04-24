@@ -112,7 +112,7 @@ def db_api(procedure: str, http_methods: List[str], inputs: List[Tuple[str, Dict
         # helper endpoint handling:
         if helper:
             if a['queryType'] == 'Station':
-                cursor.execute('select distinct(capacityInfo.stationName) as stationName FROM FoodTruck INNER JOIN (select (capacity - count(foodTruckName)) as remainingCapacity, Station.stationName from Station inner join FoodTruck on Station.stationName = FoodTruck.stationName group by Station.stationName) as capacityInfo ON FoodTruck.stationName = capacityInfo.stationName where remainingCapacity>0;')
+                cursor.execute('select distinct(capacityInfo.stationName) as stationName FROM FoodTruck LEFT JOIN (select (capacity - count(foodTruckName)) as remainingCapacity, Station.stationName from Station inner join FoodTruck on Station.stationName = FoodTruck.stationName group by Station.stationName) as capacityInfo ON FoodTruck.stationName = capacityInfo.stationName where remainingCapacity>0;')
             elif a['queryType'] == 'Staff':
                 cursor.execute('select Staff.username as staffUsername, CONCAT(firstName," ", lastName) as staffName from Staff left join `user` on Staff.username = `user`.username where Staff.foodTruckName is NULL')
             elif a['queryType'] == 'Food':
