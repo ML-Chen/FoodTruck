@@ -31,7 +31,7 @@
   "dependencies": {
     "@sveltech/routify": "^1.5.3",
     "axios": "^0.21.1",
-    "svelte": "^3.20.1",
+    "svelte": "^3.49.0",
     "svelte-tablesort": "^1.1.0",
     "wretch": "^1.7.2"
   }
